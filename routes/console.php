@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use App\Models\Page;
+use App\Services\LocationSyncService;
 
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
@@ -72,3 +73,18 @@ Artisan::command('pages:sync-routes', function () {
 
     $this->info("Route sync completed. Created: {$created}, Updated: {$updated}");
 })->purpose('Generate pages from public route list (excluding admin and dynamic routes).');
+
+Artisan::command('locations:sync {--no-cache : Fetch latest data from API without cached responses}', function (LocationSyncService $locationSyncService) {
+    $this->info('Syncing countries and states from CountryStateCity API...');
+
+    try {
+        $result = $locationSyncService->sync(!((bool) $this->option('no-cache')));
+
+        $this->info("Done. Countries: {$result['countries']}, States: {$result['states']}");
+    } catch (\Throwable $e) {
+        $this->error('Sync failed: ' . $e->getMessage());
+        return 1;
+    }
+
+    return 0;
+})->purpose('Sync countries and states from CountryStateCity API into local database.');

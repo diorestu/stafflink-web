@@ -78,7 +78,7 @@
                                     </div>
                                 </td>
                                 <td class="px-6 py-4 text-sm text-gray-500">
-                                    {{ $job->location ?? '—' }}
+                                    {{ $job->location_display ?? '—' }}
                                 </td>
                                 <td class="px-6 py-4">
                                     <span

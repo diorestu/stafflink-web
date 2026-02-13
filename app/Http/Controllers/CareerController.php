@@ -13,7 +13,8 @@ class CareerController extends Controller
 
         $search = trim((string) request('search', ''));
         $type = trim((string) request('type', ''));
-        $location = trim((string) request('location', ''));
+        $country = trim((string) request('country', ''));
+        $state = trim((string) request('state', ''));
         $salaryRange = trim((string) request('salary_range', ''));
 
         if ($search !== '') {
@@ -24,21 +25,34 @@ class CareerController extends Controller
             $query->where('type', $type);
         }
 
-        if ($location !== '') {
-            $query->where('location', $location);
+        if ($country !== '') {
+            $query->where('country', $country);
+        }
+
+        if ($state !== '') {
+            $query->where('state', $state);
         }
 
         if ($salaryRange !== '') {
             $query->where('salary_range', $salaryRange);
         }
 
-        $locationOptions = Job::query()
+        $countryOptions = Job::query()
             ->where('status', 'published')
-            ->whereNotNull('location')
-            ->where('location', '!=', '')
+            ->whereNotNull('country')
+            ->where('country', '!=', '')
             ->distinct()
-            ->orderBy('location')
-            ->pluck('location');
+            ->orderBy('country')
+            ->pluck('country');
+
+        $stateOptions = Job::query()
+            ->where('status', 'published')
+            ->whereNotNull('state')
+            ->where('state', '!=', '')
+            ->when($country !== '', fn ($q) => $q->where('country', $country))
+            ->distinct()
+            ->orderBy('state')
+            ->pluck('state');
 
         $salaryRangeOptions = Job::query()
             ->where('status', 'published')
@@ -62,6 +76,6 @@ class CareerController extends Controller
             ]);
         }
 
-        return view('jobs', compact('jobs', 'locationOptions', 'salaryRangeOptions'));
+        return view('jobs', compact('jobs', 'countryOptions', 'stateOptions', 'salaryRangeOptions'));
     }
 }

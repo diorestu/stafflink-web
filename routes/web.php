@@ -5,11 +5,13 @@ use App\Http\Controllers\AdminAppointmentController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AdminHeaderFooterController;
 use App\Http\Controllers\AdminPageController;
+use App\Http\Controllers\AiAgentController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\CareerController;
 use App\Http\Controllers\JobApplicationController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\JobController;
+use App\Http\Controllers\LocationController;
 use App\Http\Controllers\PageController;
 use Illuminate\Support\Facades\Route;
 
@@ -45,7 +47,15 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
 
     // Jobs
     Route::delete('/jobs/bulk-delete', [JobController::class, 'bulkDestroy'])->name('jobs.bulk-destroy');
+    Route::post('/jobs/ai-description', [JobController::class, 'generateDescription'])->name('jobs.ai-description');
     Route::resource('jobs', JobController::class);
+    Route::prefix('locations')->name('locations.')->group(function () {
+        Route::get('/db/countries', [LocationController::class, 'countriesFromDatabase'])->name('db.countries');
+        Route::get('/db/states', [LocationController::class, 'statesFromDatabase'])->name('db.states');
+        Route::get('/countries', [LocationController::class, 'countries'])->name('countries');
+        Route::get('/countries/{countryIso2}/states', [LocationController::class, 'states'])->name('states');
+        Route::post('/sync', [LocationController::class, 'sync'])->name('sync');
+    });
 
     // Pages
     Route::resource('pages', AdminPageController::class)->except(['show']);
@@ -59,4 +69,5 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     // Appointments
     Route::get('/appointments', [AdminAppointmentController::class, 'index'])->name('appointments.index');
     Route::patch('/appointments/{appointment}/approve', [AdminAppointmentController::class, 'approve'])->name('appointments.approve');
+    Route::post('/ai-agent/chat', [AiAgentController::class, 'chat'])->name('ai-agent.chat');
 });

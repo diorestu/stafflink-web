@@ -12,6 +12,8 @@ class Job extends Model
         'title',
         'description',
         'location',
+        'country',
+        'state',
         'type',
         'salary_range',
         'status',
@@ -21,4 +23,18 @@ class Job extends Model
     protected $casts = [
         'published_at' => 'datetime',
     ];
+
+    public function getLocationDisplayAttribute(): ?string
+    {
+        $parts = array_values(array_filter([
+            $this->state,
+            $this->country,
+        ]));
+
+        if (count($parts) > 0) {
+            return implode(', ', $parts);
+        }
+
+        return $this->location;
+    }
 }

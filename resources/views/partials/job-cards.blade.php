@@ -10,7 +10,7 @@
 
         <div class="mt-3 space-y-1 text-xs text-[#6b6b66]">
             <p><span class="font-semibold text-[#2e2e2e]">Location:</span>
-                {{ $job->location ?: 'Not specified' }}</p>
+                {{ $job->location_display ?: 'Not specified' }}</p>
             @if ($job->salary_range)
                 <p><span class="font-semibold text-[#2e2e2e]">Salary:</span>
                     {{ $job->salary_range }}</p>
