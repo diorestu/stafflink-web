@@ -3,7 +3,8 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>{{ config('app.name', 'StaffLink') }} - Contact Us</title>
+        <title>{{ \App\Models\SiteSetting::siteName() }} - Contact Us</title>
+        <link rel="icon" href="{{ asset('favicon.ico') }}">
 
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -19,20 +20,20 @@
                 <section class="mx-auto max-w-6xl space-y-12">
                     <div class="overflow-hidden rounded-[32px] bg-[#1f5f46] text-white shadow-[0_20px_60px_rgba(31,95,70,0.2)]"
                         data-aos="fade-up">
-                        <div class="grid gap-8 p-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
-                            <div>
+                        <div class="relative overflow-hidden p-8 lg:p-7">
+                            <div class="pr-0 lg:pr-56">
                                 <h2 class="text-4xl font-semibold">Get in Touch</h2>
                                 <p class="mt-3 text-sm text-white/85">
                                     Start solving your staffing issue and start saving money today.
                                 </p>
                                 <button
-                                    class="mt-6 rounded-full border border-[#b28b2e] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#b28b2e]">
+                                    class="mt-5 rounded-full border border-[#b28b2e] px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-[#b28b2e]">
                                     Get a Free Consultation Today
                                 </button>
                             </div>
-                            <div class="flex items-end justify-center lg:justify-end lg:pr-0">
+                            <div class="pointer-events-none absolute -bottom-3 right-0 lg:-bottom-4">
                                 <img src="{{ asset('images/single_img.png') }}" alt="Get in touch"
-                                    class="h-72 w-auto translate-x-6 object-contain lg:h-80" draggable="false" />
+                                    class="h-56 w-auto object-contain lg:h-60" draggable="false" />
                             </div>
                         </div>
                     </div>

@@ -3,65 +3,65 @@
 @section('page-title', 'Dashboard')
 
 @section('content')
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
-        <div class="bg-white rounded-lg shadow p-6">
-            <div class="flex items-center">
-                <div class="p-3 rounded-full bg-blue-100 text-blue-600">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-8">
+        <div class="rounded-xl border border-[#d7e8df] bg-[#f6faf8] p-5">
+            <div class="flex items-start justify-between gap-3">
+                <div>
+                    <p class="text-[11px] uppercase tracking-wide text-[#5b6d63]">Page Sections</p>
+                    <p class="mt-2 text-3xl font-semibold leading-none text-[#1f5f46]">{{ \App\Models\PageSection::count() }}</p>
+                </div>
+                <div class="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-[#e6f1ec] text-[#1f5f46]">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
                 </div>
-                <div class="ml-4">
-                    <p class="text-gray-500 text-sm">Page Sections</p>
-                    <p class="text-2xl font-semibold">{{ \App\Models\PageSection::count() }}</p>
-                </div>
             </div>
         </div>
 
-        <div class="bg-white rounded-lg shadow p-6">
-            <div class="flex items-center">
-                <div class="p-3 rounded-full bg-green-100 text-green-600">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="rounded-xl border border-[#d7e8df] bg-[#f6faf8] p-5">
+            <div class="flex items-start justify-between gap-3">
+                <div>
+                    <p class="text-[11px] uppercase tracking-wide text-[#5b6d63]">Total Jobs</p>
+                    <p class="mt-2 text-3xl font-semibold leading-none text-[#1f5f46]">{{ \App\Models\Job::count() }}</p>
+                </div>
+                <div class="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-[#e6f1ec] text-[#1f5f46]">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                     </svg>
                 </div>
-                <div class="ml-4">
-                    <p class="text-gray-500 text-sm">Total Jobs</p>
-                    <p class="text-2xl font-semibold">{{ \App\Models\Job::count() }}</p>
-                </div>
             </div>
         </div>
 
-        <div class="bg-white rounded-lg shadow p-6">
-            <div class="flex items-center">
-                <div class="p-3 rounded-full bg-yellow-100 text-yellow-600">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="rounded-xl border border-[#d7e8df] bg-[#f6faf8] p-5">
+            <div class="flex items-start justify-between gap-3">
+                <div>
+                    <p class="text-[11px] uppercase tracking-wide text-[#5b6d63]">Published Jobs</p>
+                    <p class="mt-2 text-3xl font-semibold leading-none text-[#1f5f46]">{{ \App\Models\Job::where('status', 'published')->count() }}</p>
+                </div>
+                <div class="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-[#e6f1ec] text-[#1f5f46]">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                 </div>
-                <div class="ml-4">
-                    <p class="text-gray-500 text-sm">Published Jobs</p>
-                    <p class="text-2xl font-semibold">{{ \App\Models\Job::where('status', 'published')->count() }}</p>
-                </div>
             </div>
         </div>
 
-        <div class="bg-white rounded-lg shadow p-6">
-            <div class="flex items-center">
-                <div class="p-3 rounded-full bg-purple-100 text-purple-600">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="rounded-xl border border-[#d7e8df] bg-[#f6faf8] p-5">
+            <div class="flex items-start justify-between gap-3">
+                <div>
+                    <p class="text-[11px] uppercase tracking-wide text-[#5b6d63]">Upcoming Appointments</p>
+                    <p class="mt-2 text-3xl font-semibold leading-none text-[#1f5f46]">
+                        {{ \App\Models\Appointment::where('starts_at', '>=', now())->whereIn('status', ['pending', 'confirmed'])->count() }}
+                    </p>
+                </div>
+                <div class="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-[#e6f1ec] text-[#1f5f46]">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M8 7V3m8 4V3m-9 8h10m-11 9h12a2 2 0 002-2V7a2 2 0 00-2-2H6a2 2 0 00-2 2v11a2 2 0 002 2z" />
                     </svg>
-                </div>
-                <div class="ml-4">
-                    <p class="text-gray-500 text-sm">Upcoming Appointments</p>
-                    <p class="text-2xl font-semibold">
-                        {{ \App\Models\Appointment::where('starts_at', '>=', now())->whereIn('status', ['pending', 'confirmed'])->count() }}
-                    </p>
                 </div>
             </div>
         </div>
@@ -71,27 +71,29 @@
         <div class="p-6 border-b">
             <h3 class="text-lg font-semibold">Quick Actions</h3>
         </div>
-        <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="p-6 flex flex-wrap items-center gap-3">
             <a href="{{ route('admin.sections.index') }}"
-                class="flex items-center p-4 border rounded-lg hover:bg-gray-50 transition">
-                <svg class="w-6 h-6 text-gray-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                class="inline-flex items-center gap-2 rounded-full border border-[#c7dfd4] bg-[#f6faf8] px-4 py-2 text-sm font-semibold text-[#1f5f46] transition hover:bg-[#eaf5ef]">
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                 </svg>
-                <div>
-                    <p class="font-semibold">Edit Page Content</p>
-                    <p class="text-sm text-gray-500">Manage homepage sections</p>
-                </div>
+                <span>Edit Page Content</span>
+            </a>
+            <a href="{{ route('admin.pages.index') }}"
+                class="inline-flex items-center gap-2 rounded-full border border-[#c7dfd4] bg-[#f6faf8] px-4 py-2 text-sm font-semibold text-[#1f5f46] transition hover:bg-[#eaf5ef]">
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-6m-8-8h8m0 0v8m0-8L10 14" />
+                </svg>
+                <span>Manage Pages</span>
             </a>
             <a href="{{ route('admin.jobs.create') }}"
-                class="flex items-center p-4 border rounded-lg hover:bg-gray-50 transition">
-                <svg class="w-6 h-6 text-gray-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                class="inline-flex items-center gap-2 rounded-full border border-[#c7dfd4] bg-[#f6faf8] px-4 py-2 text-sm font-semibold text-[#1f5f46] transition hover:bg-[#eaf5ef]">
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                 </svg>
-                <div>
-                    <p class="font-semibold">Add New Job</p>
-                    <p class="text-sm text-gray-500">Post a new job opening</p>
-                </div>
+                <span>Add New Job</span>
             </a>
         </div>
     </div>
@@ -104,35 +106,67 @@
             </a>
         </div>
         <div class="p-6">
-            <div class="space-y-3">
-                @forelse($weeklyAppointments as $appointment)
-                    <article class="rounded-lg border p-4">
-                        <div class="flex flex-wrap items-center justify-between gap-2">
-                            <h4 class="font-semibold text-gray-800">{{ $appointment->name }}</h4>
-                            <span
-                                class="inline-flex rounded-full px-2.5 py-1 text-xs font-semibold
-                                {{ $appointment->status === 'confirmed' ? 'bg-green-100 text-green-700' : ($appointment->status === 'cancelled' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700') }}">
-                                {{ ucfirst($appointment->status) }}
-                            </span>
+            @php
+                $startOfWeek = \Carbon\Carbon::now()->startOfWeek(\Carbon\Carbon::MONDAY);
+                $appointmentsByDay = $weeklyAppointments->groupBy(fn ($item) => $item->starts_at->toDateString());
+            @endphp
+
+            <div class="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7">
+                @for ($i = 0; $i < 7; $i++)
+                    @php
+                        $day = $startOfWeek->copy()->addDays($i);
+                        $dayItems = $appointmentsByDay->get($day->toDateString(), collect());
+                    @endphp
+                    <section class="rounded-md border border-[#e4efe9] bg-[#fbfdfc] p-3">
+                        <div class="border-b border-[#edf4f0] pb-2">
+                            <p class="text-xs font-semibold uppercase tracking-wide text-[#1f5f46]">{{ $day->format('l') }}</p>
+                            <p class="text-xs text-gray-500">{{ $day->format('d M') }}</p>
                         </div>
-                        <p class="mt-2 text-sm text-gray-600">
-                            {{ $appointment->starts_at->format('D, d M Y H:i') }} - {{ $appointment->ends_at->format('H:i') }}
-                        </p>
-                        <p class="mt-1 text-sm text-gray-600">{{ $appointment->email }}</p>
-                        @if($appointment->status === 'pending')
-                            <form action="{{ route('admin.appointments.approve', $appointment) }}" method="POST" class="mt-3">
-                                @csrf
-                                @method('PATCH')
-                                <button type="submit"
-                                    class="rounded-md bg-[#1f5f46] px-3 py-2 text-xs font-semibold text-white hover:bg-[#287854]">
-                                    Approve
-                                </button>
-                            </form>
-                        @endif
-                    </article>
-                @empty
-                    <p class="text-sm text-gray-500">No appointments for this week.</p>
-                @endforelse
+
+                        <div class="mt-2 space-y-2">
+                            @forelse ($dayItems as $appointment)
+                                <article class="rounded-md bg-[#f2f8f5] px-2.5 py-2">
+                                    <div class="flex items-start justify-between gap-2">
+                                        <p class="text-xs font-semibold text-gray-800">{{ $appointment->name }}</p>
+                                        @if($appointment->status === 'confirmed')
+                                            <span class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#dff3e9] text-[#1f5f46]" title="Confirmed">
+                                                <svg class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                                                    <path fill-rule="evenodd" d="M16.704 5.29a1 1 0 010 1.42l-7.5 7.5a1 1 0 01-1.415 0l-3-3a1 1 0 111.415-1.42l2.292 2.294 6.792-6.794a1 1 0 011.416 0z" clip-rule="evenodd" />
+                                                </svg>
+                                            </span>
+                                        @elseif($appointment->status === 'pending')
+                                            <span class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#fff7e0] text-[#8a6d1f]" title="Pending">
+                                                <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <circle cx="12" cy="12" r="9"></circle>
+                                                    <path d="M12 7v6l4 2"></path>
+                                                </svg>
+                                            </span>
+                                        @else
+                                            <span class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#fcebea] text-[#b42318]" title="{{ ucfirst($appointment->status) }}">
+                                                <svg class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-10.293a1 1 0 00-1.414-1.414L10 8.586 7.707 6.293a1 1 0 00-1.414 1.414L8.586 10l-2.293 2.293a1 1 0 101.414 1.414L10 11.414l2.293 2.293a1 1 0 001.414-1.414L11.414 10l2.293-2.293z" clip-rule="evenodd" />
+                                                </svg>
+                                            </span>
+                                        @endif
+                                    </div>
+                                    <p class="mt-1 text-[11px] text-gray-600">{{ $appointment->starts_at->format('H:i') }} - {{ $appointment->ends_at->format('H:i') }}</p>
+                                    @if($appointment->status === 'pending')
+                                        <form action="{{ route('admin.appointments.approve', $appointment) }}" method="POST" class="mt-1.5">
+                                            @csrf
+                                            @method('PATCH')
+                                            <button type="submit"
+                                                class="rounded border border-[#1f5f46]/20 bg-white px-2 py-0.5 text-[10px] font-semibold text-[#1f5f46] hover:bg-[#ecf6f1]">
+                                                Approve
+                                            </button>
+                                        </form>
+                                    @endif
+                                </article>
+                            @empty
+                                <p class="text-[11px] text-gray-400">No appointments</p>
+                            @endforelse
+                        </div>
+                    </section>
+                @endfor
             </div>
         </div>
     </div>

@@ -4,7 +4,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ config('app.name', 'StaffLink') }} - Jobs</title>
+    <title>{{ \App\Models\SiteSetting::siteName() }} - Jobs</title>
+    <link rel="icon" href="{{ asset('favicon.ico') }}">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,9 +19,9 @@
 <body class="text-[#2e2e2e]" id="page-top">
     <div class="min-h-screen bg-[radial-gradient(circle_at_top,_#ffffff_0%,_#f4f5f3_52%,_#e6f1ec_100%)]">
         <x-site-header />
-        <main class="px-10 pb-28 pt-14 lg:px-12">
+        <main class="px-10 pb-28 pt-3 lg:px-12">
             <section class="mx-auto max-w-7xl space-y-14">
-                <div class="rounded-[30px] bg-[#1f5f46] p-12 text-white shadow-[0_20px_50px_rgba(31,95,70,0.2)] lg:p-10 mb-5"
+                <div class="rounded-[30px] bg-[#1f5f46] p-12 text-white shadow-[0_20px_50px_rgba(31,95,70,0.2)] lg:p-10 mb-5 mt-3"
                     data-aos="fade-up">
                     <p class="text-xs uppercase tracking-[0.3em] text-[#e9d29d]">Careers</p>
                     <h1 class="mt-4 text-4xl font-semibold">Available Jobs</h1>
@@ -42,31 +43,44 @@
                             <label for="job-type-filter" class="text-sm font-semibold text-[#2e2e2e]">Category</label>
                             <select id="job-type-filter"
                                 class="mt-2 w-full rounded-xl border border-[#d1d5db] px-4 py-3 text-sm focus:border-[#287854] focus:outline-none">
-                                <option value="" {{ request('type') === null || request('type') === '' ? 'selected' : '' }}>All categories</option>
-                                <option value="full-time" {{ request('type') === 'full-time' ? 'selected' : '' }}>Full Time</option>
-                                <option value="part-time" {{ request('type') === 'part-time' ? 'selected' : '' }}>Part Time</option>
-                                <option value="contract" {{ request('type') === 'contract' ? 'selected' : '' }}>Contract</option>
+                                <option value=""
+                                    {{ request('type') === null || request('type') === '' ? 'selected' : '' }}>All
+                                    categories</option>
+                                <option value="full-time" {{ request('type') === 'full-time' ? 'selected' : '' }}>Full
+                                    Time</option>
+                                <option value="part-time" {{ request('type') === 'part-time' ? 'selected' : '' }}>Part
+                                    Time</option>
+                                <option value="contract" {{ request('type') === 'contract' ? 'selected' : '' }}>Contract
+                                </option>
                             </select>
                         </div>
                         <div>
-                            <label for="job-location-filter" class="text-sm font-semibold text-[#2e2e2e]">Location</label>
+                            <label for="job-location-filter"
+                                class="text-sm font-semibold text-[#2e2e2e]">Location</label>
                             <select id="job-location-filter"
                                 class="mt-2 w-full rounded-xl border border-[#d1d5db] px-4 py-3 text-sm focus:border-[#287854] focus:outline-none">
-                                <option value="" {{ request('location') === null || request('location') === '' ? 'selected' : '' }}>All locations</option>
+                                <option value=""
+                                    {{ request('location') === null || request('location') === '' ? 'selected' : '' }}>
+                                    All locations</option>
                                 @foreach ($locationOptions as $option)
-                                    <option value="{{ $option }}" {{ request('location') === $option ? 'selected' : '' }}>
+                                    <option value="{{ $option }}"
+                                        {{ request('location') === $option ? 'selected' : '' }}>
                                         {{ $option }}
                                     </option>
                                 @endforeach
                             </select>
                         </div>
                         <div>
-                            <label for="job-salary-filter" class="text-sm font-semibold text-[#2e2e2e]">Salary range</label>
+                            <label for="job-salary-filter" class="text-sm font-semibold text-[#2e2e2e]">Salary
+                                range</label>
                             <select id="job-salary-filter"
                                 class="mt-2 w-full rounded-xl border border-[#d1d5db] px-4 py-3 text-sm focus:border-[#287854] focus:outline-none">
-                                <option value="" {{ request('salary_range') === null || request('salary_range') === '' ? 'selected' : '' }}>All salary ranges</option>
+                                <option value=""
+                                    {{ request('salary_range') === null || request('salary_range') === '' ? 'selected' : '' }}>
+                                    All salary ranges</option>
                                 @foreach ($salaryRangeOptions as $option)
-                                    <option value="{{ $option }}" {{ request('salary_range') === $option ? 'selected' : '' }}>
+                                    <option value="{{ $option }}"
+                                        {{ request('salary_range') === $option ? 'selected' : '' }}>
                                         {{ $option }}
                                     </option>
                                 @endforeach

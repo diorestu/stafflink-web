@@ -4,12 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Job;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class JobController extends Controller
 {
     public function index()
     {
-        $jobs = Job::latest()->paginate(15);
+        $jobs = Job::latest()->paginate(10);
         return view('admin.jobs.index', compact('jobs'));
     }
 
@@ -71,5 +72,21 @@ class JobController extends Controller
 
         return redirect()->route('admin.jobs.index')
             ->with('success', 'Job deleted successfully.');
+    }
+
+    public function bulkDestroy(Request $request)
+    {
+        $validated = $request->validate([
+            'job_ids' => ['required', 'array', 'min:1'],
+            'job_ids.*' => ['integer', Rule::exists('career_jobs', 'id')],
+        ]);
+
+        $deleted = Job::query()
+            ->whereIn('id', $validated['job_ids'])
+            ->delete();
+
+        return redirect()
+            ->route('admin.jobs.index')
+            ->with('success', "{$deleted} job(s) deleted successfully.");
     }
 }

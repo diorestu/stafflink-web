@@ -4,30 +4,30 @@
 
 @section('content')
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div class="bg-white rounded-lg shadow p-6">
-            <p class="text-gray-500 text-sm">Total Appointments</p>
-            <p class="mt-2 text-2xl font-semibold">{{ \App\Models\Appointment::count() }}</p>
+        <div class="rounded-lg border border-[#d7e8df] bg-[#f6faf8] p-6">
+            <p class="text-[#4b5563] text-sm">Total Appointments</p>
+            <p class="mt-2 text-2xl font-semibold text-[#1f5f46]">{{ \App\Models\Appointment::count() }}</p>
         </div>
-        <div class="bg-white rounded-lg shadow p-6">
-            <p class="text-gray-500 text-sm">Upcoming</p>
-            <p class="mt-2 text-2xl font-semibold">{{ \App\Models\Appointment::where('starts_at', '>=', now())->whereIn('status', ['pending', 'confirmed'])->count() }}</p>
+        <div class="rounded-lg border border-[#d7e8df] bg-[#f6faf8] p-6">
+            <p class="text-[#4b5563] text-sm">Upcoming</p>
+            <p class="mt-2 text-2xl font-semibold text-[#1f5f46]">{{ \App\Models\Appointment::where('starts_at', '>=', now())->whereIn('status', ['pending', 'confirmed'])->count() }}</p>
         </div>
-        <div class="bg-white rounded-lg shadow p-6">
-            <p class="text-gray-500 text-sm">Pending</p>
-            <p class="mt-2 text-2xl font-semibold">{{ \App\Models\Appointment::where('status', 'pending')->count() }}</p>
+        <div class="rounded-lg border border-[#d7e8df] bg-[#f6faf8] p-6">
+            <p class="text-[#4b5563] text-sm">Pending</p>
+            <p class="mt-2 text-2xl font-semibold text-[#1f5f46]">{{ \App\Models\Appointment::where('status', 'pending')->count() }}</p>
         </div>
     </div>
 
     <div class="bg-white rounded-lg shadow">
         <div class="p-6 border-b flex flex-wrap items-center justify-between gap-3">
             <h3 class="text-lg font-semibold">Appointments Schedule</h3>
-            <div class="inline-flex rounded-lg border overflow-hidden">
+            <div class="inline-flex rounded-lg border border-[#c7dfd4] overflow-hidden">
                 <button type="button" data-view-tab="calendar"
                     class="px-4 py-2 text-sm font-medium bg-[#1f5f46] text-white">
                     Calendar View
                 </button>
                 <button type="button" data-view-tab="timeline"
-                    class="px-4 py-2 text-sm font-medium bg-white text-gray-700">
+                    class="px-4 py-2 text-sm font-medium bg-white text-[#374151]">
                     Timeline View
                 </button>
             </div>
@@ -37,39 +37,56 @@
             <div data-view-panel="calendar">
                 <div class="mb-4 flex items-center justify-between">
                     <button type="button" id="calendar-prev"
-                        class="rounded-md border px-3 py-2 text-sm hover:bg-gray-50">Previous</button>
-                    <h4 id="calendar-title" class="text-base font-semibold text-gray-800"></h4>
+                        class="rounded-md border border-[#c7dfd4] px-3 py-2 text-sm text-[#1f5f46] hover:bg-[#ecf6f1]">Previous</button>
+                    <h4 id="calendar-title" class="text-base font-semibold text-[#1f5f46]"></h4>
                     <button type="button" id="calendar-next"
-                        class="rounded-md border px-3 py-2 text-sm hover:bg-gray-50">Next</button>
+                        class="rounded-md border border-[#c7dfd4] px-3 py-2 text-sm text-[#1f5f46] hover:bg-[#ecf6f1]">Next</button>
                 </div>
                 <div id="calendar-grid" class="grid grid-cols-7 gap-2"></div>
             </div>
 
             <div data-view-panel="timeline" class="hidden">
-                <div class="space-y-4">
-                    @forelse($appointments->sortBy('starts_at') as $appointment)
-                        <article class="rounded-lg border p-3">
-                            <h4 class="text-sm font-semibold text-gray-800">{{ $appointment->name }}</h4>
-                            <p class="mt-1 text-sm text-gray-600">
-                                {{ $appointment->starts_at->format('D, d M Y H:i') }} - {{ $appointment->ends_at->format('H:i') }}
-                            </p>
-                            <p class="mt-1 text-sm text-gray-700">
-                                {{ $appointment->notes ?: '-' }}
-                            </p>
-                            @if($appointment->status === 'pending')
-                                <form action="{{ route('admin.appointments.approve', $appointment) }}" method="POST" class="mt-3">
-                                    @csrf
-                                    @method('PATCH')
-                                    <button type="submit"
-                                        class="rounded-md bg-[#1f5f46] px-3 py-2 text-xs font-semibold text-white hover:bg-[#287854]">
-                                        Approve
-                                    </button>
-                                </form>
-                            @endif
-                        </article>
-                    @empty
-                        <p class="text-sm text-gray-500">No appointments scheduled yet.</p>
-                    @endforelse
+                @php
+                    $startOfWeek = \Carbon\Carbon::now()->startOfWeek(\Carbon\Carbon::MONDAY);
+                    $endOfWeek = \Carbon\Carbon::now()->endOfWeek(\Carbon\Carbon::SUNDAY);
+                    $timelineWeekly = $appointments
+                        ->filter(fn ($a) => $a->starts_at->between($startOfWeek, $endOfWeek))
+                        ->sortBy('starts_at')
+                        ->groupBy(fn ($a) => $a->starts_at->toDateString());
+                @endphp
+                <div class="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7">
+                    @for ($i = 0; $i < 7; $i++)
+                        @php
+                            $day = $startOfWeek->copy()->addDays($i);
+                            $dayItems = $timelineWeekly->get($day->toDateString(), collect());
+                        @endphp
+                        <section class="rounded-md border border-[#e4efe9] bg-[#fbfdfc] p-3">
+                            <div class="border-b border-[#edf4f0] pb-2">
+                                <p class="text-xs font-semibold uppercase tracking-wide text-[#1f5f46]">{{ $day->format('l') }}</p>
+                                <p class="text-xs text-gray-500">{{ $day->format('d M') }}</p>
+                            </div>
+                            <div class="mt-2 space-y-2">
+                                @forelse($dayItems as $appointment)
+                                    <article class="rounded-md bg-[#f2f8f5] px-2.5 py-2">
+                                        <p class="text-xs font-semibold text-gray-800">{{ $appointment->name }}</p>
+                                        <p class="mt-1 text-[11px] text-gray-600">{{ $appointment->starts_at->format('H:i') }} - {{ $appointment->ends_at->format('H:i') }}</p>
+                                        @if($appointment->status === 'pending')
+                                            <form action="{{ route('admin.appointments.approve', $appointment) }}" method="POST" class="mt-1.5">
+                                                @csrf
+                                                @method('PATCH')
+                                                <button type="submit"
+                                                    class="rounded border border-[#1f5f46]/20 bg-white px-2 py-0.5 text-[10px] font-semibold text-[#1f5f46] hover:bg-[#ecf6f1]">
+                                                    Approve
+                                                </button>
+                                            </form>
+                                        @endif
+                                    </article>
+                                @empty
+                                    <p class="text-[11px] text-gray-400">No appointments</p>
+                                @endforelse
+                            </div>
+                        </section>
+                    @endfor
                 </div>
             </div>
         </div>
@@ -118,9 +135,9 @@
             let currentDate = new Date();
 
             const statusClass = (status) => {
-                if (status === 'confirmed') return 'bg-green-100 text-green-800';
-                if (status === 'cancelled') return 'bg-red-100 text-red-800';
-                return 'bg-yellow-100 text-yellow-800';
+                if (status === 'confirmed') return 'bg-[#dff3e9] text-[#1f5f46]';
+                if (status === 'cancelled') return 'bg-[#fcebea] text-[#b42318]';
+                return 'bg-[#fff7e0] text-[#8a6d1f]';
             };
 
             const renderCalendar = () => {
@@ -142,11 +159,11 @@
                 const cells = [];
 
                 weekdays.forEach((w) => {
-                    cells.push(`<div class="rounded-md bg-gray-50 px-2 py-2 text-xs font-semibold text-gray-600">${w}</div>`);
+                    cells.push(`<div class="rounded-md bg-[#e6f1ec] px-2 py-2 text-xs font-semibold text-[#1f5f46]">${w}</div>`);
                 });
 
                 for (let i = 0; i < startWeekDay; i++) {
-                    cells.push('<div class="min-h-[120px] rounded-md border bg-gray-50/60"></div>');
+                    cells.push('<div class="min-h-[120px] rounded-md border border-[#edf4f0] bg-[#f9fcfa]"></div>');
                 }
 
                 for (let day = 1; day <= totalDays; day++) {
@@ -164,10 +181,12 @@
                     const more = dayItems.length > 3 ? `<div class="mt-1 text-[11px] text-gray-500">+${dayItems.length - 3} more</div>` : '';
 
                     cells.push(`
-                        <button type="button" data-day-key="${dateKey}" class="min-h-[120px] rounded-md border bg-white p-2 text-left transition hover:border-[#1f5f46]">
-                            <div class="text-xs font-semibold text-gray-700">${day}</div>
+                        <button type="button" data-day-key="${dateKey}" class="relative min-h-[120px] rounded-md border border-[#d7e8df] bg-white p-2 text-left transition hover:border-[#1f5f46]">
+                            <div class="absolute left-2 top-2 text-[150%] font-bold leading-none text-gray-800">${day}</div>
+                            <div class="pt-8">
                             ${entries}
                             ${more}
+                            </div>
                         </button>
                     `);
                 }
@@ -203,21 +222,21 @@
                         const start = new Date(item.starts_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                         const end = new Date(item.ends_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                         const badgeClass = item.status === 'confirmed'
-                            ? 'bg-green-100 text-green-700'
-                            : (item.status === 'cancelled' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700');
+                            ? 'bg-[#dff3e9] text-[#1f5f46]'
+                            : (item.status === 'cancelled' ? 'bg-[#fcebea] text-[#b42318]' : 'bg-[#fff7e0] text-[#8a6d1f]');
                         const approveForm = item.status === 'pending'
                             ? `
                                 <form action="/admin/appointments/${item.id}/approve" method="POST" class="mt-3">
                                     <input type="hidden" name="_token" value="{{ csrf_token() }}">
                                     <input type="hidden" name="_method" value="PATCH">
-                                    <button type="submit" class="rounded-md bg-[#1f5f46] px-3 py-2 text-xs font-semibold text-white hover:bg-[#287854]">
+                                    <button type="submit" class="rounded-md border border-[#1f5f46]/20 bg-white px-2.5 py-1 text-[11px] font-semibold text-[#1f5f46] hover:bg-[#ecf6f1]">
                                         Approve
                                     </button>
                                 </form>
                             `
                             : '';
                         return `
-                            <article class="rounded-lg border p-4">
+                            <article class="rounded-md bg-[#f6faf8] px-4 py-3">
                                 <div class="flex items-center justify-between gap-2">
                                     <h5 class="font-semibold text-gray-800">${item.title}</h5>
                                     <span class="inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${badgeClass}">

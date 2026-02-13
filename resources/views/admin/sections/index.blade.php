@@ -9,7 +9,7 @@
         </div>
         <div class="overflow-x-auto">
             <table class="w-full">
-                <thead class="bg-gray-50 border-b">
+                <thead class="bg-[#e6f1ec]">
                     <tr>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Section
                         </th>
@@ -41,8 +41,9 @@
                             </td>
                             <td class="px-6 py-4 text-right text-sm">
                                 <a href="{{ route('admin.sections.edit', $section->section) }}"
-                                    class="text-[#287854] hover:text-[#1f5f46] font-medium">
-                                    Edit
+                                    class="inline-flex items-center justify-center rounded-md p-1.5 text-[#287854] hover:bg-[#ecf6f1] hover:text-[#1f5f46]"
+                                    title="Edit">
+                                    <iconify-icon icon="mdi:pencil-outline" width="18" height="18"></iconify-icon>
                                 </a>
                             </td>
                         </tr>
@@ -50,5 +51,10 @@
                 </tbody>
             </table>
         </div>
+        @if ($sections->hasPages())
+            <div class="p-6 border-t">
+                {{ $sections->links() }}
+            </div>
+        @endif
     </div>
 @endsection

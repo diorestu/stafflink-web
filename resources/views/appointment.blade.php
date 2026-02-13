@@ -3,7 +3,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ config('app.name', 'StaffLink') }} - Schedule Appointment</title>
+    <title>{{ \App\Models\SiteSetting::siteName() }} - Schedule Appointment</title>
+    <link rel="icon" href="{{ asset('favicon.ico') }}">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -20,7 +21,7 @@
                 <div class="rounded-[30px] bg-[#1f5f46] p-10 text-white shadow-[0_20px_50px_rgba(31,95,70,0.2)]" data-aos="fade-up">
                     <p class="text-xs uppercase tracking-[0.3em] text-[#e9d29d]">Schedule Appointment</p>
                     <h1 class="mt-4 text-4xl font-semibold">Book a consultation</h1>
-                    <p class="mt-4 max-w-2xl text-sm text-white/85">
+                    <p class="mt-4 max-w-2xl text-sm text-white">
                         Pick a date on the calendar, then choose an available time slot in the popup.
                         Every session is fixed to 1 hour.
                     </p>
@@ -50,7 +51,7 @@
                             <button type="button" id="calendar-next" class="rounded-lg border border-[#d1d5db] px-3 py-2 text-sm hover:bg-[#f7faf8]">Next</button>
                         </div>
                         <div id="calendar-grid" class="grid grid-cols-7 gap-2"></div>
-                        <p class="mt-4 text-xs text-[#6b6b66]">Click a date to check real-time slot availability.</p>
+                        <p class="mt-4 text-xs text-[#4b5563]">Click a date to check real-time slot availability.</p>
                     </div>
 
                     <div class="rounded-[28px] bg-white p-8 shadow-[0_20px_50px_rgba(31,95,70,0.12)]" data-aos="fade-up" data-aos-delay="120">
@@ -122,7 +123,7 @@
         <x-site-footer />
     </div>
 
-    <div id="slots-modal" class="fixed inset-0 z-[70] hidden items-center justify-center bg-black/40 px-4 opacity-0 transition-opacity duration-200">
+    <div id="slots-modal" class="fixed inset-0 z-[70] hidden items-center justify-center bg-black/55 px-4 opacity-0 transition-opacity duration-200">
         <div id="slots-panel" class="w-full max-w-2xl rounded-2xl bg-white p-6 shadow-xl transition duration-200 ease-out translate-y-3 scale-95 opacity-0">
             <div class="flex items-center justify-between border-b pb-3">
                 <h3 id="slots-title" class="text-lg font-semibold text-[#1b1b18]">Select a time</h3>
@@ -192,7 +193,7 @@
                 calendarMonth.textContent = first.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
 
                 const headers = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-                const cells = headers.map((h) => `<div class="rounded-md bg-[#f7faf8] px-2 py-2 text-xs font-semibold text-[#6b6b66]">${h}</div>`);
+                const cells = headers.map((h) => `<div class="rounded-md bg-[#e6f1ec] px-2 py-2 text-xs font-semibold text-[#1f5f46]">${h}</div>`);
 
                 for (let i = 0; i < startDay; i++) {
                     cells.push('<div class="h-[82px] rounded-md border border-transparent"></div>');
@@ -204,8 +205,8 @@
                     const disabled = isPastDate(dateObj);
                     const active = activeDate === dateKey;
                     const classes = [
-                        'h-[82px] rounded-md border p-2 text-left transition',
-                        disabled ? 'cursor-not-allowed border-[#e5e7eb] bg-[#f9fafb] text-[#b0b3b8]' : 'border-[#d9e3dc] bg-white hover:border-[#287854]'
+                        'relative h-[82px] rounded-md border p-2 text-left transition',
+                        disabled ? 'cursor-not-allowed border-[#d1d5db] bg-[#f3f4f6] text-[#6b7280]' : 'border-[#c7dfd4] bg-white hover:border-[#1f5f46]'
                     ];
                     if (active) {
                         classes.push('ring-2 ring-[#287854]');
@@ -213,8 +214,16 @@
 
                     cells.push(`
                         <button type="button" data-date="${dateKey}" ${disabled ? 'disabled' : ''} class="${classes.join(' ')}">
-                            <span class="text-sm font-semibold">${day}</span>
-                            ${disabled ? '' : '<span class="mt-2 inline-block h-2 w-2 rounded-full bg-[#5ea07f]"></span>'}
+                            <span class="absolute left-2 top-2 text-[150%] font-bold leading-none text-[#1b1b18]">${day}</span>
+                            <span class="block pt-8">
+                                ${disabled ? '' : `
+                                    <span class="inline-flex h-4 w-4 items-center justify-center rounded-full bg-[#dff3e9] text-[#1f5f46]">
+                                        <svg class="h-2.5 w-2.5" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M16.704 5.29a1 1 0 010 1.42l-7.5 7.5a1 1 0 01-1.415 0l-3-3a1 1 0 111.415-1.42l2.292 2.294 6.792-6.794a1 1 0 011.416 0z" clip-rule="evenodd" />
+                                        </svg>
+                                    </span>
+                                `}
+                            </span>
                         </button>
                     `);
                 }
@@ -253,7 +262,7 @@
                     weekday: 'long', day: '2-digit', month: 'long', year: 'numeric'
                 });
                 slotsTitle.textContent = `Select a time - ${prettyDate}`;
-                slotsContainer.innerHTML = '<p class="col-span-full text-sm text-[#6b6b66]">Loading slots...</p>';
+                slotsContainer.innerHTML = '<p class="col-span-full text-sm text-[#374151]">Loading slots...</p>';
 
                 try {
                     const url = `${availabilityUrl}?date=${encodeURIComponent(dateKey)}`;
@@ -264,21 +273,21 @@
                     const items = data.slots.map((slot) => {
                         const disabled = !slot.available;
                         const classes = disabled
-                            ? 'cursor-not-allowed border-[#e5e7eb] bg-[#f3f4f6] text-[#9ca3af]'
-                            : 'border-[#b5d6c5] bg-[#e9f5ee] text-[#1f5f46] hover:bg-[#dff0e7]';
+                            ? 'cursor-not-allowed border-[#d1d5db] bg-[#eceff3] text-[#4b5563]'
+                            : 'border-[#86b99f] bg-[#dff3e9] text-[#134e3a] hover:bg-[#cfeada]';
 
                         return `
                             <button type="button" data-time="${slot.time}" ${disabled ? 'disabled' : ''}
                                 class="rounded-lg border px-3 py-3 text-sm font-semibold ${classes}">
                                 ${slot.label}
-                                <span class="mt-1 block text-xs font-medium ${disabled ? 'text-[#9ca3af]' : 'text-[#2f8b62]'}">${disabled ? 'Unavailable' : 'Available'}</span>
+                                <span class="mt-1 block text-xs font-semibold ${disabled ? 'text-[#4b5563]' : 'text-[#14532d]'}">${disabled ? 'Unavailable' : 'Available'}</span>
                             </button>
                         `;
                     });
 
                     slotsContainer.innerHTML = items.length
                         ? items.join('')
-                        : '<p class="col-span-full text-sm text-[#6b6b66]">No timeslots available.</p>';
+                        : '<p class="col-span-full text-sm text-[#374151]">No timeslots available.</p>';
 
                     slotsContainer.querySelectorAll('[data-time]').forEach((btn) => {
                         btn.addEventListener('click', () => {

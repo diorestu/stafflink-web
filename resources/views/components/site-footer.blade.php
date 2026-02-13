@@ -1,13 +1,18 @@
+@php
+    $hf = \App\Models\SiteSetting::headerFooter();
+@endphp
+
 <footer class="bg-white px-6 py-8 shadow-[0_-10px_30px_rgba(31,95,70,0.08)]" data-aos="fade-up">
     <div class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-6">
         <div class="flex items-center gap-3">
             <img src="{{ asset('images/logo.png') }}" alt="StaffLink logo" class="h-10 w-auto" draggable="false" />
         </div>
         <nav class="flex items-center gap-6 text-sm text-[#4a4a45]">
-            <a href="#" class="transition hover:text-[#1b1b18]">Terms &amp; Condition</a>
-            <a href="#" class="transition hover:text-[#1b1b18]">Privacy Policy</a>
+            @foreach (($hf['footer_links'] ?? []) as $link)
+                <a href="{{ $link['url'] ?? '#' }}" class="transition hover:text-[#1b1b18]">{{ $link['label'] ?? '' }}</a>
+            @endforeach
         </nav>
-        <p class="text-xs text-[#9c9c96]">© 2026 StaffLink. All rights reserved.</p>
+        <p class="text-xs text-[#9c9c96]">{{ $hf['copyright_text'] ?? '' }}</p>
     </div>
 </footer>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">

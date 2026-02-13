@@ -21,12 +21,11 @@ class AdminController extends Controller
     public function dashboard()
     {
         $sections = PageSection::all();
-        $startOfWeek = Carbon::now()->startOfWeek();
-        $endOfWeek = Carbon::now()->endOfWeek();
+        $startOfWeek = Carbon::now()->startOfWeek(Carbon::MONDAY);
+        $endOfWeek = Carbon::now()->endOfWeek(Carbon::SUNDAY);
         $weeklyAppointments = Appointment::query()
             ->whereBetween('starts_at', [$startOfWeek, $endOfWeek])
             ->orderBy('starts_at')
-            ->limit(6)
             ->get();
 
         return view('admin.dashboard', [
@@ -38,7 +37,7 @@ class AdminController extends Controller
 
     public function index()
     {
-        $sections = PageSection::all();
+        $sections = PageSection::query()->latest()->paginate(10);
 
         return view('admin.sections.index', compact('sections'));
     }
