@@ -15,6 +15,8 @@ class Job extends Model
         'country',
         'state',
         'type',
+        'minimum_salary',
+        'maximum_salary',
         'salary_range',
         'status',
         'published_at',
@@ -36,5 +38,30 @@ class Job extends Model
         }
 
         return $this->location;
+    }
+
+    public function getSalaryRangeAttribute($value): ?string
+    {
+        $min = $this->attributes['minimum_salary'] ?? null;
+        $max = $this->attributes['maximum_salary'] ?? null;
+
+        if ($min !== null || $max !== null) {
+            $min = $min !== null ? number_format((int) $min) : null;
+            $max = $max !== null ? number_format((int) $max) : null;
+
+            if ($min !== null && $max !== null) {
+                return "IDR {$min} - {$max}";
+            }
+
+            if ($min !== null) {
+                return "IDR {$min}";
+            }
+
+            if ($max !== null) {
+                return "IDR {$max}";
+            }
+        }
+
+        return $value;
     }
 }

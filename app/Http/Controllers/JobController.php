@@ -29,10 +29,16 @@ class JobController extends Controller
             'country' => 'required|string|max:255',
             'state' => 'required|string|max:255',
             'type' => 'required|in:full-time,part-time,contract',
-            'salary_range' => 'nullable|string|max:255',
+            'minimum_salary' => 'nullable|integer|min:0|required_with:maximum_salary',
+            'maximum_salary' => 'nullable|integer|min:0|gte:minimum_salary|required_with:minimum_salary',
             'status' => 'required|in:draft,published',
         ]);
 
+        $minimumSalary = isset($validated['minimum_salary']) ? (int) $validated['minimum_salary'] : null;
+        $maximumSalary = isset($validated['maximum_salary']) ? (int) $validated['maximum_salary'] : null;
+        $validated['minimum_salary'] = $minimumSalary;
+        $validated['maximum_salary'] = $maximumSalary;
+        $validated['salary_range'] = $this->formatSalaryRange($minimumSalary, $maximumSalary);
         $validated['location'] = $this->composeLocation($validated['state'], $validated['country']);
 
         if ($request->status === 'published' && !$request->published_at) {
@@ -58,10 +64,16 @@ class JobController extends Controller
             'country' => 'required|string|max:255',
             'state' => 'required|string|max:255',
             'type' => 'required|in:full-time,part-time,contract',
-            'salary_range' => 'nullable|string|max:255',
+            'minimum_salary' => 'nullable|integer|min:0|required_with:maximum_salary',
+            'maximum_salary' => 'nullable|integer|min:0|gte:minimum_salary|required_with:minimum_salary',
             'status' => 'required|in:draft,published',
         ]);
 
+        $minimumSalary = isset($validated['minimum_salary']) ? (int) $validated['minimum_salary'] : null;
+        $maximumSalary = isset($validated['maximum_salary']) ? (int) $validated['maximum_salary'] : null;
+        $validated['minimum_salary'] = $minimumSalary;
+        $validated['maximum_salary'] = $maximumSalary;
+        $validated['salary_range'] = $this->formatSalaryRange($minimumSalary, $maximumSalary);
         $validated['location'] = $this->composeLocation($validated['state'], $validated['country']);
 
         if ($request->status === 'published' && !$job->published_at) {
@@ -177,5 +189,22 @@ class JobController extends Controller
         ]));
 
         return count($parts) > 0 ? implode(', ', $parts) : null;
+    }
+
+    private function formatSalaryRange(?int $minimumSalary, ?int $maximumSalary): ?string
+    {
+        if ($minimumSalary === null && $maximumSalary === null) {
+            return null;
+        }
+
+        if ($maximumSalary === null) {
+            $maximumSalary = $minimumSalary;
+        }
+
+        if ($minimumSalary === null) {
+            $minimumSalary = $maximumSalary;
+        }
+
+        return 'IDR ' . number_format($minimumSalary) . ' - ' . number_format($maximumSalary);
     }
 }

@@ -11,23 +11,19 @@ class PageSectionSeeder extends Seeder
     {
         PageSection::updateOrCreate(['section' => 'hero'], [
             'content' => [
-                'badge' => 'Global hiring',
-                'title' => 'Global Staffing Expansion Made Easy',
-                'subtitle' => 'Power your business with top-tier talent across borders. We build compliant, fast, and flexible teams that scale with your goals.',
+                'badge' => 'Global Staffing Expansion Made Easy',
+                'title' => 'Power Your Business with Top-Tier Talent',
+                'subtitle' => 'Staff Link Solutions sources top-tier nannies, cleaners, admin professionals, and specialised sector and more — connecting you to high-performing experts who drive elevate efficiency and success.',
                 'features' => [
                     [
                         'title' => 'Seamless Staffing, Maximum Results',
-                        'description' => 'Accelerate hiring with a curated pipeline of specialists, screened and ready to contribute from day one.',
-                    ],
-                    [
-                        'title' => 'Power Your Business',
-                        'description' => 'Dedicated account managers coordinate onboarding, payroll, and performance so you can focus on growth.',
+                        'description' => 'Maximize productivity and profitability with expertly vetted, handpicked talent from Staff Link Solutions, delivering reliability and excellence in every role.',
                     ],
                 ],
                 'stats' => [
-                    ['label' => 'Remote workforce', 'value' => 'Worldwide teams'],
-                    ['label' => 'Local contract', 'value' => 'Compliance ready'],
-                    ['label' => 'Book a call', 'value' => 'Talk to experts'],
+                    ['title' => 'MONTH TO MONTH FEES', 'cta' => 'BOOK OUR OUTSOURCING CONSULTATION'],
+                    ['title' => 'LOCK-IN CONTRACT', 'cta' => 'BOOK OUR OUTSOURCING CONSULTATION'],
+                    ['title' => 'BOOK A CALL', 'cta' => 'BOOK OUR OUTSOURCING CONSULTATION'],
                 ],
             ],
         ]);
@@ -35,10 +31,10 @@ class PageSectionSeeder extends Seeder
         PageSection::updateOrCreate(['section' => 'overview'], [
             'content' => [
                 'cards' => [
-                    ['title' => 'Scale your business', 'description' => 'Build teams across regions with tailored hiring plans and dedicated specialists.'],
-                    ['title' => 'Professional partner', 'description' => 'Partner with specialists committed to your compliance, payroll, and growth.'],
-                    ['title' => 'Seamless services', 'description' => 'Integrated hiring, HR, and payroll services that keep your teams aligned.'],
-                    ['title' => 'Tailored solutions', 'description' => 'Customized staffing models designed to meet your unique hiring needs.'],
+                    ['title' => 'Scale your business to new heights', 'description' => 'See your business grow and prosper - minus the challenges and huge costs of finding & integrating the top talent you need to make that happen.'],
+                    ['title' => 'Partner with professionals committed to your success.', 'description' => 'Work with talented individuals who are not only highly experienced & exceptionally qualified, but also with a heart to care for your business as much as you do.'],
+                    ['title' => 'Seamless services managed in our Indonesia headquarters', 'description' => 'Get access to our international talent pool, selected & vetted by our local Australia-based hiring team.'],
+                    ['title' => 'Tailored solutions designed for your unique needs', 'description' => 'We make it possible for businesses all over the world to deliver next-level services to their clients and enjoy increased revenue.'],
                 ],
                 'button_text' => 'Learn more',
             ],

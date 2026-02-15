@@ -1,28 +1,50 @@
 @props(['content' => []])
 
 <section class="px-6 pb-20">
-    <div class="mx-auto max-w-6xl">
-        <div class="grid gap-10 rounded-[32px] bg-[#e6f1ec] px-8 py-12 shadow-[0_20px_60px_rgba(31,95,70,0.12)] lg:grid-cols-[1.2fr_0.8fr]"
+    <div class="mx-auto max-w-[75.6rem]">
+        @php
+            $defaultCards = [
+                [
+                    'title' => 'Scale your business to new heights',
+                    'description' =>
+                        'See your business grow and prosper - minus the challenges and huge costs of finding & integrating the top talent you need to make that happen.',
+                ],
+                [
+                    'title' => 'Partner with professionals committed to your success.',
+                    'description' =>
+                        'Work with talented individuals who are not only highly experienced & exceptionally qualified, but also with a heart to care for your business as much as you do.',
+                ],
+                [
+                    'title' => 'Seamless services managed in our Indonesia headquarters',
+                    'description' =>
+                        'Get access to our international talent pool, selected & vetted by our local Australia-based hiring team.',
+                ],
+                [
+                    'title' => 'Tailored solutions designed for your unique needs',
+                    'description' =>
+                        'We make it possible for businesses all over the world to deliver next-level services to their clients and enjoy increased revenue.',
+                ],
+            ];
+            $cards = $content['cards'] ?? $defaultCards;
+        @endphp
+        <div class="relative overflow-hidden grid gap-10 rounded-[32px] border border-white/40 bg-white/35 px-8 py-12 shadow-[0_20px_60px_rgba(31,95,70,0.12)] backdrop-blur-xl lg:grid-cols-[1.2fr_0.8fr]"
             data-aos="fade-up">
             <div class="space-y-8">
                 <div class="grid gap-6 sm:grid-cols-2">
                     @php
                         $icons = [
-                            '<path d="M4 19h16" /><path d="M5 15l4-4 3 3 5-6" />',
-                            '<circle cx="8" cy="9" r="3" /><circle cx="16" cy="9" r="3" /><path d="M2 20a6 6 0 0 1 12 0" /><path d="M10 20a6 6 0 0 1 12 0" />',
-                            '<path d="M12 4l7 4v8l-7 4-7-4V8z" /><path d="M12 12l7-4" /><path d="M12 12l-7-4" />',
-                            '<circle cx="12" cy="12" r="8" /><circle cx="12" cy="12" r="3" />',
+                            'fa-solid fa-comments',
+                            'fa-solid fa-user-group',
+                            'fa-solid fa-building',
+                            'fa-solid fa-bullseye',
                         ];
                     @endphp
-                    @foreach ($content['cards'] ?? [] as $i => $card)
-                        <div class="rounded-2xl bg-white px-5 py-6 shadow-sm" data-aos="fade-up"
+                    @foreach ($cards as $i => $card)
+                        <div class="rounded-2xl px-5 py-6" data-aos="fade-up"
                             data-aos-delay="{{ ($i + 1) * 100 }}">
                             <div
                                 class="flex h-10 w-10 items-center justify-center rounded-full border border-[#287854]/40 text-[#287854]">
-                                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                    stroke-width="1.5">
-                                    {!! $icons[$i] ?? $icons[0] !!}
-                                </svg>
+                                <i class="{{ $icons[$i] ?? $icons[0] }} text-[1.45rem] leading-none" aria-hidden="true"></i>
                             </div>
                             <h3 class="mt-4 text-lg font-semibold">{{ $card['title'] ?? '' }}</h3>
                             <p class="mt-2 text-sm text-[#6b6b66]">{{ $card['description'] ?? '' }}</p>
@@ -35,12 +57,12 @@
                     {{ $content['button_text'] ?? 'Learn more' }}
                 </button>
             </div>
-            <div class="relative flex items-center justify-center" data-aos="zoom-in" data-aos-delay="200">
+            <div class="relative hidden lg:block" data-aos="zoom-in" data-aos-delay="200">
                 <div
-                    class="absolute h-[280px] w-[280px] rounded-full bg-gradient-to-br from-white via-[#f4f5f3] to-[#dfe9e4] shadow-[0_25px_60px_rgba(31,95,70,0.18)]">
+                    class="absolute right-[-6.6rem] top-1/2 h-[510px] w-[510px] -translate-y-1/2 rounded-full bg-gradient-to-br from-white via-[#f4f5f3] to-[#dfe9e4] shadow-[0_25px_60px_rgba(31,95,70,0.18)]">
                 </div>
                 <img src="{{ asset('images/side_globe.png') }}" alt="World map"
-                    class="relative h-[240px] w-[240px] rounded-full object-cover" draggable="false" />
+                    class="absolute right-[-5rem] top-1/2 h-[450px] w-[450px] -translate-y-1/2 -scale-y-100 rotate-180 rounded-full object-cover" draggable="false" />
             </div>
         </div>
     </div>

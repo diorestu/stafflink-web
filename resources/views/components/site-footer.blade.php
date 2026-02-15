@@ -11,6 +11,9 @@
             @foreach (($hf['footer_links'] ?? []) as $link)
                 <a href="{{ $link['url'] ?? '#' }}" class="transition hover:text-[#1b1b18]">{{ $link['label'] ?? '' }}</a>
             @endforeach
+            @foreach (($hf['user_links'] ?? []) as $link)
+                <a href="{{ $link['url'] ?? '#' }}" class="transition hover:text-[#1b1b18]">{{ $link['label'] ?? '' }}</a>
+            @endforeach
         </nav>
         <p class="text-xs text-[#9c9c96]">{{ $hf['copyright_text'] ?? '' }}</p>
     </div>

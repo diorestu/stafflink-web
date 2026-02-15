@@ -38,19 +38,45 @@ openButtons.forEach((button) => {
             const descEl = modal?.querySelector('[data-talent-description]');
             const listEl = modal?.querySelector('[data-talent-jobs]');
 
+            const applyGridColumns = (el, count) => {
+                if (!el) return;
+                el.classList.remove('grid-cols-1', 'md:grid-cols-2', 'lg:grid-cols-3', 'lg:grid-cols-4');
+                el.classList.add('grid-cols-1');
+
+                if (count === 2) {
+                    el.classList.add('md:grid-cols-2');
+                } else if (count === 3) {
+                    el.classList.add('md:grid-cols-2', 'lg:grid-cols-3');
+                } else if (count >= 4) {
+                    el.classList.add('md:grid-cols-2', 'lg:grid-cols-4');
+                }
+            };
+
             if (titleEl) titleEl.textContent = title || '';
             if (descEl) descEl.textContent = description || '';
             if (listEl) {
-                listEl.innerHTML = jobs
-                    .map(
-                        (job) => `
-                        <a href=\"${job.link}\" class=\"rounded-2xl border border-[#ececf4] p-4 transition hover:border-[#287854] hover:shadow-sm\">
-                            <h4 class=\"text-base font-semibold\">${job.title}</h4>
-                            <p class=\"mt-2 text-sm text-[#6b6b66]\">${job.description}</p>
-                        </a>
+                applyGridColumns(listEl, jobs.length);
+                if (!jobs.length) {
+                    listEl.innerHTML = `
+                        <div class=\"col-span-full rounded-2xl border border-[#ececf4] p-4\">
+                            <p class=\"text-sm text-[#6b6b66]\">No careers available in this category yet.</p>
+                        </div>
+                    `;
+                } else {
+                    listEl.innerHTML = jobs
+                        .map(
+                            (job) => `
+                        <article class=\"overflow-hidden rounded-xl border border-[#e2e5ee] bg-white shadow-sm\">
+                            ${job.thumbnail ? `<img src=\"${job.thumbnail}\" alt=\"${job.title}\" class=\"h-40 w-full object-cover\" draggable=\"false\">` : '<div class=\"h-40 w-full bg-[#eef2f7]\"></div>'}
+                            <div class=\"p-4\">
+                                <h4 class=\"text-lg font-semibold text-[#111]\">${job.title}</h4>
+                                <p class=\"mt-2 text-sm leading-relaxed text-[#5a5a66]\">${job.description || ''}</p>
+                            </div>
+                        </article>
                     `
-                    )
-                    .join('');
+                        )
+                        .join('');
+                }
             }
         }
 

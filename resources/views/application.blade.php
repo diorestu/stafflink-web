@@ -71,6 +71,9 @@
                         class="grid gap-5 sm:grid-cols-2">
                         @csrf
 
+                        <input type="hidden" name="career_job_id"
+                            value="{{ old('career_job_id', $selectedJob?->id) }}">
+
                         <div class="sm:col-span-2">
                             <label class="text-sm font-semibold">Full Name</label>
                             <input name="full_name" value="{{ old('full_name') }}" type="text" required
@@ -186,8 +189,14 @@
 
                         <div class="sm:col-span-2">
                             <label class="text-sm font-semibold">Position Title Applying For</label>
-                            <input name="position_title" value="{{ old('position_title') }}" type="text" required
+                            <input name="position_title"
+                                value="{{ old('position_title', $selectedJob?->title) }}"
+                                type="text"
+                                @if($selectedJob) readonly @else required @endif
                                 class="mt-2 w-full rounded-xl border border-[#d1d5db] px-4 py-3 text-sm focus:border-[#287854] focus:outline-none">
+                            @if($selectedJob)
+                                <p class="mt-2 text-xs text-[#6b6b66]">Auto-filled from selected job posting.</p>
+                            @endif
                         </div>
 
                         <div class="sm:col-span-2">

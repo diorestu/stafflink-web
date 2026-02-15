@@ -1,6 +1,6 @@
 @props(['content' => []])
 
-<section class="px-6 pb-20">
+<section class="px-6 pb-12 pt-10">
     <div class="mx-auto max-w-6xl">
         <div class="rounded-[32px] bg-[#1f5f46] px-8 py-12 text-white shadow-[0_20px_60px_rgba(31,95,70,0.2)]"
             data-aos="fade-up">

@@ -3,11 +3,14 @@
 use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\AdminAppointmentController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AdminJobApplicationController;
+use App\Http\Controllers\AdminCareerController;
 use App\Http\Controllers\AdminHeaderFooterController;
 use App\Http\Controllers\AdminPageController;
 use App\Http\Controllers\AiAgentController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\CareerController;
+use App\Http\Controllers\CareerCategoryController;
 use App\Http\Controllers\JobApplicationController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\JobController;
@@ -48,7 +51,11 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     // Jobs
     Route::delete('/jobs/bulk-delete', [JobController::class, 'bulkDestroy'])->name('jobs.bulk-destroy');
     Route::post('/jobs/ai-description', [JobController::class, 'generateDescription'])->name('jobs.ai-description');
-    Route::resource('jobs', JobController::class);
+    Route::resource('jobs', JobController::class)->except(['show']);
+    Route::resource('careers', AdminCareerController::class)->except(['show']);
+    Route::resource('career-categories', CareerCategoryController::class)
+        ->parameters(['career-categories' => 'careerCategory'])
+        ->except(['show']);
     Route::prefix('locations')->name('locations.')->group(function () {
         Route::get('/db/countries', [LocationController::class, 'countriesFromDatabase'])->name('db.countries');
         Route::get('/db/states', [LocationController::class, 'statesFromDatabase'])->name('db.states');
@@ -69,5 +76,8 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     // Appointments
     Route::get('/appointments', [AdminAppointmentController::class, 'index'])->name('appointments.index');
     Route::patch('/appointments/{appointment}/approve', [AdminAppointmentController::class, 'approve'])->name('appointments.approve');
+    Route::get('/applicants', [AdminJobApplicationController::class, 'index'])->name('applicants.index');
+    Route::patch('/applicants/{application}/status', [AdminJobApplicationController::class, 'updateStatus'])->name('applicants.status');
+    Route::get('/applicants/{application}/resume', [AdminJobApplicationController::class, 'resume'])->name('applicants.resume');
     Route::post('/ai-agent/chat', [AiAgentController::class, 'chat'])->name('ai-agent.chat');
 });

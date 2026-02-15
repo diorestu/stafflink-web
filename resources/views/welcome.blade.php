@@ -13,6 +13,7 @@
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Google+Sans:wght@400;500;600;700&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -23,8 +24,8 @@
         <main>
             <x-hero :content="$hero" />
             <x-overview :content="$overview" />
-            <x-solutions :content="$solutions" />
-            <x-staffing :content="$staffing" />
+            <x-industries :content="$industries" />
+            <x-staffing :content="$staffing" :categories="$careerCategories" />
             <x-cta :content="$cta" />
         </main>
         <x-site-footer />

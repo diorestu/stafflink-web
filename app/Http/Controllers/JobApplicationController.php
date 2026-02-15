@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Mail\JobApplicationSubmitted;
+use App\Models\Job;
 use App\Models\JobApplication;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
@@ -10,9 +11,16 @@ use Throwable;
 
 class JobApplicationController extends Controller
 {
-    public function create()
+    public function create(Request $request)
     {
-        return view('application');
+        $selectedJob = null;
+        $jobId = (int) $request->query('job_id', 0);
+
+        if ($jobId > 0) {
+            $selectedJob = Job::query()->find($jobId);
+        }
+
+        return view('application', compact('selectedJob'));
     }
 
     public function store(Request $request)
@@ -22,7 +30,7 @@ class JobApplicationController extends Controller
             'email' => ['required', 'email', 'max:190'],
             'phone' => ['required', 'string', 'max:40'],
             'age' => ['required', 'integer', 'min:16', 'max:75'],
-            'religion' => ['required', 'in:Islam,Christan,Catolichs,Buddha,Hindu,Konghucu'],
+            'religion' => ['required', 'in:Islam,Christan,Catholic,Catolichs,Buddha,Hindu,Konghucu'],
             'province' => ['required', 'string', 'max:120'],
             'city' => ['required', 'string', 'max:120'],
             'speaks_english' => ['required', 'in:yes,no'],
@@ -31,7 +39,8 @@ class JobApplicationController extends Controller
             'has_motorbike' => ['required', 'in:yes,no'],
             'has_passport' => ['required', 'in:yes,no'],
             'can_drive_car' => ['required', 'in:yes,no'],
-            'position_title' => ['required', 'string', 'max:120'],
+            'career_job_id' => ['nullable', 'integer', 'exists:career_jobs,id'],
+            'position_title' => ['nullable', 'string', 'max:120', 'required_without:career_job_id'],
             'resume' => ['required', 'file', 'mimes:pdf', 'max:4096'],
         ]);
 
@@ -47,6 +56,19 @@ class JobApplicationController extends Controller
 
         $resumePath = $request->file('resume')->store('applications/resumes', 'public');
 
+        $linkedJob = null;
+        if (!empty($validated['career_job_id'])) {
+            $linkedJob = Job::query()->find((int) $validated['career_job_id']);
+        }
+
+        $positionTitle = $linkedJob?->title ?? (string) ($validated['position_title'] ?? '');
+
+        if ($positionTitle === '') {
+            return back()
+                ->withInput()
+                ->withErrors(['position_title' => 'Position title is required.']);
+        }
+
         $application = JobApplication::create([
             'full_name' => $validated['full_name'],
             'email' => $validated['email'],
@@ -61,7 +83,8 @@ class JobApplicationController extends Controller
             'has_motorbike' => $validated['has_motorbike'] === 'yes',
             'has_passport' => $validated['has_passport'] === 'yes',
             'can_drive_car' => $validated['can_drive_car'] === 'yes',
-            'position_title' => $validated['position_title'],
+            'position_title' => $positionTitle,
+            'career_job_id' => $linkedJob?->id,
             'resume_path' => $resumePath,
             'status' => 'new',
         ]);

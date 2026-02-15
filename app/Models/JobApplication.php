@@ -21,6 +21,7 @@ class JobApplication extends Model
         'has_passport',
         'can_drive_car',
         'position_title',
+        'career_job_id',
         'resume_path',
         'status',
     ];

@@ -19,12 +19,8 @@
                 {{ ($job->published_at ?? $job->created_at)->format('d M Y') }}</p>
         </div>
 
-        <p class="mt-3 text-xs leading-relaxed text-[#6b6b66]">
-            {{ \Illuminate\Support\Str::limit(strip_tags($job->description), 120) }}
-        </p>
-
         <div class="mt-auto pt-4">
-            <a href="{{ route('applications.create') }}"
+            <a href="{{ route('applications.create', ['job_id' => $job->id]) }}"
                 class="inline-flex w-full items-center justify-center rounded-full border border-[#287854] bg-white px-4 py-2 text-xs font-semibold text-[#287854] transition hover:bg-[#287854] hover:text-white">
                 Apply now
             </a>
@@ -32,7 +28,7 @@
     </article>
 @empty
     <div class="col-span-full rounded-2xl bg-white p-10 text-center shadow-[0_20px_50px_rgba(31,95,70,0.12)]">
-        <h2 class="text-2xl font-semibold text-[#1b1b18]">No jobs match your filter</h2>
-        <p class="mt-3 text-sm text-[#6b6b66]">Try changing the job type or search keyword.</p>
+        <h2 class="text-2xl font-semibold text-[#1b1b18]">Currently no jobs available</h2>
+        <p class="mt-3 text-sm text-[#6b6b66]">Please check back later for new openings.</p>
     </div>
 @endforelse
