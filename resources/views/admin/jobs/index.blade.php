@@ -1,11 +1,11 @@
 @extends('admin.layout')
 
-@section('page-title', 'Jobs & Careers')
+@section('page-title', 'Career')
 
 @section('content')
     <div class="bg-white rounded-lg shadow">
         <div class="p-6 border-b flex justify-between items-center">
-            <h3 class="text-lg font-semibold">All Jobs</h3>
+                    <h3 class="text-lg font-semibold">All Career Posts</h3>
             <div class="flex items-center gap-2">
                 <button type="submit" form="bulk-delete-form" id="bulk-delete-btn"
                     class="hidden bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium">
@@ -16,7 +16,7 @@
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                     </svg>
-                    Add New Job
+                    Add Career Post
                 </a>
             </div>
         </div>
@@ -46,6 +46,8 @@
                                 Location</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type
                             </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Work Mode
+                            </th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Status</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date
@@ -71,7 +73,9 @@
                                         </svg>
                                         <div>
                                             <p class="font-semibold text-gray-900">{{ $job->title }}</p>
-                                            @if ($job->salary_range)
+                                            @if ($job->hide_salary_range)
+                                                <p class="text-sm text-gray-400">Salary hidden</p>
+                                            @elseif ($job->salary_range)
                                                 <p class="text-sm text-gray-500">{{ $job->salary_range }}</p>
                                             @endif
                                         </div>
@@ -84,6 +88,11 @@
                                     <span
                                         class="px-2 py-1 text-xs font-medium rounded-full {{ $job->type === 'full-time' ? 'bg-blue-100 text-blue-800' : ($job->type === 'part-time' ? 'bg-purple-100 text-purple-800' : 'bg-orange-100 text-orange-800') }}">
                                         {{ ucwords(str_replace('-', ' ', $job->type)) }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="px-2 py-1 text-xs font-medium rounded-full bg-emerald-100 text-emerald-800">
+                                        {{ strtoupper((string) ($job->work_mode ?: 'hybrid')) }}
                                     </span>
                                 </td>
                                 <td class="px-6 py-4">
@@ -143,7 +152,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                     </svg>
-                    Add New Job
+                    Add Career Post
                 </a>
             </div>
         @endif

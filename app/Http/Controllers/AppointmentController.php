@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\AppointmentSubmitted;
 use App\Models\Appointment;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use Throwable;
 
 class AppointmentController extends Controller
 {
@@ -133,7 +136,7 @@ class AppointmentController extends Controller
                 ->withErrors(['start_time' => 'This timeslot is already booked. Please pick another time.']);
         }
 
-        Appointment::create([
+        $appointment = Appointment::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
             'phone' => $validated['phone'],
@@ -143,6 +146,26 @@ class AppointmentController extends Controller
             'ends_at' => $endsAt,
             'status' => 'pending',
         ]);
+
+        $notificationRecipient = (string) config('mail.notifications.appointments', config('mail.from.address'));
+
+        if ($notificationRecipient !== '') {
+            try {
+                Mail::to($notificationRecipient)->send(new AppointmentSubmitted($appointment));
+            } catch (Throwable $e) {
+                report($e);
+
+                if ($request->expectsJson()) {
+                    return response()->json([
+                        'message' => 'Appointment request submitted, but notification email delivery failed.',
+                    ]);
+                }
+
+                return redirect()
+                    ->route('appointments.create')
+                    ->with('warning', 'Appointment request submitted, but notification email delivery failed.');
+            }
+        }
 
         if ($request->expectsJson()) {
             return response()->json([

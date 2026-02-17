@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ \App\Models\SiteSetting::siteName() }}</title>
-    <link rel="icon" href="{{ asset('favicon.ico') }}">
+    <link rel="icon" href="{{ asset('images/logo.png') }}">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -40,7 +40,7 @@
                 <path d="M6 11l6-6 6 6" />
             </svg>
         </button>
-        <a href="https://wa.me/1234567890"
+        <a href="https://wa.me/6285739660906?text=Hello,%20I%E2%80%99m%20interested%20in%20learning%20more%20about%20your%20staffing%20services.%0A%0ACompany%20Name:%20%0AIndustry:%20%0APositions%20Needed:%20%0ANumber%20of%20Hires:%20%0AWork%20Arrangement%20(On-site%20/%20Remote%20/%20Hybrid):%20%0A%0APlease%20let%20me%20know%20how%20we%20can%20proceed%20with%20a%20consultation.%20Thank%20you."
             class="group relative flex h-14 w-14 items-center justify-center overflow-visible rounded-full bg-transparent transition"
             aria-label="WhatsApp Chat">
             <img src="{{ asset('images/512px-WhatsApp.svg.webp') }}" alt="WhatsApp" class="h-[3.6rem] w-[3.6rem]"

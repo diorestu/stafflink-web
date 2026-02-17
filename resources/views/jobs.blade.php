@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ \App\Models\SiteSetting::siteName() }} - Jobs</title>
-    <link rel="icon" href="{{ asset('favicon.ico') }}">
+    <link rel="icon" href="{{ asset('images/logo.png') }}">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -32,7 +32,7 @@
 
                 <section class="rounded-2xl bg-white p-5 mb-5 shadow-[0_16px_40px_rgba(31,95,70,0.1)]"
                     data-aos="fade-up">
-                    <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-[1fr_170px_190px_190px_220px_auto] md:items-end">
+                    <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-[1fr_170px_170px_180px_180px_220px_auto] md:items-end">
                         <div>
                             <label for="job-search" class="text-sm font-semibold text-[#2e2e2e]">Filter by name</label>
                             <input id="job-search" type="text" placeholder="Search job title..."
@@ -87,6 +87,23 @@
                             </select>
                         </div>
                         <div>
+                            <label for="job-work-mode-filter"
+                                class="text-sm font-semibold text-[#2e2e2e]">Work mode</label>
+                            <select id="job-work-mode-filter"
+                                class="mt-2 w-full rounded-xl border border-[#d1d5db] px-4 py-3 text-sm focus:border-[#287854] focus:outline-none">
+                                <option value=""
+                                    {{ request('work_mode') === null || request('work_mode') === '' ? 'selected' : '' }}>
+                                    All work modes</option>
+                                @foreach ($workModeOptions as $option)
+                                    <option value="{{ $option }}"
+                                        {{ request('work_mode') === $option ? 'selected' : '' }}>
+                                        {{ strtoupper($option) }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div>
                             <label for="job-salary-filter" class="text-sm font-semibold text-[#2e2e2e]">Salary
                                 range</label>
                             <select id="job-salary-filter"
@@ -133,6 +150,7 @@
             const typeSelect = document.getElementById('job-type-filter');
             const countrySelect = document.getElementById('job-country-filter');
             const stateSelect = document.getElementById('job-state-filter');
+            const workModeSelect = document.getElementById('job-work-mode-filter');
             const salarySelect = document.getElementById('job-salary-filter');
             const resetBtn = document.getElementById('job-filter-reset');
 
@@ -154,6 +172,7 @@
                 if (typeSelect.value) url.searchParams.set('type', typeSelect.value);
                 if (countrySelect.value) url.searchParams.set('country', countrySelect.value);
                 if (stateSelect.value) url.searchParams.set('state', stateSelect.value);
+                if (workModeSelect.value) url.searchParams.set('work_mode', workModeSelect.value);
                 if (salarySelect.value) url.searchParams.set('salary_range', salarySelect.value);
                 url.searchParams.set('page', String(page));
                 return url.toString();
@@ -231,6 +250,7 @@
             typeSelect.addEventListener('change', triggerFilter);
             countrySelect.addEventListener('change', triggerFilter);
             stateSelect.addEventListener('change', triggerFilter);
+            workModeSelect.addEventListener('change', triggerFilter);
             salarySelect.addEventListener('change', triggerFilter);
 
             resetBtn.addEventListener('click', () => {
@@ -238,6 +258,7 @@
                 typeSelect.value = '';
                 countrySelect.value = '';
                 stateSelect.value = '';
+                workModeSelect.value = '';
                 salarySelect.value = '';
                 triggerFilter();
             });

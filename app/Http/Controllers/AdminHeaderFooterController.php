@@ -36,7 +36,7 @@ class AdminHeaderFooterController extends Controller
             'apply_now_label' => $validated['apply_now_label'] ?? 'Apply now',
             'apply_now_url' => $validated['apply_now_url'] ?? '#',
             'consultation_label' => $validated['consultation_label'] ?? 'Free Consultation',
-            'consultation_url' => $validated['consultation_url'] ?? '#',
+            'consultation_url' => $validated['consultation_url'] ?? route('appointments.create'),
             'copyright_text' => $validated['copyright_text'] ?? '',
             'about_links' => $this->parseJsonLinks($validated['about_links'] ?? '[]'),
             'main_links' => $this->parseJsonLinks($validated['main_links'] ?? '[]'),

@@ -15,15 +15,21 @@ class Job extends Model
         'country',
         'state',
         'type',
+        'work_mode',
         'minimum_salary',
         'maximum_salary',
         'salary_range',
+        'hide_salary_range',
+        'custom_questions',
+        'whatsapp_inquiry_template',
         'status',
         'published_at',
     ];
 
     protected $casts = [
         'published_at' => 'datetime',
+        'hide_salary_range' => 'boolean',
+        'custom_questions' => 'array',
     ];
 
     public function getLocationDisplayAttribute(): ?string
@@ -42,6 +48,10 @@ class Job extends Model
 
     public function getSalaryRangeAttribute($value): ?string
     {
+        if ((bool) ($this->attributes['hide_salary_range'] ?? false)) {
+            return null;
+        }
+
         $min = $this->attributes['minimum_salary'] ?? null;
         $max = $this->attributes['maximum_salary'] ?? null;
 

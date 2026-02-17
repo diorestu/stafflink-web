@@ -24,6 +24,15 @@ class AdminAuthController extends Controller
         ]);
 
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
+            $user = Auth::user();
+            if (!$user || !in_array($user->role, ['super_admin', 'admin'], true)) {
+                Auth::logout();
+
+                return back()->withErrors([
+                    'email' => 'You are not allowed to access admin dashboard.',
+                ])->onlyInput('email');
+            }
+
             $request->session()->regenerate();
 
             return redirect()->intended(route('admin.dashboard'));

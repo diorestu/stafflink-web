@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>{{ \App\Models\SiteSetting::siteName() }} - Contact Us</title>
-        <link rel="icon" href="{{ asset('favicon.ico') }}">
+        <link rel="icon" href="{{ asset('images/logo.png') }}">
 
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -26,10 +26,10 @@
                                 <p class="mt-3 text-sm text-white/85">
                                     Start solving your staffing issue and start saving money today.
                                 </p>
-                                <button
-                                    class="mt-5 rounded-full border border-[#b28b2e] px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-[#b28b2e]">
+                                <a href="{{ route('appointments.create') }}"
+                                    class="mt-5 inline-flex rounded-full border border-[#b28b2e] px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-[#b28b2e]">
                                     Get a Free Consultation Today
-                                </button>
+                                </a>
                             </div>
                             <div class="pointer-events-none absolute -bottom-3 right-0 lg:-bottom-4">
                                 <img src="{{ asset('images/single_img.png') }}" alt="Get in touch"
@@ -171,7 +171,7 @@
                 </svg>
             </button>
             <a
-                href="https://wa.me/1234567890"
+                href="https://wa.me/6285739660906"
                 class="group relative flex h-14 w-14 items-center justify-center overflow-visible rounded-full bg-transparent transition"
                 aria-label="WhatsApp Chat"
             >

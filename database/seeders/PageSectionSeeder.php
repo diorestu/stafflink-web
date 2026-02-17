@@ -61,6 +61,12 @@ class PageSectionSeeder extends Seeder
                 'badge' => 'Talent solutions',
                 'title' => 'We find the perfect-match professionals for you',
                 'subtitle' => 'From specialists to leadership teams, our global network connects you with the right people for every project.',
+                'client_pov_badge' => 'Careers to Services',
+                'client_pov_title' => 'Client point of view',
+                'client_pov_description' => 'Need consultation about a position? Book a consultation with our team and we will map the best service fit.',
+                'candidate_pov_badge' => 'Jobs to Career',
+                'candidate_pov_title' => 'Candidate point of view',
+                'candidate_pov_description' => 'Looking for a role? Access our job portal and apply directly to positions that match your expertise.',
                 'cards' => [
                     [
                         'title' => 'Domestic service',

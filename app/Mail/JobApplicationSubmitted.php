@@ -33,15 +33,26 @@ class JobApplicationSubmitted extends Mailable
 
     public function attachments(): array
     {
-        $fullPath = storage_path('app/public/' . $this->application->resume_path);
+        $files = array_filter([
+            $this->application->resume_path,
+            $this->application->id_ktp_path,
+            $this->application->skck_path,
+            $this->application->cover_letter_file_path,
+            $this->application->portfolio_file_path,
+        ]);
 
-        if (!is_file($fullPath)) {
-            return [];
+        $attachments = [];
+
+        foreach ($files as $path) {
+            $fullPath = storage_path('app/public/' . $path);
+            if (!is_file($fullPath)) {
+                continue;
+            }
+
+            $attachments[] = \Illuminate\Mail\Mailables\Attachment::fromPath($fullPath)
+                ->as(basename($fullPath));
         }
 
-        return [
-            \Illuminate\Mail\Mailables\Attachment::fromPath($fullPath)
-                ->as(basename($fullPath)),
-        ];
+        return $attachments;
     }
 }

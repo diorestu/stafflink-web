@@ -24,7 +24,7 @@
             return [
                 'title' => $category->name,
                 'description' => \Illuminate\Support\Str::limit(
-                    $category->description ?: count($careers) . ' career(s) available',
+                    $category->description ?: count($careers) . ' service(s) available',
                     100,
                 ),
                 'jobs' => $careers,
@@ -66,7 +66,7 @@
                     @if (!empty($category['image_path']))
                         <img src="{{ \Illuminate\Support\Facades\Storage::url($category['image_path']) }}"
                             alt="{{ $category['title'] ?? 'Category image' }}"
-                            class="h-40 w-full object-cover transition duration-300 ease-out group-hover:scale-105"
+                            class="block h-40 w-full object-cover transition duration-300 ease-out group-hover:scale-105"
                             draggable="false" />
                     @else
                         <div class="flex h-40 w-full items-center justify-center bg-[#ecf7f1] text-[#287854]">

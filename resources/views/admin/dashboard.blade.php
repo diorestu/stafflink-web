@@ -3,6 +3,10 @@
 @section('page-title', 'Dashboard')
 
 @section('content')
+    @php
+        $dashboardTimezone = 'Asia/Singapore'; // UTC+8
+    @endphp
+
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-8">
         <div class="rounded-xl border border-[#d7e8df] bg-[#f6faf8] p-5">
             <div class="flex items-start justify-between gap-3">
@@ -72,28 +76,37 @@
             <h3 class="text-lg font-semibold">Quick Actions</h3>
         </div>
         <div class="p-6 flex flex-wrap items-center gap-3">
-            <a href="{{ route('admin.sections.index') }}"
-                class="inline-flex items-center gap-2 rounded-full border border-[#c7dfd4] bg-[#f6faf8] px-4 py-2 text-sm font-semibold text-[#1f5f46] transition hover:bg-[#eaf5ef]">
-                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                </svg>
-                <span>Edit Page Content</span>
-            </a>
-            <a href="{{ route('admin.pages.index') }}"
-                class="inline-flex items-center gap-2 rounded-full border border-[#c7dfd4] bg-[#f6faf8] px-4 py-2 text-sm font-semibold text-[#1f5f46] transition hover:bg-[#eaf5ef]">
-                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M12 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-6m-8-8h8m0 0v8m0-8L10 14" />
-                </svg>
-                <span>Manage Pages</span>
-            </a>
-            <a href="{{ route('admin.jobs.create') }}"
+            @if (auth()->user()?->role === 'super_admin')
+                <a href="{{ route('admin.sections.index') }}"
+                    class="inline-flex items-center gap-2 rounded-full border border-[#c7dfd4] bg-[#f6faf8] px-4 py-2 text-sm font-semibold text-[#1f5f46] transition hover:bg-[#eaf5ef]">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                    <span>Edit Page Content</span>
+                </a>
+                <a href="{{ route('admin.pages.index') }}"
+                    class="inline-flex items-center gap-2 rounded-full border border-[#c7dfd4] bg-[#f6faf8] px-4 py-2 text-sm font-semibold text-[#1f5f46] transition hover:bg-[#eaf5ef]">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-6m-8-8h8m0 0v8m0-8L10 14" />
+                    </svg>
+                    <span>Manage Pages</span>
+                </a>
+                <a href="{{ route('admin.jobs.create') }}"
+                    class="inline-flex items-center gap-2 rounded-full border border-[#c7dfd4] bg-[#f6faf8] px-4 py-2 text-sm font-semibold text-[#1f5f46] transition hover:bg-[#eaf5ef]">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    <span>Add New Job</span>
+                </a>
+            @endif
+            <a href="{{ route('admin.careers.create') }}"
                 class="inline-flex items-center gap-2 rounded-full border border-[#c7dfd4] bg-[#f6faf8] px-4 py-2 text-sm font-semibold text-[#1f5f46] transition hover:bg-[#eaf5ef]">
                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                 </svg>
-                <span>Add New Job</span>
+                <span>Add Service</span>
             </a>
         </div>
     </div>
@@ -107,8 +120,8 @@
         </div>
         <div class="p-6">
             @php
-                $startOfWeek = \Carbon\Carbon::now()->startOfWeek(\Carbon\Carbon::MONDAY);
-                $appointmentsByDay = $weeklyAppointments->groupBy(fn ($item) => $item->starts_at->toDateString());
+                $startOfWeek = \Carbon\Carbon::now($dashboardTimezone)->startOfWeek(\Carbon\Carbon::MONDAY);
+                $appointmentsByDay = $weeklyAppointments->groupBy(fn ($item) => $item->starts_at->copy()->timezone($dashboardTimezone)->toDateString());
             @endphp
 
             <div class="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7">
@@ -149,7 +162,12 @@
                                             </span>
                                         @endif
                                     </div>
-                                    <p class="mt-1 text-[11px] text-gray-600">{{ $appointment->starts_at->format('H:i') }} - {{ $appointment->ends_at->format('H:i') }}</p>
+                                    <p class="mt-1 text-[11px] text-gray-600">
+                                        {{ $appointment->starts_at->copy()->timezone($dashboardTimezone)->format('H:i') }}
+                                        -
+                                        {{ $appointment->ends_at->copy()->timezone($dashboardTimezone)->format('H:i') }}
+                                        (UTC+8)
+                                    </p>
                                     @if($appointment->status === 'pending')
                                         <form action="{{ route('admin.appointments.approve', $appointment) }}" method="POST" class="mt-1.5">
                                             @csrf

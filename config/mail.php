@@ -115,4 +115,8 @@ return [
         'name' => env('MAIL_FROM_NAME', 'Example'),
     ],
 
+    'notifications' => [
+        'appointments' => env('APPOINTMENT_NOTIFICATION_TO', env('MAIL_FROM_ADDRESS')),
+    ],
+
 ];

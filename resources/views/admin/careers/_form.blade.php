@@ -4,7 +4,7 @@
 
 <div class="space-y-6">
     <div>
-        <label for="career_category_id" class="block text-sm font-medium text-gray-700 mb-2">Career Category *</label>
+        <label for="career_category_id" class="block text-sm font-medium text-gray-700 mb-2">Service Category *</label>
         <select name="career_category_id" id="career_category_id" required
             class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#287854] focus:border-transparent bg-white">
             <option value="">Select category</option>
@@ -20,7 +20,7 @@
     </div>
 
     <div>
-        <label for="title" class="block text-sm font-medium text-gray-700 mb-2">Career Title *</label>
+        <label for="title" class="block text-sm font-medium text-gray-700 mb-2">Service Title *</label>
         <input type="text" name="title" id="title" value="{{ old('title', $career?->title) }}" required
             class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#287854] focus:border-transparent"
             placeholder="e.g. Senior Executive Assistant">
@@ -40,7 +40,7 @@
     </div>
 
     <div>
-        <label for="thumbnail" class="block text-sm font-medium text-gray-700 mb-2">Career Thumbnail</label>
+        <label for="thumbnail" class="block text-sm font-medium text-gray-700 mb-2">Service Thumbnail</label>
         <input type="file" id="thumbnail" name="thumbnail" accept="image/*"
             class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#287854] focus:border-transparent bg-white">
         @error('thumbnail')

@@ -1,12 +1,12 @@
 @extends('admin.layout')
 
-@section('page-title', 'Edit Job')
+@section('page-title', 'Edit Career Post')
 
 @section('content')
     <div class="max-w-5xl">
         <div class="bg-white rounded-xl shadow-sm border border-gray-100">
             <div class="px-8 py-6 border-b bg-gray-50/60 rounded-t-xl">
-                <h3 class="text-lg font-semibold text-gray-900">Edit Job</h3>
+                <h3 class="text-lg font-semibold text-gray-900">Edit Career Post</h3>
                 <p class="text-sm text-gray-500 mt-1">Update role details and publish settings.</p>
             </div>
             <form action="{{ route('admin.jobs.update', $job) }}" method="POST" class="p-8 space-y-8">
@@ -97,6 +97,19 @@
                         </div>
 
                         <div>
+                            <label for="work_mode" class="block text-sm font-medium text-gray-700 mb-2">Work Mode *</label>
+                            <select name="work_mode" id="work_mode" required
+                                class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#287854] focus:border-transparent bg-white">
+                                <option value="wfo" {{ old('work_mode', $job->work_mode) === 'wfo' ? 'selected' : '' }}>WFO</option>
+                                <option value="wfh" {{ old('work_mode', $job->work_mode) === 'wfh' ? 'selected' : '' }}>WFH</option>
+                                <option value="hybrid" {{ old('work_mode', $job->work_mode ?? 'hybrid') === 'hybrid' ? 'selected' : '' }}>Hybrid</option>
+                            </select>
+                            @error('work_mode')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div>
                             <label for="status" class="block text-sm font-medium text-gray-700 mb-2">Status *</label>
                             <select name="status" id="status" required
                                 class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#287854] focus:border-transparent bg-white">
@@ -144,6 +157,46 @@
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                             @error('maximum_salary')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+
+                            <label class="mt-2 inline-flex items-center gap-2 text-sm text-gray-700">
+                                <input type="checkbox" name="hide_salary_range" value="1"
+                                    @checked(old('hide_salary_range', $job->hide_salary_range))
+                                    class="h-4 w-4 rounded border-gray-300 text-[#287854] focus:ring-[#287854]">
+                                Hide salary range on public jobs page
+                            </label>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="space-y-4">
+                    <div>
+                        <h4 class="text-sm font-semibold tracking-wide text-gray-500 uppercase">Candidate Flow</h4>
+                    </div>
+                    <div class="grid grid-cols-1 gap-5">
+                        <div>
+                            <label for="custom_questions_text" class="block text-sm font-medium text-gray-700 mb-2">
+                                Custom Questions (one per line)
+                            </label>
+                            <textarea name="custom_questions_text" id="custom_questions_text" rows="4"
+                                class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#287854] focus:border-transparent"
+                                placeholder="Why are you a great fit for this role?&#10;What is your expected start date?">{{ old('custom_questions_text', collect($job->custom_questions ?? [])->implode("\n")) }}</textarea>
+                            <p class="mt-1 text-xs text-gray-500">Candidates must answer these in the Apply form.</p>
+                            @error('custom_questions_text')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div>
+                            <label for="whatsapp_inquiry_template" class="block text-sm font-medium text-gray-700 mb-2">
+                                WhatsApp Inquiry Message Template
+                            </label>
+                            <textarea name="whatsapp_inquiry_template" id="whatsapp_inquiry_template" rows="3"
+                                class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#287854] focus:border-transparent"
+                                placeholder="Hi Staff Link, I want to ask about the {position} role in {location}.">{{ old('whatsapp_inquiry_template', $job->whatsapp_inquiry_template) }}</textarea>
+                            <p class="mt-1 text-xs text-gray-500">Use placeholders: <code>{position}</code>, <code>{location}</code>, <code>{work_mode}</code>.</p>
+                            @error('whatsapp_inquiry_template')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>
@@ -398,6 +451,7 @@
                         body: JSON.stringify({
                             title,
                             type: document.getElementById('type')?.value || null,
+                            work_mode: document.getElementById('work_mode')?.value || null,
                             country: countrySelect.value || null,
                             state: stateSelect.value || null
                         })

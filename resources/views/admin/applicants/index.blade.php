@@ -52,15 +52,53 @@
                     </thead>
                     <tbody class="divide-y divide-gray-200 bg-white">
                         @foreach ($applications as $application)
+                            @php
+                                $waNumber = preg_replace('/\D+/', '', (string) $application->phone);
+                                $waTemplate = (string) config('services.whatsapp.candidate_template', 'Hi {name}, thank you for applying to {position}. We would like to continue your process.');
+                                $waMessage = strtr($waTemplate, [
+                                    '{name}' => (string) $application->full_name,
+                                    '{position}' => (string) $application->position_title,
+                                ]);
+                                $waUrl = $waNumber !== '' ? 'https://wa.me/' . $waNumber . '?text=' . urlencode($waMessage) : null;
+                                $isSelected = in_array($application->status, ['shortlisted', 'hired'], true);
+                            @endphp
                             <tr class="hover:bg-gray-50">
                                 <td class="px-6 py-4">
                                     <p class="font-semibold text-gray-900">{{ $application->full_name }}</p>
                                     <p class="text-sm text-gray-500">{{ $application->email }}</p>
                                     <p class="text-sm text-gray-500">{{ $application->phone }}</p>
+                                    @if ($application->attachment_link)
+                                        <a href="{{ $application->attachment_link }}" target="_blank" rel="noopener"
+                                            class="mt-1 inline-flex text-xs font-medium text-[#287854] hover:text-[#1f5f46]">
+                                            Attachment Link
+                                        </a>
+                                    @endif
+                                    @if ($application->reference_name || $application->reference_company || $application->reference_phone || $application->reference_email)
+                                        <details class="mt-2 rounded-md border border-gray-200 bg-gray-50 p-2">
+                                            <summary class="cursor-pointer text-xs font-semibold text-gray-700">Reference contact</summary>
+                                            <ul class="mt-2 space-y-1 text-xs text-gray-600">
+                                                <li><span class="font-semibold">Name:</span> {{ $application->reference_name ?: '-' }}</li>
+                                                <li><span class="font-semibold">Company:</span> {{ $application->reference_company ?: '-' }}</li>
+                                                <li><span class="font-semibold">Phone:</span> {{ $application->reference_phone ?: '-' }}</li>
+                                                <li><span class="font-semibold">Email:</span> {{ $application->reference_email ?: '-' }}</li>
+                                            </ul>
+                                        </details>
+                                    @endif
+                                    @if (is_array($application->custom_answers) && count($application->custom_answers))
+                                        <details class="mt-2 rounded-md border border-gray-200 bg-gray-50 p-2">
+                                            <summary class="cursor-pointer text-xs font-semibold text-gray-700">Custom answers</summary>
+                                            <ul class="mt-2 space-y-1 text-xs text-gray-600">
+                                                @foreach ($application->custom_answers as $question => $answer)
+                                                    <li><span class="font-semibold">{{ $question }}:</span>
+                                                        {{ \Illuminate\Support\Str::limit((string) $answer, 90) }}</li>
+                                                @endforeach
+                                            </ul>
+                                        </details>
+                                    @endif
                                 </td>
                                 <td class="px-6 py-4 text-sm text-gray-600">{{ $application->position_title }}</td>
                                 <td class="px-6 py-4 text-sm text-gray-600">
-                                    {{ $application->city }}, {{ $application->province }}
+                                    {{ $application->address ?: trim($application->city . ', ' . $application->province, ', ') }}
                                 </td>
                                 <td class="px-6 py-4 text-sm text-gray-600">{{ $application->created_at->format('M d, Y H:i') }}</td>
                                 <td class="px-6 py-4">
@@ -91,6 +129,44 @@
                                             class="inline-flex items-center justify-center rounded-md p-1.5 text-[#287854] hover:bg-[#ecf6f1]">
                                             <iconify-icon icon="mdi:file-download-outline" width="18" height="18"></iconify-icon>
                                         </a>
+                                        <a href="{{ route('admin.applicants.document', [$application, 'id_ktp']) }}"
+                                            class="inline-flex items-center justify-center rounded-md p-1.5 text-[#287854] hover:bg-[#ecf6f1]"
+                                            title="Download ID / KTP">
+                                            <iconify-icon icon="mdi:card-account-details-outline" width="18" height="18"></iconify-icon>
+                                        </a>
+                                        <a href="{{ route('admin.applicants.document', [$application, 'skck']) }}"
+                                            class="inline-flex items-center justify-center rounded-md p-1.5 text-[#287854] hover:bg-[#ecf6f1]"
+                                            title="Download SKCK">
+                                            <iconify-icon icon="mdi:file-certificate-outline" width="18" height="18"></iconify-icon>
+                                        </a>
+                                        @if ($application->cover_letter_file_path)
+                                            <a href="{{ route('admin.applicants.document', [$application, 'cover_letter']) }}"
+                                                class="inline-flex items-center justify-center rounded-md p-1.5 text-[#287854] hover:bg-[#ecf6f1]"
+                                                title="Download Cover Letter">
+                                                <iconify-icon icon="mdi:file-document-outline" width="18" height="18"></iconify-icon>
+                                            </a>
+                                        @endif
+                                        @if ($application->portfolio_file_path)
+                                            <a href="{{ route('admin.applicants.document', [$application, 'portfolio']) }}"
+                                                class="inline-flex items-center justify-center rounded-md p-1.5 text-[#287854] hover:bg-[#ecf6f1]"
+                                                title="Download Portfolio">
+                                                <iconify-icon icon="mdi:briefcase-outline" width="18" height="18"></iconify-icon>
+                                            </a>
+                                        @endif
+                                        @if ($waUrl && $isSelected)
+                                            <a href="{{ $waUrl }}" target="_blank" rel="noopener"
+                                                class="inline-flex items-center justify-center rounded-md p-1.5 text-[#25d366] hover:bg-[#e9fce9]"
+                                                title="Chat candidate via WhatsApp">
+                                                <iconify-icon icon="mdi:whatsapp" width="18" height="18"></iconify-icon>
+                                            </a>
+                                        @endif
+                                        @if ($application->reference_token)
+                                            <a href="{{ route('references.show', $application->reference_token) }}" target="_blank" rel="noopener"
+                                                class="inline-flex items-center justify-center rounded-md p-1.5 text-[#2b89b5] hover:bg-[#ebf4fa]"
+                                                title="Open reference link">
+                                                <iconify-icon icon="mdi:link-variant" width="18" height="18"></iconify-icon>
+                                            </a>
+                                        @endif
                                     </div>
                                 </td>
                             </tr>

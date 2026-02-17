@@ -29,17 +29,24 @@ class JobController extends Controller
             'country' => 'required|string|max:255',
             'state' => 'required|string|max:255',
             'type' => 'required|in:full-time,part-time,contract',
+            'work_mode' => 'required|in:wfo,wfh,hybrid',
             'minimum_salary' => 'nullable|integer|min:0|required_with:maximum_salary',
             'maximum_salary' => 'nullable|integer|min:0|gte:minimum_salary|required_with:minimum_salary',
+            'hide_salary_range' => 'nullable|boolean',
+            'custom_questions_text' => 'nullable|string|max:4000',
+            'whatsapp_inquiry_template' => 'nullable|string|max:1000',
             'status' => 'required|in:draft,published',
         ]);
 
         $minimumSalary = isset($validated['minimum_salary']) ? (int) $validated['minimum_salary'] : null;
         $maximumSalary = isset($validated['maximum_salary']) ? (int) $validated['maximum_salary'] : null;
+        $validated['hide_salary_range'] = $request->boolean('hide_salary_range');
         $validated['minimum_salary'] = $minimumSalary;
         $validated['maximum_salary'] = $maximumSalary;
-        $validated['salary_range'] = $this->formatSalaryRange($minimumSalary, $maximumSalary);
+        $validated['salary_range'] = $validated['hide_salary_range'] ? null : $this->formatSalaryRange($minimumSalary, $maximumSalary);
         $validated['location'] = $this->composeLocation($validated['state'], $validated['country']);
+        $validated['custom_questions'] = $this->extractCustomQuestions((string) ($validated['custom_questions_text'] ?? ''));
+        unset($validated['custom_questions_text']);
 
         if ($request->status === 'published' && !$request->published_at) {
             $validated['published_at'] = now();
@@ -64,17 +71,24 @@ class JobController extends Controller
             'country' => 'required|string|max:255',
             'state' => 'required|string|max:255',
             'type' => 'required|in:full-time,part-time,contract',
+            'work_mode' => 'required|in:wfo,wfh,hybrid',
             'minimum_salary' => 'nullable|integer|min:0|required_with:maximum_salary',
             'maximum_salary' => 'nullable|integer|min:0|gte:minimum_salary|required_with:minimum_salary',
+            'hide_salary_range' => 'nullable|boolean',
+            'custom_questions_text' => 'nullable|string|max:4000',
+            'whatsapp_inquiry_template' => 'nullable|string|max:1000',
             'status' => 'required|in:draft,published',
         ]);
 
         $minimumSalary = isset($validated['minimum_salary']) ? (int) $validated['minimum_salary'] : null;
         $maximumSalary = isset($validated['maximum_salary']) ? (int) $validated['maximum_salary'] : null;
+        $validated['hide_salary_range'] = $request->boolean('hide_salary_range');
         $validated['minimum_salary'] = $minimumSalary;
         $validated['maximum_salary'] = $maximumSalary;
-        $validated['salary_range'] = $this->formatSalaryRange($minimumSalary, $maximumSalary);
+        $validated['salary_range'] = $validated['hide_salary_range'] ? null : $this->formatSalaryRange($minimumSalary, $maximumSalary);
         $validated['location'] = $this->composeLocation($validated['state'], $validated['country']);
+        $validated['custom_questions'] = $this->extractCustomQuestions((string) ($validated['custom_questions_text'] ?? ''));
+        unset($validated['custom_questions_text']);
 
         if ($request->status === 'published' && !$job->published_at) {
             $validated['published_at'] = now();
@@ -115,6 +129,7 @@ class JobController extends Controller
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'type' => ['nullable', 'in:full-time,part-time,contract'],
+            'work_mode' => ['nullable', 'in:wfo,wfh,hybrid'],
             'country' => ['nullable', 'string', 'max:255'],
             'state' => ['nullable', 'string', 'max:255'],
         ]);
@@ -130,11 +145,13 @@ class JobController extends Controller
         }
 
         $jobType = str_replace('-', ' ', (string) ($validated['type'] ?? 'full-time'));
+        $workMode = strtoupper((string) ($validated['work_mode'] ?? 'hybrid'));
         $location = $this->composeLocation($validated['state'] ?? null, $validated['country'] ?? null);
 
         $userPrompt = "Create a professional job description for this role:\n" .
             "Title: {$validated['title']}\n" .
             "Job type: {$jobType}\n" .
+            "Work mode: {$workMode}\n" .
             "Location: " . ($location ?: 'Not specified') . "\n\n" .
             "Use plain text with sections: Overview, Key Responsibilities, Requirements, Nice to Have, and Benefits.";
 
@@ -206,5 +223,15 @@ class JobController extends Controller
         }
 
         return 'IDR ' . number_format($minimumSalary) . ' - ' . number_format($maximumSalary);
+    }
+
+    private function extractCustomQuestions(string $raw): array
+    {
+        return collect(preg_split('/\r\n|\r|\n/', $raw))
+            ->map(fn ($line) => trim((string) $line))
+            ->filter(fn ($line) => $line !== '')
+            ->take(8)
+            ->values()
+            ->all();
     }
 }

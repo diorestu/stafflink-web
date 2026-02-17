@@ -3,15 +3,18 @@
 @endphp
 
 <footer class="bg-white px-6 py-8 shadow-[0_-10px_30px_rgba(31,95,70,0.08)]" data-aos="fade-up">
-    <div class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-6">
-        <div class="flex items-center gap-3">
-            <img src="{{ asset('images/logo.png') }}" alt="StaffLink logo" class="h-10 w-auto" draggable="false" />
-        </div>
-        <nav class="flex items-center gap-6 text-sm text-[#4a4a45]">
+    <div class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4">
+        <nav class="flex flex-wrap items-center gap-6 text-sm text-[#4a4a45]">
             @foreach (($hf['footer_links'] ?? []) as $link)
+                @if (strtolower(trim((string) ($link['label'] ?? ''))) === 'apply now')
+                    @continue
+                @endif
                 <a href="{{ $link['url'] ?? '#' }}" class="transition hover:text-[#1b1b18]">{{ $link['label'] ?? '' }}</a>
             @endforeach
             @foreach (($hf['user_links'] ?? []) as $link)
+                @if (strtolower(trim((string) ($link['label'] ?? ''))) === 'apply now')
+                    @continue
+                @endif
                 <a href="{{ $link['url'] ?? '#' }}" class="transition hover:text-[#1b1b18]">{{ $link['label'] ?? '' }}</a>
             @endforeach
         </nav>

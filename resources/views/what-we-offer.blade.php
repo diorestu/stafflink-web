@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ \App\Models\SiteSetting::siteName() }} - What We Offer</title>
-    <link rel="icon" href="{{ asset('favicon.ico') }}">
+    <link rel="icon" href="{{ asset('images/logo.png') }}">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -35,7 +35,7 @@
                             <p class="mt-4 max-w-2xl text-sm leading-relaxed text-[#3f3f3a]">
                                 Talk to us to discover how our high-performing talent pool can empower you to realise your firm's aspirations.
                             </p>
-                            <a href="{{ route('contact') }}"
+                            <a href="{{ route('appointments.create') }}"
                                 class="mt-8 inline-flex rounded-full bg-[#287854] px-7 py-3 text-sm font-semibold text-white transition hover:bg-[#1f5f46]">
                                 Book a free consultation call
                             </a>
@@ -227,7 +227,7 @@
             </svg>
         </button>
         <a
-            href="https://wa.me/1234567890"
+            href="https://wa.me/6285739660906"
             class="group relative flex h-14 w-14 items-center justify-center overflow-visible rounded-full bg-transparent transition"
             aria-label="WhatsApp Chat"
         >

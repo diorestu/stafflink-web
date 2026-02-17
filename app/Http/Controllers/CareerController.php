@@ -16,6 +16,7 @@ class CareerController extends Controller
         $country = trim((string) request('country', ''));
         $state = trim((string) request('state', ''));
         $salaryRange = trim((string) request('salary_range', ''));
+        $workMode = trim((string) request('work_mode', ''));
 
         if ($search !== '') {
             $query->where('title', 'like', '%' . $search . '%');
@@ -37,6 +38,10 @@ class CareerController extends Controller
             $query->where('salary_range', $salaryRange);
         }
 
+        if (in_array($workMode, ['wfo', 'wfh', 'hybrid'], true)) {
+            $query->where('work_mode', $workMode);
+        }
+
         $countryOptions = Job::query()
             ->where('status', 'published')
             ->whereNotNull('country')
@@ -56,11 +61,22 @@ class CareerController extends Controller
 
         $salaryRangeOptions = Job::query()
             ->where('status', 'published')
+            ->where(function ($q) {
+                $q->whereNull('hide_salary_range')->orWhere('hide_salary_range', false);
+            })
             ->whereNotNull('salary_range')
             ->where('salary_range', '!=', '')
             ->distinct()
             ->orderBy('salary_range')
             ->pluck('salary_range');
+
+        $workModeOptions = Job::query()
+            ->where('status', 'published')
+            ->whereNotNull('work_mode')
+            ->where('work_mode', '!=', '')
+            ->distinct()
+            ->orderBy('work_mode')
+            ->pluck('work_mode');
 
         $jobs = $query
             ->orderByDesc('published_at')
@@ -76,6 +92,6 @@ class CareerController extends Controller
             ]);
         }
 
-        return view('jobs', compact('jobs', 'countryOptions', 'stateOptions', 'salaryRangeOptions'));
+        return view('jobs', compact('jobs', 'countryOptions', 'stateOptions', 'salaryRangeOptions', 'workModeOptions'));
     }
 }

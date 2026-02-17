@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\JobApplication;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class AdminJobApplicationController extends Controller
 {
@@ -49,15 +50,40 @@ class AdminJobApplicationController extends Controller
 
     public function resume(JobApplication $application)
     {
-        if (!$application->resume_path || !Storage::disk('public')->exists($application->resume_path)) {
+        return $this->document($application, 'resume');
+    }
+
+    public function document(JobApplication $application, string $type)
+    {
+        $map = [
+            'resume' => ['column' => 'resume_path', 'name' => 'resume'],
+            'id_ktp' => ['column' => 'id_ktp_path', 'name' => 'id-ktp'],
+            'skck' => ['column' => 'skck_path', 'name' => 'skck'],
+            'cover_letter' => ['column' => 'cover_letter_file_path', 'name' => 'cover-letter'],
+            'portfolio' => ['column' => 'portfolio_file_path', 'name' => 'portfolio'],
+        ];
+
+        if (!isset($map[$type])) {
             return redirect()
                 ->route('admin.applicants.index')
-                ->with('error', 'Resume file not found.');
+                ->with('error', 'Document type is invalid.');
         }
 
-        return Storage::disk('public')->download(
-            $application->resume_path,
-            'resume-' . $application->id . '.pdf'
-        );
+        $column = $map[$type]['column'];
+        $path = (string) ($application->{$column} ?? '');
+
+        if ($path === '' || !Storage::disk('public')->exists($path)) {
+            return redirect()
+                ->route('admin.applicants.index')
+                ->with('error', 'Document file not found.');
+        }
+
+        $extension = pathinfo($path, PATHINFO_EXTENSION);
+        $filename = $map[$type]['name'] . '-' . $application->id;
+        if ($extension !== '') {
+            $filename .= '.' . Str::lower($extension);
+        }
+
+        return Storage::disk('public')->download($path, $filename);
     }
 }

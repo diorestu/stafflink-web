@@ -13,7 +13,7 @@ class AdminController extends Controller
         'hero' => 'Hero Banner',
         'overview' => 'Overview',
         'solutions' => 'Solutions',
-        'staffing' => 'Staffing / Talent',
+        'staffing' => 'Careers to Services',
         'industries' => 'Industries',
         'cta' => 'Call to Action',
     ];

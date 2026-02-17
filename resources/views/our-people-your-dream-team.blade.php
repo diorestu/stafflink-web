@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ \App\Models\SiteSetting::siteName() }} - Our People, Your Dream Team</title>
-    <link rel="icon" href="{{ asset('favicon.ico') }}">
+    <link rel="icon" href="{{ asset('images/logo.png') }}">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -30,7 +30,7 @@
                                 Our team sourcing process is transparent, efficient, and designed to deliver high-performing talent
                                 for long-term impact.
                             </p>
-                            <a href="{{ route('contact') }}"
+                            <a href="{{ route('appointments.create') }}"
                                 class="mt-8 inline-flex rounded-full bg-[#b28b2e] px-7 py-3 text-sm font-semibold text-white transition hover:bg-[#9b7829]">
                                 Book a free consultation call
                             </a>
@@ -70,7 +70,7 @@
                             We understand that trust and reliability are critical when building offshore capability.
                             Our people-first model ensures every team member is supported, engaged, and set up to deliver.
                         </p>
-                        <a href="{{ route('contact') }}"
+                        <a href="{{ route('appointments.create') }}"
                             class="mt-7 inline-flex rounded-full bg-[#b28b2e] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#9b7829]">
                             Book a free consultation call
                         </a>
@@ -162,7 +162,7 @@
             </svg>
         </button>
         <a
-            href="https://wa.me/1234567890"
+            href="https://wa.me/6285739660906"
             class="group relative flex h-14 w-14 items-center justify-center overflow-visible rounded-full bg-transparent transition"
             aria-label="WhatsApp Chat"
         >

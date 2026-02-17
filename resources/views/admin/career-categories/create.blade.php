@@ -1,12 +1,12 @@
 @extends('admin.layout')
 
-@section('page-title', 'Add Career Category')
+@section('page-title', 'Add Service Category')
 
 @section('content')
     <div class="max-w-4xl">
         <div class="bg-white rounded-xl shadow-sm border border-gray-100">
             <div class="px-8 py-6 border-b bg-gray-50/60 rounded-t-xl">
-                <h3 class="text-lg font-semibold text-gray-900">Create Career Category</h3>
+                <h3 class="text-lg font-semibold text-gray-900">Create Service Category</h3>
                 <p class="text-sm text-gray-500 mt-1">These categories appear in the Let us build your team section.</p>
             </div>
             <form action="{{ route('admin.career-categories.store') }}" method="POST" enctype="multipart/form-data" class="p-8 space-y-8">

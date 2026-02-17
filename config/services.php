@@ -51,4 +51,10 @@ return [
         'base_url' => env('COUNTRYSTATECITY_BASE_URL', 'https://api.countrystatecity.in/v1'),
     ],
 
+    'whatsapp' => [
+        'inquiry_number' => env('WHATSAPP_INQUIRY_NUMBER', '6285739660906'),
+        'inquiry_template' => env('WHATSAPP_INQUIRY_TEMPLATE', 'Hi Staff Link, I am interested in the {position} role ({work_mode}) in {location}.'),
+        'candidate_template' => env('WHATSAPP_CANDIDATE_TEMPLATE', 'Hi {name}, thank you for applying to {position}. We would like to continue your process.'),
+    ],
+
 ];

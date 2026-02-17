@@ -1,11 +1,11 @@
 @extends('admin.layout')
 
-@section('page-title', 'Career Categories')
+@section('page-title', 'Service Categories')
 
 @section('content')
     <div class="bg-white rounded-lg shadow">
         <div class="p-6 border-b flex justify-between items-center">
-            <h3 class="text-lg font-semibold">All Career Categories</h3>
+            <h3 class="text-lg font-semibold">All Service Categories</h3>
             <a href="{{ route('admin.career-categories.create') }}"
                 class="bg-[#287854] hover:bg-[#1f5f46] text-white px-4 py-2 rounded-lg font-medium inline-flex items-center">
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -22,7 +22,7 @@
                         <tr>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Slug</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Careers</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Services</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order</th>
                             <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
@@ -62,7 +62,7 @@
                                             <iconify-icon icon="mdi:pencil-outline" width="18" height="18"></iconify-icon>
                                         </a>
                                         <form action="{{ route('admin.career-categories.destroy', $category) }}" method="POST" class="inline"
-                                            onsubmit="return confirm('Delete this category? Careers under it will also be deleted.');">
+                                            onsubmit="return confirm('Delete this category? Services under it will also be deleted.');">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit"

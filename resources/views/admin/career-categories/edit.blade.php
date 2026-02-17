@@ -1,12 +1,12 @@
 @extends('admin.layout')
 
-@section('page-title', 'Edit Career Category')
+@section('page-title', 'Edit Service Category')
 
 @section('content')
     <div class="max-w-4xl">
         <div class="bg-white rounded-xl shadow-sm border border-gray-100">
             <div class="px-8 py-6 border-b bg-gray-50/60 rounded-t-xl">
-                <h3 class="text-lg font-semibold text-gray-900">Edit Career Category</h3>
+                <h3 class="text-lg font-semibold text-gray-900">Edit Service Category</h3>
                 <p class="text-sm text-gray-500 mt-1">Update category details and visibility.</p>
             </div>
             <form action="{{ route('admin.career-categories.update', $careerCategory) }}" method="POST" enctype="multipart/form-data" class="p-8 space-y-8">
