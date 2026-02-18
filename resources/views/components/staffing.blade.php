@@ -12,7 +12,7 @@
                         'title' => $career->title,
                         'meta' => trim($type . ' • ' . $location, ' •'),
                         'description' => \Illuminate\Support\Str::limit(strip_tags((string) $career->description), 100),
-                        'link' => '#',
+                        'link' => route('services.roles.show', \Illuminate\Support\Str::slug((string) $career->title)),
                         'thumbnail' => $career->thumbnail_path
                             ? \Illuminate\Support\Facades\Storage::url($career->thumbnail_path)
                             : null,
@@ -61,7 +61,8 @@
                     class="group overflow-hidden rounded-2xl bg-white text-left shadow-sm transition duration-300 ease-out hover:-translate-y-1 hover:shadow-md"
                     data-modal-target="talent" data-talent-title="{{ $category['title'] ?? '' }}"
                     data-talent-description="{{ $category['description'] ?? '' }}"
-                    data-talent-jobs='@json($category['jobs'] ?? [])' data-aos="fade-up"
+                    data-talent-jobs='@json($category['jobs'] ?? [])'
+                    data-aos="fade-up"
                     data-aos-delay="{{ 100 + $i * 50 }}">
                     @if (!empty($category['image_path']))
                         <img src="{{ \Illuminate\Support\Facades\Storage::url($category['image_path']) }}"

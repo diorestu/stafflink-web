@@ -20,6 +20,7 @@ use App\Http\Controllers\JobController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\ReferenceController;
+use App\Http\Controllers\ServiceDetailController;
 use Illuminate\Support\Facades\Route;
 
 // Public
@@ -29,6 +30,10 @@ Route::view('/who-we-are', 'who-we-are')->name('who-we-are');
 Route::view('/what-we-offer', 'what-we-offer')->name('what-we-offer');
 Route::view('/our-people-your-dream-team', 'our-people-your-dream-team')->name('our-people-your-dream-team');
 Route::view('/our-purpose-business-principles', 'our-purpose-business-principles')->name('our-purpose-business-principles');
+Route::view('/airport-services/nanny-concierge', 'nanny-concierge')->name('airport-services.nanny-concierge');
+Route::redirect('/airport-services', '/airport-services/nanny-concierge');
+Route::get('/services/sectors/{slug}', [ServiceDetailController::class, 'sector'])->name('services.sectors.show');
+Route::get('/services/roles/{slug}', [ServiceDetailController::class, 'role'])->name('services.roles.show');
 Route::get('/blog', [BlogController::class, 'index'])->name('blog');
 Route::get('/blog/{blogPost:slug}', [BlogController::class, 'show'])->name('blog.show');
 Route::get('/jobs', [CareerController::class, 'index'])->name('jobs.index');

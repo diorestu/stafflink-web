@@ -1,6 +1,5 @@
 @php
     $hf = \App\Models\SiteSetting::headerFooter();
-    $marqueeTitle = 'STAFF LINK | Global Staffing Solutions Company';
     $consultationUrl = trim((string) ($hf['consultation_url'] ?? ''));
     if ($consultationUrl === '' || $consultationUrl === '#') {
         $consultationUrl = route('appointments.create');
@@ -77,7 +76,7 @@
                 </div>
             </div>
             <div class="relative" data-dropdown data-services-mega>
-                <button class="flex items-center gap-2 text-[#287854] transition hover:text-[#1f5f46]" data-dropdown-trigger>
+                <button class="flex items-center gap-2 transition hover:text-[#1b1b18]" data-dropdown-trigger>
                     Services
                     <svg class="h-3 w-3" viewBox="0 0 12 8" fill="none" stroke="currentColor" stroke-width="1.5">
                         <path d="M1 1l5 5 5-5" />
@@ -138,7 +137,7 @@
                                 <div class="rounded-2xl border border-[#e3ebe6] bg-[#f9fbfa] p-6">
                                     <p class="text-xs uppercase tracking-[0.2em] text-[#287854]">Airport Services</p>
                                     <div class="mt-4">
-                                        <a href="{{ route('jobs.index') }}"
+                                        <a href="{{ route('airport-services.nanny-concierge') }}"
                                             class="inline-flex rounded-xl border border-[#dfe8e3] bg-white px-4 py-3 text-sm font-semibold text-[#2e2e2e] transition hover:border-[#bcd7c8] hover:bg-[#f4faf7] hover:text-[#1f5f46]">
                                             Nanny - Concierge Services
                                         </a>
@@ -151,7 +150,7 @@
                                     <p class="text-xs uppercase tracking-[0.2em] text-[#287854]">Sectors</p>
                                     <div class="mt-4 grid gap-3 sm:grid-cols-2">
                                         @forelse ($serviceCategories as $category)
-                                            <a href="{{ route('jobs.index') }}"
+                                            <a href="{{ route('services.sectors.show', $category->slug) }}"
                                                 class="rounded-xl border border-[#dfe8e3] bg-white px-4 py-3 text-sm font-semibold text-[#2e2e2e] transition hover:border-[#bcd7c8] hover:bg-[#f4faf7] hover:text-[#1f5f46]">
                                                 {{ $category->name }}
                                             </a>
@@ -167,7 +166,7 @@
                                     <p class="text-xs uppercase tracking-[0.2em] text-[#287854]">Roles</p>
                                     <div class="mt-4 grid gap-3 sm:grid-cols-2">
                                         @forelse ($serviceRoles as $role)
-                                            <a href="{{ route('jobs.index') }}"
+                                            <a href="{{ route('services.roles.show', \Illuminate\Support\Str::slug($role)) }}"
                                                 class="rounded-xl border border-[#dfe8e3] bg-white px-4 py-3 text-sm font-semibold text-[#2e2e2e] transition hover:border-[#bcd7c8] hover:bg-[#f4faf7] hover:text-[#1f5f46]">
                                                 {{ $role }}
                                             </a>
@@ -225,19 +224,6 @@
 @once
     <script>
         (() => {
-            const marker = '__stafflink_title_marquee__';
-            if (window[marker]) return;
-            window[marker] = true;
-
-            const base = @json($marqueeTitle . '   ');
-            let text = base;
-            document.title = @json($marqueeTitle);
-
-            setInterval(() => {
-                text = text.slice(1) + text.charAt(0);
-                document.title = text;
-            }, 220);
-
             const megaMenus = Array.from(document.querySelectorAll('[data-services-mega]'));
 
             megaMenus.forEach((menu) => {

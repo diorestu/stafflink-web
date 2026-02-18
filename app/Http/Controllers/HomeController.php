@@ -14,6 +14,7 @@ class HomeController extends Controller
             ->where('is_active', true)
             ->with([
                 'careers' => fn ($query) => $query
+                    ->where('status', 'published')
                     ->orderByDesc('published_at')
                     ->orderByDesc('created_at'),
             ])

@@ -66,13 +66,13 @@ openButtons.forEach((button) => {
                     listEl.innerHTML = jobs
                         .map(
                             (job) => `
-                        <article class=\"overflow-hidden rounded-xl border border-[#e2e5ee] bg-white shadow-sm\">
+                        <a href=\"${job.link || '#'}\" class=\"block overflow-hidden rounded-xl border border-[#e2e5ee] bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md\">
                             ${job.thumbnail ? `<img src=\"${job.thumbnail}\" alt=\"${job.title}\" class=\"block h-40 w-full object-cover\" draggable=\"false\">` : '<div class=\"h-40 w-full bg-[#eef2f7]\"></div>'}
                             <div class=\"p-4\">
                                 <h4 class=\"text-lg font-semibold text-[#111]\">${job.title}</h4>
                                 <p class=\"mt-2 text-sm leading-relaxed text-[#5a5a66]\">${job.description || ''}</p>
                             </div>
-                        </article>
+                        </a>
                     `
                         )
                         .join('');
