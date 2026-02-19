@@ -50,7 +50,9 @@
                                 <p class="mt-3 text-sm text-[#6b6b66]">
                                     {{ \Illuminate\Support\Str::limit($featuredPost->excerpt ?: strip_tags($featuredPost->content), 220) }}
                                 </p>
-                                <p class="mt-4 text-xs text-[#7a7a74]">{{ $featuredPost->published_at?->format('F d, Y') }}</p>
+                                <p class="mt-4 text-xs text-[#7a7a74]">
+                                    {{ $featuredPost->published_at?->format('F d, Y') }} · By {{ $featuredPost->author_name ?: 'StaffLink Editorial Team' }}
+                                </p>
                                 <a href="{{ route('blog.show', $featuredPost) }}"
                                     class="mt-6 inline-flex rounded-full bg-[#287854] px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-[#1f5f46]">
                                     Read Article
@@ -80,6 +82,7 @@
                                     </a>
                                     <div class="p-6">
                                         <p class="text-xs uppercase tracking-[0.2em] text-[#287854]">{{ $post->published_at?->format('M d, Y') }}</p>
+                                        <p class="mt-2 text-xs text-[#7a7a74]">By {{ $post->author_name ?: 'StaffLink Editorial Team' }}</p>
                                         <h3 class="mt-3 text-xl font-semibold text-[#1b1b18]">
                                             <a href="{{ route('blog.show', $post) }}" class="hover:text-[#287854] transition">{{ $post->title }}</a>
                                         </h3>

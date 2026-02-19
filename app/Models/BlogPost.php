@@ -10,6 +10,7 @@ class BlogPost extends Model
     protected $fillable = [
         'title',
         'slug',
+        'author_name',
         'excerpt',
         'content',
         'featured_image_path',
@@ -31,6 +32,6 @@ class BlogPost extends Model
         return $query
             ->where('status', 'published')
             ->whereNotNull('published_at')
-            ->where('published_at', '<=', now());
+            ->whereRaw('published_at <= CURRENT_TIMESTAMP');
     }
 }

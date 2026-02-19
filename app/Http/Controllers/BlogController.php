@@ -25,12 +25,12 @@ class BlogController extends Controller
 
     public function show(BlogPost $blogPost)
     {
-        abort_unless(
-            $blogPost->status === 'published'
-                && $blogPost->published_at
-                && $blogPost->published_at->lte(now()),
-            404
-        );
+        $isPublished = BlogPost::query()
+            ->published()
+            ->whereKey($blogPost->id)
+            ->exists();
+
+        abort_unless($isPublished, 404);
 
         $relatedPosts = BlogPost::query()
             ->published()

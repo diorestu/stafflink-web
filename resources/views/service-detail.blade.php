@@ -68,24 +68,9 @@
                             ->first(fn ($career) => !empty($career->thumbnail_path))
                             ?->thumbnail_path;
                     @endphp
-                    <section class="space-y-6 rounded-[28px] bg-white p-8 shadow-[0_20px_50px_rgba(31,95,70,0.12)]" data-aos="fade-up">
-                        <div>
-                            <div class="grid gap-4 md:grid-cols-3">
-                                <article class="rounded-2xl border border-[#dfe8e3] bg-white p-5">
-                                    <h4 class="text-base font-semibold text-[#1b1b18]">Move In Support</h4>
-                                    <p class="mt-2 text-sm leading-relaxed text-[#6b6b66]">End-to-end preparation and staffing support before move-in day.</p>
-                                </article>
-                                <article class="rounded-2xl border border-[#dfe8e3] bg-white p-5">
-                                    <h4 class="text-base font-semibold text-[#1b1b18]">Move Out Support</h4>
-                                    <p class="mt-2 text-sm leading-relaxed text-[#6b6b66]">Reliable coordination and staffing assistance for a smooth move-out process.</p>
-                                </article>
-                                <article class="rounded-2xl border border-[#dfe8e3] bg-white p-5">
-                                    <h4 class="text-base font-semibold text-[#1b1b18]">Flexible Assistance</h4>
-                                    <p class="mt-2 text-sm leading-relaxed text-[#6b6b66]">Personalized requests, schedule changes, and additional services handled quickly.</p>
-                                </article>
-                            </div>
-                        </div>
+                    @include('partials.role-services')
 
+                    <section class="space-y-6 rounded-[28px] bg-white p-8 shadow-[0_20px_50px_rgba(31,95,70,0.12)]" data-aos="fade-up">
                         <div class="grid gap-8 lg:grid-cols-[1.25fr_1fr] lg:items-stretch">
                             <div class="overflow-hidden rounded-2xl border border-[#dfe8e3] bg-[#f7faf8]">
                                 <img src="{{ $featureImage ? \Illuminate\Support\Facades\Storage::url($featureImage) : asset('images/img_hero.webp') }}" alt="Service support"

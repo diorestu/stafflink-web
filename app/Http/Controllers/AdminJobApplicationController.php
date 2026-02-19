@@ -43,6 +43,13 @@ class AdminJobApplicationController extends Controller
             'status' => $validated['status'],
         ]);
 
+        if ($request->expectsJson() || $request->wantsJson()) {
+            return response()->json([
+                'message' => 'Applicant status updated.',
+                'status' => $application->status,
+            ]);
+        }
+
         return redirect()
             ->route('admin.applicants.index')
             ->with('success', 'Applicant status updated.');

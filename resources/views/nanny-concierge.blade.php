@@ -18,34 +18,35 @@
         <x-site-header />
 
         <main class="px-6 pb-20 pt-12 lg:px-10">
-            <section class="mx-auto max-w-6xl overflow-hidden rounded-[32px] bg-white shadow-[0_20px_60px_rgba(31,95,70,0.16)]" data-aos="fade-up">
-                <div class="grid gap-0 lg:grid-cols-[1.05fr_0.95fr] lg:items-stretch">
-                    <div class="flex flex-col justify-center gap-6 px-8 py-12 lg:px-12">
-                        <p class="text-xs uppercase tracking-[0.3em] text-[#287854]">Airport Services</p>
-                        <h1 class="text-4xl font-semibold leading-tight text-[#1b1b18] md:text-5xl">
-                            International Childcare Recruitment Agency
-                        </h1>
-                        <p class="text-sm leading-relaxed text-[#3f3f3a] max-w-2xl">
-                            Staff Link is the first International VIP Agency specialising in the recruitment and placement of professional
-                            Nannies, Mannies, Bilingual Nannies, Governesses, Nanny/Housekeepers, Maternity Nurses and Tutors for luxury households in Indonesia.
-                        </p>
-                        <p class="text-sm leading-relaxed text-[#3f3f3a] max-w-2xl">
-                            We have successfully placed highly qualified candidates for International &amp; American TV Stars and UHNW clients.
-                            From renowned business figures to politicians and celebrities, our Indonesia-based offices give us global reach for both clients and candidates.
-                        </p>
-                        <p class="text-sm leading-relaxed text-[#3f3f3a] max-w-2xl">
-                            Our team is fluent in English, Russian, Mandarin, Bahasa, Persian/Farsi and Turkish. Every Staff Link consultant has firsthand
-                            household experience, so we assess and match candidates to each family’s unique requirements with confidence.
-                        </p>
-                        <div class="flex flex-wrap gap-3">
-                            <a href="{{ route('contact') }}" class="inline-flex items-center rounded-full bg-[#287854] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#1f5f46]">Call Us</a>
-                            <a href="{{ route('applications.create') }}" class="inline-flex items-center rounded-full border border-[#287854] px-6 py-3 text-sm font-semibold text-[#287854] transition hover:bg-[#e7f2ec]">Candidate Registration</a>
-                            <a href="{{ route('appointments.create') }}" class="inline-flex items-center rounded-full border border-[#b28b2e] px-6 py-3 text-sm font-semibold text-[#b28b2e] transition hover:bg-[#b28b2e] hover:text-white">Nanny &amp; Governess Training School</a>
+            <section class="mx-auto max-w-6xl overflow-hidden rounded-[32px] shadow-[0_20px_60px_rgba(31,95,70,0.16)]" data-aos="fade-up">
+                <div class="relative min-h-[620px]">
+                    <img src="{{ asset('images/img_hero.webp') }}" alt="Nanny assisting child" class="absolute inset-0 h-full w-full object-cover" draggable="false" />
+                    <div class="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/45"></div>
+
+                    <div class="relative flex h-full items-center px-8 py-10 lg:px-12">
+                        <div class="max-w-3xl rounded-[26px] border border-white/20 bg-black/35 p-6 text-white shadow-[0_14px_34px_rgba(0,0,0,0.25)] backdrop-blur-[2px] md:p-8">
+                            <p class="text-xs uppercase tracking-[0.3em] text-[#e9d29d]">Airport Services</p>
+                            <h1 class="mt-4 text-4xl font-semibold leading-tight text-white md:text-5xl">
+                                International Childcare Recruitment Agency
+                            </h1>
+                            <p class="mt-5 max-w-2xl text-sm leading-relaxed text-white/90">
+                                Staff Link is the first International VIP Agency specialising in the recruitment and placement of professional
+                                Nannies, Mannies, Bilingual Nannies, Governesses, Nanny/Housekeepers, Maternity Nurses and Tutors for luxury households in Indonesia.
+                            </p>
+                            <p class="mt-4 max-w-2xl text-sm leading-relaxed text-white/90">
+                                We have successfully placed highly qualified candidates for International &amp; American TV Stars and UHNW clients.
+                                From renowned business figures to politicians and celebrities, our Indonesia-based offices give us global reach for both clients and candidates.
+                            </p>
+                            <p class="mt-4 max-w-2xl text-sm leading-relaxed text-white/90">
+                                Our team is fluent in English, Russian, Mandarin, Bahasa, Persian/Farsi and Turkish. Every Staff Link consultant has firsthand
+                                household experience, so we assess and match candidates to each family’s unique requirements with confidence.
+                            </p>
+                            <div class="mt-6 flex flex-wrap gap-3">
+                                <a href="{{ route('contact') }}" class="inline-flex items-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-[#1f5f46] transition hover:bg-[#e7f2ec]">Call Us</a>
+                                <a href="{{ route('applications.create') }}" class="inline-flex items-center rounded-full border border-white/80 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white hover:text-[#1f5f46]">Candidate Registration</a>
+                                <a href="{{ route('appointments.create') }}" class="inline-flex items-center rounded-full border border-[#e9d29d] px-6 py-3 text-sm font-semibold text-[#f3ddac] transition hover:bg-[#e9d29d] hover:text-[#1f5f46]">Nanny &amp; Governess Training School</a>
+                            </div>
                         </div>
-                    </div>
-                    <div class="relative">
-                        <img src="{{ asset('images/img_hero.webp') }}" alt="Nanny assisting child" class="h-full w-full object-cover" draggable="false" />
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/15 to-transparent"></div>
                     </div>
                 </div>
             </section>

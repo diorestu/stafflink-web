@@ -26,6 +26,16 @@
     </div>
 
     <div>
+        <label for="author_name" class="block text-sm font-medium text-gray-700 mb-2">Author Name</label>
+        <input type="text" name="author_name" id="author_name" value="{{ old('author_name', $blogPost?->author_name) }}"
+            class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#287854] focus:border-transparent"
+            placeholder="e.g. StaffLink Editorial Team">
+        @error('author_name')
+            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+        @enderror
+    </div>
+
+    <div>
         <label for="excerpt" class="block text-sm font-medium text-gray-700 mb-2">Excerpt</label>
         <textarea name="excerpt" id="excerpt" rows="3"
             class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#287854] focus:border-transparent"

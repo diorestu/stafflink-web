@@ -53,7 +53,7 @@
                                 </td>
                                 <td class="px-6 py-4 text-right text-sm">
                                     <div class="inline-flex items-center gap-1">
-                                        @if ($post->status === 'published' && $post->published_at && $post->published_at->lte(now()))
+                                        @if ($post->status === 'published' && $post->published_at)
                                             <a href="{{ route('blog.show', $post->slug) }}" target="_blank"
                                                 class="inline-flex items-center justify-center rounded-md p-1.5 text-[#2b89b5] hover:bg-[#ebf4fa]" title="View">
                                                 <iconify-icon icon="mdi:open-in-new" width="18" height="18"></iconify-icon>

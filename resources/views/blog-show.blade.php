@@ -19,7 +19,9 @@
         <main class="px-8 pb-24 pt-12 lg:px-10">
             <article class="mx-auto max-w-4xl rounded-[30px] bg-white p-8 shadow-[0_18px_44px_rgba(31,95,70,0.12)] lg:p-10">
                 <a href="{{ route('blog') }}" class="text-sm font-semibold text-[#287854] hover:text-[#1f5f46]">← Back to blog</a>
-                <p class="mt-4 text-xs uppercase tracking-[0.2em] text-[#287854]">{{ $post->published_at?->format('F d, Y') }}</p>
+                <p class="mt-4 text-xs uppercase tracking-[0.2em] text-[#287854]">
+                    {{ $post->published_at?->format('F d, Y') }} · By {{ $post->author_name ?: 'StaffLink Editorial Team' }}
+                </p>
                 <h1 class="mt-3 text-4xl font-semibold text-[#1b1b18]">{{ $post->title }}</h1>
 
                 @if ($post->featured_image_path)
@@ -28,7 +30,7 @@
                 @endif
 
                 <div class="prose prose-lg mt-8 max-w-none text-[#3f3f3a]">
-                    {!! nl2br(e($post->content)) !!}
+                    {!! $post->content !!}
                 </div>
             </article>
 
@@ -44,6 +46,7 @@
                                 @endif
                                 <div class="p-5">
                                     <h3 class="text-lg font-semibold text-[#1b1b18]">{{ $related->title }}</h3>
+                                    <p class="mt-2 text-xs text-[#7a7a74]">By {{ $related->author_name ?: 'StaffLink Editorial Team' }}</p>
                                     <a href="{{ route('blog.show', $related) }}" class="mt-3 inline-flex text-sm font-semibold text-[#287854] hover:text-[#1f5f46]">
                                         Read more →
                                     </a>

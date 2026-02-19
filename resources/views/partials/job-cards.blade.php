@@ -35,14 +35,21 @@
         </div>
 
         <div class="mt-auto pt-4">
-            <a href="{{ route('applications.create', ['job_id' => $job->id]) }}"
-                class="inline-flex w-full items-center justify-center rounded-full border border-[#287854] bg-white px-4 py-2 text-xs font-semibold text-[#287854] transition hover:bg-[#287854] hover:text-white">
-                Apply now
-            </a>
             @if ($inquiryUrl)
-                <a href="{{ $inquiryUrl }}" target="_blank" rel="noopener"
-                    class="mt-2 inline-flex w-full items-center justify-center rounded-full bg-[#25d366] px-4 py-2 text-xs font-semibold text-white transition hover:bg-[#1eb95a]">
-                    Ask via WhatsApp
+                <div class="flex items-stretch gap-2">
+                    <a href="{{ route('applications.create', ['job_id' => $job->id]) }}"
+                        class="inline-flex w-4/5 items-center justify-center rounded-full border border-[#287854] bg-white px-4 py-2 text-xs font-semibold text-[#287854] transition hover:bg-[#287854] hover:text-white">
+                        Apply now
+                    </a>
+                    <a href="{{ $inquiryUrl }}" target="_blank" rel="noopener" aria-label="Ask via WhatsApp"
+                        class="inline-flex w-1/5 items-center justify-center rounded-full bg-[#25d366] px-2 py-2 text-white transition hover:bg-[#1eb95a]">
+                        <img src="{{ asset('images/64px-WhatsApp.svg.png') }}" alt="WhatsApp" class="h-5 w-5" draggable="false" />
+                    </a>
+                </div>
+            @else
+                <a href="{{ route('applications.create', ['job_id' => $job->id]) }}"
+                    class="inline-flex w-full items-center justify-center rounded-full border border-[#287854] bg-white px-4 py-2 text-xs font-semibold text-[#287854] transition hover:bg-[#287854] hover:text-white">
+                    Apply now
                 </a>
             @endif
         </div>
