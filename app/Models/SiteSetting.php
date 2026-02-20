@@ -3,10 +3,24 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
+use Throwable;
 
 class SiteSetting extends Model
 {
+    private const SETTINGS_CACHE_KEY = 'site_settings:all';
+
+    private const SETTINGS_CACHE_MINUTES = 10;
+
+    private static ?bool $hasSettingsTable = null;
+
+    private static ?array $runtimeSettings = null;
+
+    private static ?array $runtimeHeaderFooter = null;
+
+    private static ?string $runtimeSiteName = null;
+
     protected $fillable = ['key', 'value'];
 
     protected $casts = [
@@ -15,18 +29,18 @@ class SiteSetting extends Model
 
     public static function getValue(string $key, mixed $default = null): mixed
     {
-        if (!Schema::hasTable('site_settings')) {
+        $settings = static::allSettings();
+
+        if (!array_key_exists($key, $settings)) {
             return $default;
         }
 
-        $setting = static::query()->where('key', $key)->first();
-
-        return $setting?->value ?? $default;
+        return $settings[$key];
     }
 
     public static function setValue(string $key, mixed $value): void
     {
-        if (!Schema::hasTable('site_settings')) {
+        if (!static::hasSettingsTable()) {
             return;
         }
 
@@ -34,6 +48,8 @@ class SiteSetting extends Model
             ['key' => $key],
             ['value' => $value]
         );
+
+        static::flushSettingsCache();
     }
 
     public static function headerFooterDefaults(): array
@@ -68,11 +84,17 @@ class SiteSetting extends Model
 
     public static function headerFooter(): array
     {
+        if (static::$runtimeHeaderFooter !== null) {
+            return static::$runtimeHeaderFooter;
+        }
+
         $defaults = static::headerFooterDefaults();
         $stored = static::getValue('header_footer', []);
 
         if (!is_array($stored)) {
-            return $defaults;
+            static::$runtimeHeaderFooter = $defaults;
+
+            return static::$runtimeHeaderFooter;
         }
 
         $merged = array_replace_recursive($defaults, $stored);
@@ -87,17 +109,76 @@ class SiteSetting extends Model
             $merged['user_links'] = $defaults['user_links'];
         }
 
-        return $merged;
+        static::$runtimeHeaderFooter = $merged;
+
+        return static::$runtimeHeaderFooter;
     }
 
     public static function siteName(): string
     {
+        if (static::$runtimeSiteName !== null) {
+            return static::$runtimeSiteName;
+        }
+
         $stored = static::getValue('site_identity', []);
 
         if (is_array($stored) && !empty($stored['site_name'])) {
-            return (string) $stored['site_name'];
+            static::$runtimeSiteName = (string) $stored['site_name'];
+
+            return static::$runtimeSiteName;
         }
 
-        return (string) config('app.name', 'StaffLink');
+        static::$runtimeSiteName = (string) config('app.name', 'StaffLink');
+
+        return static::$runtimeSiteName;
+    }
+
+    private static function hasSettingsTable(): bool
+    {
+        if (static::$hasSettingsTable !== null) {
+            return static::$hasSettingsTable;
+        }
+
+        try {
+            static::$hasSettingsTable = Schema::hasTable('site_settings');
+        } catch (Throwable) {
+            static::$hasSettingsTable = false;
+        }
+
+        return static::$hasSettingsTable;
+    }
+
+    private static function allSettings(): array
+    {
+        if (static::$runtimeSettings !== null) {
+            return static::$runtimeSettings;
+        }
+
+        if (!static::hasSettingsTable()) {
+            static::$runtimeSettings = [];
+
+            return static::$runtimeSettings;
+        }
+
+        static::$runtimeSettings = Cache::remember(
+            static::SETTINGS_CACHE_KEY,
+            now()->addMinutes(static::SETTINGS_CACHE_MINUTES),
+            function (): array {
+                return static::query()
+                    ->get(['key', 'value'])
+                    ->mapWithKeys(fn (SiteSetting $setting) => [$setting->key => $setting->value])
+                    ->all();
+            }
+        );
+
+        return static::$runtimeSettings;
+    }
+
+    private static function flushSettingsCache(): void
+    {
+        Cache::forget(static::SETTINGS_CACHE_KEY);
+        static::$runtimeSettings = null;
+        static::$runtimeHeaderFooter = null;
+        static::$runtimeSiteName = null;
     }
 }

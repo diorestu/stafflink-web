@@ -4,15 +4,11 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ \App\Models\SiteSetting::siteName() }} - Jobs</title>
-    <link rel="icon" href="{{ asset('favicon.ico') }}">
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Google+Sans:wght@400;500;600;700&display=swap"
-        rel="stylesheet">
-    <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css">
+    @include('partials.seo-meta', [
+        'seoTitle' => \App\Models\SiteSetting::siteName().' | Job Openings',
+        'seoDescription' => 'Browse current job openings and career opportunities published by StaffLink Solutions.',
+        'seoKeywords' => 'jobs, career openings, staffing jobs, recruitment vacancies',
+    ])
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
@@ -139,8 +135,7 @@
         </main>
         <x-site-footer />
     </div>
-    <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
-    <script>
+<script>
         (() => {
             const container = document.getElementById('jobs-container');
             const sentinel = document.getElementById('jobs-sentinel');

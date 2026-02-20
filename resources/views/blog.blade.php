@@ -3,16 +3,15 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ \App\Models\SiteSetting::siteName() }} - Blog</title>
-    <link rel="icon" href="{{ asset('favicon.ico') }}">
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Google+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css">
+    @include('partials.seo-meta', [
+        'seoTitle' => \App\Models\SiteSetting::siteName().' | Blog',
+        'seoDescription' => 'Read hiring insights, staffing tips, and workforce growth guides from StaffLink Solutions.',
+        'seoKeywords' => 'staffing blog, recruitment insights, hiring guide, workforce strategy',
+    ])
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
+
 <body class="text-[#2e2e2e]" id="page-top">
     <div class="min-h-screen bg-[radial-gradient(circle_at_top,_#ffffff_0%,_#f4f5f3_52%,_#e6f1ec_100%)]">
         <x-site-header />
@@ -37,7 +36,7 @@
                             <a href="{{ route('blog.show', $featuredPost) }}" class="block h-full">
                                 @if ($featuredPost->featured_image_path)
                                     <img src="{{ \Illuminate\Support\Facades\Storage::url($featuredPost->featured_image_path) }}"
-                                        alt="{{ $featuredPost->title }}" class="block h-full min-h-[280px] w-full object-cover" draggable="false">
+                                        alt="{{ filled($featuredPost->title) ? $featuredPost->title : 'Featured post image' }}" class="block h-full min-h-[280px] w-full object-cover" draggable="false">
                                 @else
                                     <div class="flex h-full min-h-[280px] items-center justify-center bg-[#e6f1ec] text-[#287854]">
                                         <span class="text-lg font-semibold">Featured Post</span>
@@ -75,7 +74,7 @@
                                     <a href="{{ route('blog.show', $post) }}" class="block">
                                         @if ($post->featured_image_path)
                                             <img src="{{ \Illuminate\Support\Facades\Storage::url($post->featured_image_path) }}"
-                                                alt="{{ $post->title }}" class="block h-48 w-full object-cover" draggable="false">
+                                                alt="{{ filled($post->title) ? $post->title : 'Blog post image' }}" class="block h-48 w-full object-cover" draggable="false">
                                         @else
                                             <div class="h-48 w-full bg-[#e6f1ec]"></div>
                                         @endif
@@ -125,15 +124,12 @@
             </svg>
         </button>
         <a href="https://wa.me/6285739660906"
-            class="group relative flex h-14 w-14 items-center justify-center overflow-visible rounded-full bg-transparent transition"
+            class="group relative flex h-16 w-16 items-center justify-center overflow-visible rounded-full bg-transparent transition"
             aria-label="WhatsApp Chat">
-            <img src="{{ asset('images/512px-WhatsApp.svg.webp') }}" alt="WhatsApp" class="h-[3.6rem] w-[3.6rem]" draggable="false" />
+            <img src="{{ asset('images/64px-WhatsApp.svg.png') }}" alt="WhatsApp" class="h-full w-full object-contain" draggable="false" loading="lazy" />
             <span class="pointer-events-none absolute right-full mr-3 flex items-center gap-2 whitespace-nowrap rounded-full bg-[#287854] px-4 py-2 text-[11px] font-semibold tracking-tight text-white shadow-lg opacity-0 transition duration-300 ease-out translate-x-6 scale-x-105 origin-right group-hover:translate-x-0 group-hover:opacity-100">
                 Click here to chat
             </span>
         </a>
-    </div>
-
-    <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
-</body>
+    </div></body>
 </html>

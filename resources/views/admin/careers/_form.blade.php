@@ -49,7 +49,7 @@
         @if ($career?->thumbnail_path)
             <div class="mt-3">
                 <p class="text-xs text-gray-500 mb-2">Current thumbnail</p>
-                <img src="{{ \Illuminate\Support\Facades\Storage::url($career->thumbnail_path) }}" alt="{{ $career->title }}"
+                <img src="{{ \Illuminate\Support\Facades\Storage::url($career->thumbnail_path) }}" alt="{{ filled($career->title) ? $career->title : 'Career thumbnail' }}"
                     class="h-20 w-20 rounded-lg object-cover border border-gray-200" draggable="false" />
             </div>
         @endif

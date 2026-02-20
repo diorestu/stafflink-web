@@ -4,15 +4,34 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ \App\Models\SiteSetting::siteName() }} - {{ $pageType }}: {{ $pageTitle }}</title>
-    <link rel="icon" href="{{ asset('favicon.ico') }}">
+    @php
+        $breadcrumbItems = [['name' => 'Home', 'url' => url('/')]];
+        if (!empty($currentArea)) {
+            $breadcrumbItems[] = ['name' => $pageType, 'url' => route($baseRouteName, $baseSlug)];
+        }
+        $breadcrumbItems[] = ['name' => $pageTitle, 'url' => request()->url()];
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Google+Sans:wght@400;500;600;700&display=swap"
-        rel="stylesheet">
-    <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css">
+        $serviceSchema = [
+            '@type' => 'Service',
+            '@id' => request()->url().'#service',
+            'name' => $pageTitle,
+            'serviceType' => $pageType.' Staffing',
+            'description' => $metaDescription ?? $subtitle,
+            'provider' => ['@id' => url('/').'#organization'],
+            'url' => request()->url(),
+            'areaServed' => [
+                '@type' => 'Place',
+                'name' => $currentArea['seo_label'] ?? 'Bali',
+            ],
+        ];
+    @endphp
+    @include('partials.seo-meta', [
+        'seoTitle' => \App\Models\SiteSetting::siteName().' | '.$pageType.': '.$pageTitle,
+        'seoDescription' => $metaDescription ?? 'Explore staffing services, sectors, and roles available through StaffLink Solutions.',
+        'seoKeywords' => 'service sectors, service roles, staffing area pages, recruitment services',
+        'seoBreadcrumbItems' => $breadcrumbItems,
+        'seoStructuredDataNodes' => [$serviceSchema],
+    ])
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
@@ -21,6 +40,7 @@
         <x-site-header />
         <main class="px-8 pb-28 pt-14 lg:px-10">
             <section class="mx-auto max-w-6xl space-y-12">
+                @include('partials.breadcrumbs', ['breadcrumbItems' => $breadcrumbItems])
                 <div class="rounded-[30px] bg-[#1f5f46] p-10 text-white shadow-[0_20px_50px_rgba(31,95,70,0.2)] lg:p-12"
                     data-aos="fade-up">
                     <p class="text-xs uppercase tracking-[0.3em] text-[#e9d29d]">{{ $pageType }}</p>
@@ -47,6 +67,26 @@
                         </div>
                     @endif
                 </div>
+
+                @if (($serviceAreas ?? collect())->isNotEmpty())
+                    <section class="rounded-[28px] bg-white p-6 shadow-[0_20px_50px_rgba(31,95,70,0.12)]" data-aos="fade-up">
+                        <div class="flex flex-wrap items-center justify-between gap-3">
+                            <p class="text-xs uppercase tracking-[0.3em] text-[#287854]">Browse by area</p>
+                            @if (!empty($currentArea))
+                                <a href="{{ route($baseRouteName, $baseSlug) }}" class="inline-flex rounded-full border border-[#dfe8e3] bg-white px-4 py-2 text-xs font-semibold text-[#3f4b45] transition hover:border-[#bcd7c8] hover:bg-[#f4faf7]">
+                                    View all areas
+                                </a>
+                            @endif
+                        </div>
+                        <div class="mt-4 flex flex-wrap gap-2.5">
+                            @foreach ($serviceAreas as $areaItem)
+                                <a href="{{ route($areaRouteName, ['slug' => $baseSlug, 'areaSlug' => $areaItem['slug']]) }}" class="inline-flex rounded-full border px-4 py-2 text-xs font-semibold transition {{ ($currentArea['slug'] ?? null) === $areaItem['slug'] ? 'border-[#287854] bg-[#ecf7f1] text-[#1f5f46]' : 'border-[#dfe8e3] bg-white text-[#3f4b45] hover:border-[#bcd7c8] hover:bg-[#f4faf7]' }}">
+                                    {{ $areaItem['label'] }}
+                                </a>
+                            @endforeach
+                        </div>
+                    </section>
+                @endif
 
                 <section class="rounded-[28px] bg-white p-8 shadow-[0_20px_50px_rgba(31,95,70,0.12)]" data-aos="fade-up">
                     <p class="text-xs uppercase tracking-[0.3em] text-[#287854]">{{ $highlightsLabel }}</p>
@@ -191,17 +231,15 @@
             </svg>
         </button>
         <a href="https://wa.me/6285739660906"
-            class="group relative flex h-14 w-14 items-center justify-center overflow-visible rounded-full bg-transparent transition"
+            class="group relative flex h-16 w-16 items-center justify-center overflow-visible rounded-full bg-transparent transition"
             aria-label="WhatsApp Chat">
-            <img src="{{ asset('images/512px-WhatsApp.svg.webp') }}" alt="WhatsApp" class="h-[3.6rem] w-[3.6rem]"
-                draggable="false" />
+            <img src="{{ asset('images/64px-WhatsApp.svg.png') }}" alt="WhatsApp" class="h-full w-full object-contain"
+                draggable="false" loading="lazy" />
             <span
                 class="pointer-events-none absolute right-full mr-3 flex items-center gap-2 whitespace-nowrap rounded-full bg-[#287854] px-4 py-2 text-[11px] font-semibold tracking-tight text-white shadow-lg opacity-0 transition duration-300 ease-out translate-x-6 scale-x-105 origin-right group-hover:translate-x-0 group-hover:opacity-100">
                 Click here to chat
             </span>
         </a>
-    </div>
-    <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
-</body>
+    </div></body>
 
 </html>

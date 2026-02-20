@@ -5,11 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Admin Login — {{ \App\Models\SiteSetting::siteName() }}</title>
-    <link rel="icon" href="{{ asset('favicon.ico') }}">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    @vite(['resources/css/app.css'])
+    <link rel="icon" href="{{ asset('favicon.ico') }}">    @vite(['resources/css/app.css'])
 </head>
 
 <body
@@ -17,7 +13,7 @@
     <div class="w-full max-w-md px-6">
         <div class="rounded-3xl bg-white px-8 py-10 shadow-[0_30px_80px_rgba(31,95,70,0.15)]">
             <div class="mb-8 text-center">
-                <img src="{{ asset('images/logo.png') }}" alt="StaffLink" class="mx-auto h-14 w-auto" />
+                <img src="{{ asset('images/logo.webp') }}" alt="StaffLink" class="mx-auto h-14 w-auto" loading="lazy" />
                 <h1 class="mt-4 text-2xl font-semibold text-[#2e2e2e]">Admin Login</h1>
                 <p class="mt-1 text-sm text-[#6b6b66]">Sign in to manage your website content</p>
             </div>

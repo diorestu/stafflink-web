@@ -34,7 +34,7 @@
                                     <div class="flex items-start gap-3">
                                         @if ($post->featured_image_path)
                                             <img src="{{ \Illuminate\Support\Facades\Storage::url($post->featured_image_path) }}"
-                                                alt="{{ $post->title }}" class="h-12 w-12 rounded object-cover border border-gray-200" draggable="false">
+                                                alt="{{ filled($post->title) ? $post->title : 'Blog post image' }}" class="h-12 w-12 rounded object-cover border border-gray-200" draggable="false">
                                         @endif
                                         <div>
                                             <p class="font-semibold text-gray-900">{{ $post->title }}</p>

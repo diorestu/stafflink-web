@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\ApplicantStatusUpdated;
 use App\Models\JobApplication;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -9,6 +10,8 @@ use Illuminate\Support\Str;
 
 class AdminJobApplicationController extends Controller
 {
+    private const STATUS_OPTIONS = ['new', 'reviewed', 'shortlisted', 'rejected', 'hired', 'onboard'];
+
     public function index(Request $request)
     {
         $search = trim((string) $request->query('search', ''));
@@ -23,7 +26,7 @@ class AdminJobApplicationController extends Controller
                         ->orWhere('position_title', 'like', "%{$search}%");
                 });
             })
-            ->when(in_array($status, ['new', 'reviewed', 'shortlisted', 'rejected', 'hired'], true), function ($query) use ($status) {
+            ->when(in_array($status, self::STATUS_OPTIONS, true), function ($query) use ($status) {
                 $query->where('status', $status);
             })
             ->latest()
@@ -36,12 +39,19 @@ class AdminJobApplicationController extends Controller
     public function updateStatus(Request $request, JobApplication $application)
     {
         $validated = $request->validate([
-            'status' => ['required', 'in:new,reviewed,shortlisted,rejected,hired'],
+            'status' => ['required', 'in:' . implode(',', self::STATUS_OPTIONS)],
         ]);
 
-        $application->update([
-            'status' => $validated['status'],
-        ]);
+        $fromStatus = (string) $application->status;
+        $toStatus = (string) $validated['status'];
+
+        if ($fromStatus !== $toStatus) {
+            $application->update([
+                'status' => $toStatus,
+            ]);
+
+            event(new ApplicantStatusUpdated($application->fresh(), $fromStatus, $toStatus));
+        }
 
         if ($request->expectsJson() || $request->wantsJson()) {
             return response()->json([

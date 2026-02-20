@@ -1,26 +1,29 @@
 <?php
 
-use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\AdminAppointmentController;
-use App\Http\Controllers\AdminController;
-use App\Http\Controllers\AdminJobApplicationController;
+use App\Http\Controllers\AdminAuthController;
+use App\Http\Controllers\AdminBlogPostController;
 use App\Http\Controllers\AdminCareerController;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AdminFaqController;
 use App\Http\Controllers\AdminHeaderFooterController;
+use App\Http\Controllers\AdminJobApplicationController;
 use App\Http\Controllers\AdminPageController;
 use App\Http\Controllers\AdminUserController;
 use App\Http\Controllers\AiAgentController;
-use App\Http\Controllers\AdminBlogPostController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\BlogController;
-use App\Http\Controllers\CareerController;
 use App\Http\Controllers\CareerCategoryController;
-use App\Http\Controllers\JobApplicationController;
+use App\Http\Controllers\CareerController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\JobApplicationController;
 use App\Http\Controllers\JobController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\ReferenceController;
 use App\Http\Controllers\ServiceDetailController;
+use App\Http\Controllers\SitemapController;
+use App\Http\Middleware\EnsureUserRole;
 use Illuminate\Support\Facades\Route;
 
 // Public
@@ -30,10 +33,14 @@ Route::view('/who-we-are', 'who-we-are')->name('who-we-are');
 Route::view('/what-we-offer', 'what-we-offer')->name('what-we-offer');
 Route::view('/our-people-your-dream-team', 'our-people-your-dream-team')->name('our-people-your-dream-team');
 Route::view('/our-purpose-business-principles', 'our-purpose-business-principles')->name('our-purpose-business-principles');
-Route::view('/airport-services/nanny-concierge', 'nanny-concierge')->name('airport-services.nanny-concierge');
+Route::get('/airport-services/nanny-concierge', [ServiceDetailController::class, 'airportServices'])->name('airport-services.nanny-concierge');
+Route::get('/airport-services/nanny-concierge/areas/{areaSlug}', [ServiceDetailController::class, 'airportServicesArea'])->name('airport-services.nanny-concierge.area');
 Route::redirect('/airport-services', '/airport-services/nanny-concierge');
 Route::get('/services/sectors/{slug}', [ServiceDetailController::class, 'sector'])->name('services.sectors.show');
+Route::get('/services/sectors/{slug}/areas/{areaSlug}', [ServiceDetailController::class, 'sectorArea'])->name('services.sectors.areas.show');
 Route::get('/services/roles/{slug}', [ServiceDetailController::class, 'role'])->name('services.roles.show');
+Route::get('/services/roles/{slug}/areas/{areaSlug}', [ServiceDetailController::class, 'roleArea'])->name('services.roles.areas.show');
+Route::get('/services/areas/{areaSlug}', [ServiceDetailController::class, 'area'])->name('services.areas.show');
 Route::get('/blog', [BlogController::class, 'index'])->name('blog');
 Route::get('/blog/{blogPost:slug}', [BlogController::class, 'show'])->name('blog.show');
 Route::get('/jobs', [CareerController::class, 'index'])->name('jobs.index');
@@ -44,6 +51,7 @@ Route::get('/apply-now', [JobApplicationController::class, 'create'])->name('app
 Route::post('/apply-now', [JobApplicationController::class, 'store'])->name('applications.store');
 Route::get('/references/{token}', [ReferenceController::class, 'show'])->name('references.show');
 Route::get('/p/{slug}', [PageController::class, 'show'])->name('pages.show');
+Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
 
 // Admin auth
 Route::get('/admin/login', [AdminAuthController::class, 'showLogin'])->name('admin.login');
@@ -55,9 +63,10 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', [AdminController::class, 'dashboard'])->name('dashboard');
 
     // Shared for super admin and admin
-    Route::middleware('role:super_admin,admin')->group(function () {
+    Route::middleware(EnsureUserRole::class.':super_admin,admin')->group(function () {
         Route::resource('careers', AdminCareerController::class)->except(['show']);
         Route::resource('blog-posts', AdminBlogPostController::class)->except(['show']);
+        Route::resource('faqs', AdminFaqController::class)->except(['show']);
         Route::get('/applicants', [AdminJobApplicationController::class, 'index'])->name('applicants.index');
         Route::patch('/applicants/{application}/status', [AdminJobApplicationController::class, 'updateStatus'])->name('applicants.status');
         Route::get('/applicants/{application}/resume', [AdminJobApplicationController::class, 'resume'])->name('applicants.resume');
@@ -67,7 +76,7 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     });
 
     // Super admin only
-    Route::middleware('role:super_admin')->group(function () {
+    Route::middleware(EnsureUserRole::class.':super_admin')->group(function () {
         // User management
         Route::resource('users', AdminUserController::class)->except(['show']);
 

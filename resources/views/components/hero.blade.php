@@ -6,7 +6,7 @@
             data-aos="fade-up">
             <div class="absolute inset-0">
                 <img src="{{ asset('images/hero-bg.webp') }}" alt="Confident professional"
-                    class="h-full w-full scale-105 object-cover object-[82%_center] opacity-90" draggable="false" />
+                    class="h-full w-full scale-105 object-cover object-[82%_center] opacity-90" draggable="false" width="2526" height="1786" fetchpriority="high" decoding="async" />
                 <div class="absolute inset-0 bg-gradient-to-r from-[#1f5f46]/90 via-[#1f5f46]/65 to-transparent"></div>
             </div>
             <div class="relative grid gap-8 px-6 py-8 sm:px-8 sm:py-10 lg:grid-cols-[1.1fr_0.9fr] lg:gap-10 lg:px-10 lg:py-12">

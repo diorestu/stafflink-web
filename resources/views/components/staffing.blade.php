@@ -66,12 +66,12 @@
                     data-aos-delay="{{ 100 + $i * 50 }}">
                     @if (!empty($category['image_path']))
                         <img src="{{ \Illuminate\Support\Facades\Storage::url($category['image_path']) }}"
-                            alt="{{ $category['title'] ?? 'Category image' }}"
+                            alt="{{ filled($category['title'] ?? null) ? $category['title'] : 'Service category image' }}"
                             class="block h-40 w-full object-cover transition duration-300 ease-out group-hover:scale-105"
-                            draggable="false" />
+                            draggable="false" loading="lazy" />
                     @else
                         <div class="flex h-40 w-full items-center justify-center bg-[#ecf7f1] text-[#287854]">
-                            <i class="fa-solid fa-briefcase text-3xl leading-none" aria-hidden="true"></i>
+                            <x-ui-icon name="briefcase" class="h-10 w-10" />
                         </div>
                     @endif
                     <div class="p-5">

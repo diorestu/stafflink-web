@@ -45,7 +45,7 @@
         @if ($category?->image_path)
             <div class="mt-3">
                 <p class="text-xs text-gray-500 mb-2">Current image</p>
-                <img src="{{ \Illuminate\Support\Facades\Storage::url($category->image_path) }}" alt="{{ $category->name }}"
+                <img src="{{ \Illuminate\Support\Facades\Storage::url($category->image_path) }}" alt="{{ filled($category->name) ? $category->name : 'Category image' }}"
                     class="h-20 w-20 rounded-lg object-cover border border-gray-200" draggable="false" />
             </div>
         @endif

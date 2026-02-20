@@ -12,7 +12,7 @@
             <div class="flex items-start justify-between gap-3">
                 <div>
                     <p class="text-[11px] uppercase tracking-wide text-[#5b6d63]">Page Sections</p>
-                    <p class="mt-2 text-3xl font-semibold leading-none text-[#1f5f46]">{{ \App\Models\PageSection::count() }}</p>
+                    <p class="mt-2 text-3xl font-semibold leading-none text-[#1f5f46]">{{ $metrics['page_sections'] ?? 0 }}</p>
                 </div>
                 <div class="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-[#e6f1ec] text-[#1f5f46]">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -27,7 +27,7 @@
             <div class="flex items-start justify-between gap-3">
                 <div>
                     <p class="text-[11px] uppercase tracking-wide text-[#5b6d63]">Total Jobs</p>
-                    <p class="mt-2 text-3xl font-semibold leading-none text-[#1f5f46]">{{ \App\Models\Job::count() }}</p>
+                    <p class="mt-2 text-3xl font-semibold leading-none text-[#1f5f46]">{{ $metrics['total_jobs'] ?? 0 }}</p>
                 </div>
                 <div class="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-[#e6f1ec] text-[#1f5f46]">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -42,7 +42,7 @@
             <div class="flex items-start justify-between gap-3">
                 <div>
                     <p class="text-[11px] uppercase tracking-wide text-[#5b6d63]">Published Jobs</p>
-                    <p class="mt-2 text-3xl font-semibold leading-none text-[#1f5f46]">{{ \App\Models\Job::where('status', 'published')->count() }}</p>
+                    <p class="mt-2 text-3xl font-semibold leading-none text-[#1f5f46]">{{ $metrics['published_jobs'] ?? 0 }}</p>
                 </div>
                 <div class="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-[#e6f1ec] text-[#1f5f46]">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -58,7 +58,7 @@
                 <div>
                     <p class="text-[11px] uppercase tracking-wide text-[#5b6d63]">Upcoming Appointments</p>
                     <p class="mt-2 text-3xl font-semibold leading-none text-[#1f5f46]">
-                        {{ \App\Models\Appointment::where('starts_at', '>=', now())->whereIn('status', ['pending', 'confirmed'])->count() }}
+                        {{ $metrics['upcoming_appointments'] ?? 0 }}
                     </p>
                 </div>
                 <div class="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-[#e6f1ec] text-[#1f5f46]">

@@ -1,8 +1,18 @@
-import './bootstrap';
-
 const modals = Array.from(document.querySelectorAll('[data-modal]'));
 const openButtons = Array.from(document.querySelectorAll('[data-modal-target]'));
 const closeButtons = Array.from(document.querySelectorAll('[data-modal-close]'));
+
+const applyLazyLoadingToImages = () => {
+    const images = Array.from(document.querySelectorAll('img'));
+    images.forEach((img) => {
+        const isHighPriority = (img.getAttribute('fetchpriority') || '').toLowerCase() === 'high';
+        if (!img.hasAttribute('loading') && !isHighPriority) {
+            img.setAttribute('loading', 'lazy');
+        }
+    });
+};
+
+applyLazyLoadingToImages();
 
 const setModalState = (modal, isOpen) => {
     if (!modal) return;
@@ -67,7 +77,7 @@ openButtons.forEach((button) => {
                         .map(
                             (job) => `
                         <a href=\"${job.link || '#'}\" class=\"block overflow-hidden rounded-xl border border-[#e2e5ee] bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md\">
-                            ${job.thumbnail ? `<img src=\"${job.thumbnail}\" alt=\"${job.title}\" class=\"block h-40 w-full object-cover\" draggable=\"false\">` : '<div class=\"h-40 w-full bg-[#eef2f7]\"></div>'}
+                            ${job.thumbnail ? `<img src=\"${job.thumbnail}\" alt=\"${job.title}\" class=\"block h-40 w-full object-cover\" draggable=\"false\" loading=\"lazy\">` : '<div class=\"h-40 w-full bg-[#eef2f7]\"></div>'}
                             <div class=\"p-4\">
                                 <h4 class=\"text-lg font-semibold text-[#111]\">${job.title}</h4>
                                 <p class=\"mt-2 text-sm leading-relaxed text-[#5a5a66]\">${job.description || ''}</p>
@@ -77,6 +87,7 @@ openButtons.forEach((button) => {
                         )
                         .join('');
                 }
+                applyLazyLoadingToImages();
             }
         }
 
@@ -122,18 +133,6 @@ if (scrollTopButton) {
 
     toggleScrollTop();
     window.addEventListener('scroll', toggleScrollTop, { passive: true });
-}
-
-const initAos = () => {
-    if (!window.AOS) return false;
-    window.AOS.init({ duration: 800, easing: 'ease-out', once: true });
-    return true;
-};
-
-if (!initAos()) {
-    window.addEventListener('load', () => {
-        initAos();
-    });
 }
 
 const dropdowns = Array.from(document.querySelectorAll('[data-dropdown]'));

@@ -27,5 +27,11 @@ class DatabaseSeeder extends Seeder
 
         // Seed page sections
         $this->call(PageSectionSeeder::class);
+
+        // Optional: seed full global countries/states from API.
+        // Enable by setting SEED_LOCATIONS=true in environment.
+        if ((bool) env('SEED_LOCATIONS', false)) {
+            $this->call(CountryStateSeeder::class);
+        }
     }
 }

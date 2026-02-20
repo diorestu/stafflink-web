@@ -71,14 +71,10 @@
                                         <p class="text-xs font-semibold text-gray-800">{{ $appointment->name }}</p>
                                         <p class="mt-1 text-[11px] text-gray-600">{{ $appointment->starts_at->format('H:i') }} - {{ $appointment->ends_at->format('H:i') }}</p>
                                         @if($appointment->status === 'pending')
-                                            <form action="{{ route('admin.appointments.approve', $appointment) }}" method="POST" class="mt-1.5">
-                                                @csrf
-                                                @method('PATCH')
-                                                <button type="submit"
-                                                    class="rounded border border-[#1f5f46]/20 bg-white px-2 py-0.5 text-[10px] font-semibold text-[#1f5f46] hover:bg-[#ecf6f1]">
-                                                    Approve
-                                                </button>
-                                            </form>
+                                            <button type="button" data-approve-id="{{ $appointment->id }}"
+                                                class="mt-1.5 rounded border border-[#1f5f46]/20 bg-white px-2 py-0.5 text-[10px] font-semibold text-[#1f5f46] hover:bg-[#ecf6f1]">
+                                                Approve
+                                            </button>
                                         @endif
                                     </article>
                                 @empty
@@ -101,10 +97,25 @@
             <div id="day-events-list" class="max-h-[70vh] space-y-3 overflow-y-auto p-6"></div>
         </div>
     </div>
+    <div id="approve-processing-modal" class="fixed inset-0 z-[80] hidden items-center justify-center bg-black/45 p-4">
+        <div class="w-full max-w-sm rounded-2xl bg-white px-6 py-6 text-center shadow-xl">
+            <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[#ecf6f1]">
+                <svg class="h-7 w-7 animate-spin text-[#1f5f46]" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-opacity="0.25" stroke-width="3"></circle>
+                    <path d="M12 3a9 9 0 0 1 9 9" stroke="currentColor" stroke-width="3" stroke-linecap="round"></path>
+                </svg>
+            </div>
+            <p class="mt-4 text-base font-semibold text-[#1f5f46]">Processing approval...</p>
+            <p class="mt-1 text-sm text-gray-600">Please wait while we update the appointment.</p>
+        </div>
+    </div>
 
     <script>
         (() => {
             const appointments = @json($appointmentsForJs);
+            const appointmentTimeZone = 'Asia/Makassar';
+            const csrfToken = @json(csrf_token());
+            let currentOpenDayKey = null;
 
             const tabs = Array.from(document.querySelectorAll('[data-view-tab]'));
             const panels = Array.from(document.querySelectorAll('[data-view-panel]'));
@@ -132,12 +143,39 @@
             const dayEventsTitle = document.getElementById('day-events-title');
             const dayEventsList = document.getElementById('day-events-list');
             const dayEventsClose = document.getElementById('day-events-close');
+            const approveProcessingModal = document.getElementById('approve-processing-modal');
             let currentDate = new Date();
+            let isApproving = false;
 
             const statusClass = (status) => {
                 if (status === 'confirmed') return 'bg-[#dff3e9] text-[#1f5f46]';
                 if (status === 'cancelled') return 'bg-[#fcebea] text-[#b42318]';
                 return 'bg-[#fff7e0] text-[#8a6d1f]';
+            };
+
+            const toAppointmentDateKey = (value) => {
+                const date = new Date(value);
+                const parts = new Intl.DateTimeFormat('en-CA', {
+                    timeZone: appointmentTimeZone,
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                }).formatToParts(date);
+
+                const year = parts.find((p) => p.type === 'year')?.value;
+                const month = parts.find((p) => p.type === 'month')?.value;
+                const day = parts.find((p) => p.type === 'day')?.value;
+
+                return `${year}-${month}-${day}`;
+            };
+
+            const toAppointmentTime = (value) => {
+                return new Intl.DateTimeFormat(undefined, {
+                    timeZone: appointmentTimeZone,
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false,
+                }).format(new Date(value));
             };
 
             const renderCalendar = () => {
@@ -168,14 +206,17 @@
 
                 for (let day = 1; day <= totalDays; day++) {
                     const dateObj = new Date(year, month, day);
-                    const dateKey = dateObj.toISOString().slice(0, 10);
+                    const dateKey = [
+                        dateObj.getFullYear(),
+                        String(dateObj.getMonth() + 1).padStart(2, '0'),
+                        String(dateObj.getDate()).padStart(2, '0'),
+                    ].join('-');
                     const dayItems = appointments.filter((a) => {
-                        const d = new Date(a.starts_at);
-                        return d.toISOString().slice(0, 10) === dateKey;
+                        return toAppointmentDateKey(a.starts_at) === dateKey;
                     });
 
                     const entries = dayItems.slice(0, 3).map((a) => {
-                        const time = new Date(a.starts_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                        const time = toAppointmentTime(a.starts_at);
                         return `<div class="mt-1 truncate rounded px-2 py-0.5 text-[11px] ${statusClass(a.status)}">${time} ${a.title}</div>`;
                     }).join('');
                     const more = dayItems.length > 3 ? `<div class="mt-1 text-[11px] text-gray-500">+${dayItems.length - 3} more</div>` : '';
@@ -198,11 +239,90 @@
                 });
             };
 
+            const showProcessingModal = () => {
+                approveProcessingModal?.classList.remove('hidden');
+                approveProcessingModal?.classList.add('flex');
+            };
+
+            const hideProcessingModal = () => {
+                approveProcessingModal?.classList.add('hidden');
+                approveProcessingModal?.classList.remove('flex');
+            };
+
+            const updateAppointmentStatus = (appointmentId, status) => {
+                const targetId = Number(appointmentId);
+                appointments.forEach((item) => {
+                    if (Number(item.id) === targetId) {
+                        item.status = status;
+                    }
+                });
+            };
+
+            const showToast = (text, isError = false) => {
+                if (!window.Toastify || !text) return;
+                Toastify({
+                    text,
+                    duration: 3200,
+                    gravity: 'top',
+                    position: 'center',
+                    close: true,
+                    stopOnFocus: true,
+                    className: 'stafflink-toast',
+                    style: {
+                        background: '#ffffff',
+                        color: '#1b1b18',
+                        border: `1px solid ${isError ? '#b42318' : '#287854'}`,
+                        borderRadius: '20px',
+                    },
+                }).showToast();
+            };
+
+            const approveAppointment = async (appointmentId) => {
+                if (isApproving) {
+                    return;
+                }
+                isApproving = true;
+                showProcessingModal();
+
+                try {
+                    const response = await fetch(`/admin/appointments/${appointmentId}/approve`, {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+                            'X-CSRF-TOKEN': csrfToken,
+                            'X-Requested-With': 'XMLHttpRequest',
+                        },
+                        body: new URLSearchParams({
+                            _method: 'PATCH',
+                        }),
+                    });
+
+                    const payload = await response.json().catch(() => ({}));
+                    if (!response.ok) {
+                        throw new Error(payload.message || 'Failed to approve appointment.');
+                    }
+
+                    updateAppointmentStatus(payload.appointment_id ?? appointmentId, payload.status || 'confirmed');
+                    renderCalendar();
+                    if (currentOpenDayKey) {
+                        openDayModal(currentOpenDayKey);
+                    }
+
+                    showToast(payload.message || 'Appointment approved successfully.');
+                } catch (error) {
+                    showToast(error.message || 'Failed to approve appointment.', true);
+                } finally {
+                    hideProcessingModal();
+                    isApproving = false;
+                }
+            };
+
             const openDayModal = (dateKey) => {
+                currentOpenDayKey = dateKey;
                 const dayItems = appointments
                     .filter((a) => {
-                        const d = new Date(a.starts_at);
-                        return d.toISOString().slice(0, 10) === dateKey;
+                        return toAppointmentDateKey(a.starts_at) === dateKey;
                     })
                     .sort((a, b) => new Date(a.starts_at) - new Date(b.starts_at));
 
@@ -219,20 +339,16 @@
                     dayEventsList.innerHTML = '<p class="text-sm text-gray-500">No appointments on this date.</p>';
                 } else {
                     dayEventsList.innerHTML = dayItems.map((item) => {
-                        const start = new Date(item.starts_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                        const end = new Date(item.ends_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                        const start = toAppointmentTime(item.starts_at);
+                        const end = toAppointmentTime(item.ends_at);
                         const badgeClass = item.status === 'confirmed'
                             ? 'bg-[#dff3e9] text-[#1f5f46]'
                             : (item.status === 'cancelled' ? 'bg-[#fcebea] text-[#b42318]' : 'bg-[#fff7e0] text-[#8a6d1f]');
-                        const approveForm = item.status === 'pending'
+                        const approveButton = item.status === 'pending'
                             ? `
-                                <form action="/admin/appointments/${item.id}/approve" method="POST" class="mt-3">
-                                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                                    <input type="hidden" name="_method" value="PATCH">
-                                    <button type="submit" class="rounded-md border border-[#1f5f46]/20 bg-white px-2.5 py-1 text-[11px] font-semibold text-[#1f5f46] hover:bg-[#ecf6f1]">
-                                        Approve
-                                    </button>
-                                </form>
+                                <button type="button" data-approve-id="${item.id}" class="mt-3 rounded-md border border-[#1f5f46]/20 bg-white px-2.5 py-1 text-[11px] font-semibold text-[#1f5f46] hover:bg-[#ecf6f1]">
+                                    Approve
+                                </button>
                             `
                             : '';
                         return `
@@ -245,7 +361,7 @@
                                 </div>
                                 <p class="mt-2 text-sm text-gray-600">${start} - ${end}</p>
                                 <p class="mt-1 text-sm text-gray-600">${item.email} | ${item.phone}</p>
-                                ${approveForm}
+                                ${approveButton}
                             </article>
                         `;
                     }).join('');
@@ -256,6 +372,7 @@
             };
 
             const closeDayModal = () => {
+                currentOpenDayKey = null;
                 dayEventsModal.classList.add('hidden');
                 dayEventsModal.classList.remove('flex');
             };
@@ -263,6 +380,16 @@
             dayEventsClose?.addEventListener('click', closeDayModal);
             dayEventsModal?.addEventListener('click', (e) => {
                 if (e.target === dayEventsModal) closeDayModal();
+            });
+
+            document.addEventListener('click', (event) => {
+                const button = event.target.closest('[data-approve-id]');
+                if (!button) return;
+
+                const appointmentId = button.getAttribute('data-approve-id');
+                if (!appointmentId) return;
+
+                approveAppointment(appointmentId);
             });
 
             prevBtn?.addEventListener('click', () => {

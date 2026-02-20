@@ -22,7 +22,7 @@
                         <select id="status" name="status"
                             class="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-[#287854] focus:outline-none">
                             <option value="">All statuses</option>
-                            @foreach (['new', 'reviewed', 'shortlisted', 'rejected', 'hired'] as $opt)
+                            @foreach (['new', 'reviewed', 'shortlisted', 'rejected', 'hired', 'onboard'] as $opt)
                                 <option value="{{ $opt }}" {{ $status === $opt ? 'selected' : '' }}>
                                     {{ ucfirst($opt) }}
                                 </option>
@@ -113,7 +113,7 @@
                                         <select name="status"
                                             data-initial-status="{{ $application->status }}"
                                             class="rounded-lg border border-gray-300 px-2 py-1 text-sm focus:border-[#287854] focus:outline-none">
-                                            @foreach (['new', 'reviewed', 'shortlisted', 'rejected', 'hired'] as $opt)
+                                            @foreach (['new', 'reviewed', 'shortlisted', 'rejected', 'hired', 'onboard'] as $opt)
                                                 <option value="{{ $opt }}" {{ $application->status === $opt ? 'selected' : '' }}>
                                                     {{ ucfirst($opt) }}
                                                 </option>

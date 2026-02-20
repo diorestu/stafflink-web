@@ -33,10 +33,10 @@
                 <div class="grid gap-6 sm:grid-cols-2">
                     @php
                         $icons = [
-                            'fa-solid fa-comments',
-                            'fa-solid fa-user-group',
-                            'fa-solid fa-building',
-                            'fa-solid fa-bullseye',
+                            'comments',
+                            'users',
+                            'building',
+                            'target',
                         ];
                     @endphp
                     @foreach ($cards as $i => $card)
@@ -44,7 +44,7 @@
                             data-aos-delay="{{ ($i + 1) * 100 }}">
                             <div
                                 class="flex h-10 w-10 items-center justify-center rounded-full border border-[#287854]/40 text-[#287854]">
-                                <i class="{{ $icons[$i] ?? $icons[0] }} text-[1.45rem] leading-none" aria-hidden="true"></i>
+                                <x-ui-icon :name="$icons[$i] ?? $icons[0]" class="h-6 w-6" />
                             </div>
                             <h3 class="mt-4 text-lg font-semibold">{{ $card['title'] ?? '' }}</h3>
                             <p class="mt-2 text-sm text-[#6b6b66]">{{ $card['description'] ?? '' }}</p>
@@ -61,8 +61,8 @@
                 <div
                     class="absolute right-[-6.6rem] top-1/2 h-[510px] w-[510px] -translate-y-1/2 rounded-full bg-gradient-to-br from-white via-[#f4f5f3] to-[#dfe9e4] shadow-[0_25px_60px_rgba(31,95,70,0.18)]">
                 </div>
-                <img src="{{ asset('images/side_globe.png') }}" alt="World map"
-                    class="absolute right-[-5rem] top-1/2 h-[450px] w-[450px] -translate-y-1/2 -scale-y-100 rotate-180 rounded-full object-cover" draggable="false" />
+                <img src="{{ asset('images/side_globe.webp') }}" alt="World map"
+                    class="absolute right-[-5rem] top-1/2 h-[450px] w-[450px] -translate-y-1/2 -scale-y-100 rotate-180 rounded-full object-cover" draggable="false" loading="lazy" decoding="async" />
             </div>
         </div>
     </div>

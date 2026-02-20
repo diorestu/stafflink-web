@@ -34,11 +34,11 @@
     @endphp
     <div class="flex h-screen">
         <!-- WordPress-style Sidebar -->
-        <aside class="w-64 bg-[#1f5f46] text-white flex-shrink-0">
+        <aside class="relative flex h-screen w-64 flex-shrink-0 flex-col bg-[#1f5f46] text-white">
             <div class="p-6">
                 <h1 class="text-lg font-bold">StaffLink CMS</h1>
             </div>
-            <nav class="mt-6 text-[80%]">
+            <nav class="mt-2 flex-1 overflow-y-auto pb-4 text-[80%]">
                 <a href="{{ route('admin.dashboard') }}"
                     class="flex items-center px-6 py-3 hover:bg-[#287854] {{ request()->routeIs('admin.dashboard') ? 'bg-[#287854] border-l-4 border-[#b28b2e]' : '' }}">
                     <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -83,6 +83,14 @@
                                 d="M19 5H5a2 2 0 00-2 2v10a2 2 0 002 2h14a2 2 0 002-2V7a2 2 0 00-2-2zM8 9h8M8 13h6" />
                         </svg>
                         Blog Posts
+                    </a>
+                    <a href="{{ route('admin.faqs.index') }}"
+                        class="flex items-center px-6 py-3 hover:bg-[#287854] {{ request()->routeIs('admin.faqs.*') ? 'bg-[#287854] border-l-4 border-[#b28b2e]' : '' }}">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 10h8M8 14h5m6 6H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v12a2 2 0 01-2 2z" />
+                        </svg>
+                        FAQs
                     </a>
                     @if ($isSuperAdmin)
                         <a href="{{ route('admin.career-categories.index') }}"
@@ -143,7 +151,7 @@
                 </div>
             </nav>
 
-            <div class="absolute bottom-0 w-64 border-t border-white/10 bg-[#1b553f]/80 px-5 py-4">
+            <div class="mt-auto border-t border-white/10 bg-[#1b553f]/80 px-5 py-4">
                 <div class="flex items-center justify-between rounded-xl bg-white/5 px-3 py-2">
                     <div class="flex items-center gap-2">
                         <div

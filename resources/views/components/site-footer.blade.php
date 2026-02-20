@@ -21,58 +21,109 @@
         <p class="text-xs text-[#9c9c96]">{{ $hf['copyright_text'] ?? '' }}</p>
     </div>
 </footer>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
 <style>
-    @keyframes stafflink-toast-pop {
+    @keyframes stafflink-toast-in {
         0% {
             opacity: 0;
-            transform: translateY(-10px) scale(0.98);
+            transform: translateY(-8px) scale(0.98);
         }
+
         100% {
             opacity: 1;
             transform: translateY(0) scale(1);
         }
     }
 
+    .stafflink-toast-stack {
+        position: fixed;
+        top: 1rem;
+        left: 50%;
+        z-index: 60;
+        display: grid;
+        gap: 0.5rem;
+        transform: translateX(-50%);
+        pointer-events: none;
+    }
+
     .stafflink-toast {
-        box-shadow: 0 10px 30px rgba(31, 95, 70, 0.12) !important;
-        animation: stafflink-toast-pop 260ms ease-out;
+        min-width: 16rem;
+        max-width: min(90vw, 30rem);
+        border-radius: 18px;
+        border: 1px solid #287854;
+        background: #ffffff;
+        padding: 0.625rem 0.875rem;
+        color: #1b1b18;
+        box-shadow: 0 10px 30px rgba(31, 95, 70, 0.12);
+        animation: stafflink-toast-in 220ms ease-out;
+        pointer-events: auto;
     }
 </style>
-<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 <script>
     (() => {
-        if (!window.Toastify) return;
-
         const success = @json(session('success'));
         const error = @json(session('error'));
         const info = @json(session('info'));
-        const warnings = @json(session('warning'));
+        const warning = @json(session('warning'));
         const errors = @json($errors->all());
 
-        const showToast = (text, type = 'success') => {
-            if (!text) return;
-            Toastify({
-                text,
-                duration: 4000,
-                gravity: 'top',
-                position: 'center',
-                close: true,
-                stopOnFocus: true,
-                className: 'stafflink-toast',
-                style: {
-                    background: '#ffffff',
-                    color: '#1b1b18',
-                    border: '1px solid #287854',
-                    borderRadius: '20px',
-                },
-            }).showToast();
+        const queue = [];
+        if (success) queue.push({ text: success, type: 'success' });
+        if (error) queue.push({ text: error, type: 'error' });
+        if (info) queue.push({ text: info, type: 'info' });
+        if (warning) queue.push({ text: warning, type: 'warning' });
+        (errors || []).forEach((message) => {
+            if (message) queue.push({ text: message, type: 'error' });
+        });
+
+        const getBorderColor = (type) => {
+            if (type === 'error') return '#b42318';
+            if (type === 'warning') return '#b28b2e';
+            if (type === 'info') return '#2f6f9f';
+            return '#287854';
         };
 
-        showToast(success, 'success');
-        showToast(error, 'error');
-        showToast(info, 'info');
-        showToast(warnings, 'warning');
-        (errors || []).forEach((msg) => showToast(msg, 'error'));
+        const getStack = () => {
+            let stack = document.querySelector('.stafflink-toast-stack');
+            if (stack) return stack;
+
+            stack = document.createElement('div');
+            stack.className = 'stafflink-toast-stack';
+            document.body.appendChild(stack);
+
+            return stack;
+        };
+
+        const showToast = ({ text, type }) => {
+            const stack = getStack();
+            const node = document.createElement('div');
+            node.className = 'stafflink-toast';
+            node.style.borderColor = getBorderColor(type);
+            node.textContent = text;
+            stack.appendChild(node);
+
+            window.setTimeout(() => {
+                node.style.opacity = '0';
+                node.style.transform = 'translateY(-8px)';
+                node.style.transition = 'opacity 180ms ease, transform 180ms ease';
+            }, 3600);
+
+            window.setTimeout(() => {
+                node.remove();
+                if (!stack.childElementCount) {
+                    stack.remove();
+                }
+            }, 3850);
+        };
+
+        window.stafflinkToast = (text, type = 'success') => {
+            if (!text) return;
+            showToast({ text, type });
+        };
+
+        if (!queue.length) return;
+
+        queue.forEach((toast, index) => {
+            window.setTimeout(() => window.stafflinkToast(toast.text, toast.type), index * 120);
+        });
     })();
 </script>

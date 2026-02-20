@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Appointment;
+use App\Models\Job;
 use App\Models\PageSection;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -21,6 +22,16 @@ class AdminController extends Controller
     public function dashboard()
     {
         $sections = PageSection::all();
+        $metrics = [
+            'page_sections' => $sections->count(),
+            'total_jobs' => Job::query()->count(),
+            'published_jobs' => Job::query()->where('status', 'published')->count(),
+            'upcoming_appointments' => Appointment::query()
+                ->where('starts_at', '>=', now())
+                ->whereIn('status', ['pending', 'confirmed'])
+                ->count(),
+        ];
+
         $startOfWeek = Carbon::now()->startOfWeek(Carbon::MONDAY);
         $endOfWeek = Carbon::now()->endOfWeek(Carbon::SUNDAY);
         $weeklyAppointments = Appointment::query()
@@ -31,6 +42,7 @@ class AdminController extends Controller
         return view('admin.dashboard', [
             'sections' => $sections,
             'labels' => $this->sectionLabels,
+            'metrics' => $metrics,
             'weeklyAppointments' => $weeklyAppointments,
         ]);
     }

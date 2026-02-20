@@ -3,31 +3,62 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ \App\Models\SiteSetting::siteName() }} - Nanny Concierge Services</title>
-    <link rel="icon" href="{{ asset('favicon.ico') }}">
+    @php
+        $seoArea = $seoArea ?? null;
+        $serviceAreas = $serviceAreas ?? collect();
+        $areaLabel = $seoArea['seo_label'] ?? null;
+        $pageTitle = $areaLabel ? "Nanny Concierge Services in {$areaLabel}" : 'Nanny Concierge Services';
+        $pageDescription = $areaLabel
+            ? "Discover VIP nanny and concierge recruitment services in {$areaLabel} with Staff Link."
+            : 'Discover VIP nanny and concierge recruitment services with Staff Link.';
+        $breadcrumbItems = [['name' => 'Home', 'url' => url('/')], ['name' => 'Airport Services', 'url' => route('airport-services.nanny-concierge')]];
+        if ($areaLabel) {
+            $breadcrumbItems[] = ['name' => $areaLabel, 'url' => request()->url()];
+        }
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Google+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css">
+        $serviceSchema = [
+            '@type' => 'Service',
+            '@id' => request()->url().'#service',
+            'name' => $pageTitle,
+            'serviceType' => 'Nanny Concierge Service',
+            'description' => $pageDescription,
+            'provider' => ['@id' => url('/').'#organization'],
+            'url' => request()->url(),
+            'areaServed' => [
+                '@type' => 'Place',
+                'name' => $areaLabel ?? 'Bali',
+            ],
+        ];
+    @endphp
+    @include('partials.seo-meta', [
+        'seoTitle' => \App\Models\SiteSetting::siteName().' | '.$pageTitle,
+        'seoDescription' => $pageDescription,
+        'seoKeywords' => 'nanny concierge service, airport service, childcare recruitment bali',
+        'seoBreadcrumbItems' => $breadcrumbItems,
+        'seoStructuredDataNodes' => [$serviceSchema],
+    ])
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
+
 <body class="text-[#2e2e2e]" id="page-top">
     <div class="min-h-screen bg-[radial-gradient(circle_at_top,_#ffffff_0%,_#f4f5f3_52%,_#e6f1ec_100%)]">
         <x-site-header />
 
         <main class="px-6 pb-20 pt-12 lg:px-10">
+            <section class="mx-auto max-w-6xl">
+                @include('partials.breadcrumbs', ['breadcrumbItems' => $breadcrumbItems])
+            </section>
             <section class="mx-auto max-w-6xl overflow-hidden rounded-[32px] shadow-[0_20px_60px_rgba(31,95,70,0.16)]" data-aos="fade-up">
                 <div class="relative min-h-[620px]">
-                    <img src="{{ asset('images/img_hero.webp') }}" alt="Nanny assisting child" class="absolute inset-0 h-full w-full object-cover" draggable="false" />
+                    <img src="{{ asset('images/img_hero.webp') }}" alt="Nanny assisting child" class="absolute inset-0 h-full w-full object-cover" draggable="false" loading="lazy" />
                     <div class="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/45"></div>
 
                     <div class="relative flex h-full items-center px-8 py-10 lg:px-12">
                         <div class="max-w-3xl rounded-[26px] border border-white/20 bg-black/35 p-6 text-white shadow-[0_14px_34px_rgba(0,0,0,0.25)] backdrop-blur-[2px] md:p-8">
                             <p class="text-xs uppercase tracking-[0.3em] text-[#e9d29d]">Airport Services</p>
                             <h1 class="mt-4 text-4xl font-semibold leading-tight text-white md:text-5xl">
-                                International Childcare Recruitment Agency
+                                International Childcare Recruitment Agency @if($areaLabel) in {{ $areaLabel }} @endif
                             </h1>
                             <p class="mt-5 max-w-2xl text-sm leading-relaxed text-white/90">
                                 Staff Link is the first International VIP Agency specialising in the recruitment and placement of professional
@@ -50,6 +81,26 @@
                     </div>
                 </div>
             </section>
+
+            @if ($serviceAreas->isNotEmpty())
+                <section class="mx-auto mt-8 max-w-6xl rounded-[24px] bg-white p-6 shadow-[0_18px_44px_rgba(31,95,70,0.12)]" data-aos="fade-up">
+                    <div class="flex flex-wrap items-center justify-between gap-3">
+                        <p class="text-xs uppercase tracking-[0.25em] text-[#287854]">Airport service areas</p>
+                        @if ($areaLabel)
+                            <a href="{{ route('airport-services.nanny-concierge') }}" class="inline-flex rounded-full border border-[#dfe8e3] bg-white px-4 py-2 text-xs font-semibold text-[#3f4b45] transition hover:border-[#bcd7c8] hover:bg-[#f4faf7]">
+                                View all areas
+                            </a>
+                        @endif
+                    </div>
+                    <div class="mt-4 flex flex-wrap gap-x-3 gap-y-3 sm:gap-x-4 sm:gap-y-4">
+                        @foreach ($serviceAreas as $area)
+                            <a href="{{ route('airport-services.nanny-concierge.area', $area['slug']) }}" class="inline-flex rounded-full border px-4 py-2 text-xs font-semibold transition {{ ($seoArea['slug'] ?? null) === $area['slug'] ? 'border-[#287854] bg-[#ecf7f1] text-[#1f5f46]' : 'border-[#dfe8e3] bg-white text-[#3f4b45] hover:border-[#bcd7c8] hover:bg-[#f4faf7]' }}">
+                                {{ $area['label'] }}
+                            </a>
+                        @endforeach
+                    </div>
+                </section>
+            @endif
 
             <section class="mx-auto mt-16 max-w-5xl space-y-10" data-aos="fade-up">
                 <div class="text-center space-y-4">
@@ -207,14 +258,11 @@
                 <path d="M6 11l6-6 6 6" />
             </svg>
         </button>
-        <a href="https://wa.me/6285739660906" class="group relative flex h-14 w-14 items-center justify-center overflow-visible rounded-full bg-transparent transition" aria-label="WhatsApp Chat">
-            <img src="{{ asset('images/512px-WhatsApp.svg.webp') }}" alt="WhatsApp" class="h-[3.6rem] w-[3.6rem]" draggable="false" />
+        <a href="https://wa.me/6285739660906" class="group relative flex h-16 w-16 items-center justify-center overflow-visible rounded-full bg-transparent transition" aria-label="WhatsApp Chat">
+            <img src="{{ asset('images/64px-WhatsApp.svg.png') }}" alt="WhatsApp" class="h-full w-full object-contain" draggable="false" loading="lazy" />
             <span class="pointer-events-none absolute right-full mr-3 flex items-center gap-2 whitespace-nowrap rounded-full bg-[#287854] px-4 py-2 text-[11px] font-semibold tracking-tight text-white shadow-lg opacity-0 transition duration-300 ease-out translate-x-6 scale-x-105 origin-right group-hover:translate-x-0 group-hover:opacity-100">
                 Click here to chat
             </span>
         </a>
-    </div>
-
-    <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
-</body>
+    </div></body>
 </html>

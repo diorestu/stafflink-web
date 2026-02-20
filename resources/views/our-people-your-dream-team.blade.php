@@ -3,16 +3,15 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ \App\Models\SiteSetting::siteName() }} - Our People, Your Dream Team</title>
-    <link rel="icon" href="{{ asset('favicon.ico') }}">
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Google+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css">
+    @include('partials.seo-meta', [
+        'seoTitle' => \App\Models\SiteSetting::siteName().' | Our People, Your Dream Team',
+        'seoDescription' => 'Build high-performing offshore teams with StaffLink Solutions through transparent and efficient hiring processes.',
+        'seoKeywords' => 'offshore team hiring, dedicated team recruitment, dream team staffing',
+    ])
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
+
 <body class="text-[#2e2e2e]" id="page-top">
     <div class="min-h-screen bg-[radial-gradient(circle_at_top,_#ffffff_0%,_#f4f5f3_52%,_#e6f1ec_100%)]">
         <x-site-header />
@@ -37,7 +36,7 @@
                         </div>
                         <div class="flex justify-center lg:justify-end">
                             <img src="{{ asset('images/img_hero.webp') }}" alt="Professional team discussion"
-                                class="h-[280px] w-full max-w-md rounded-2xl object-cover shadow-[0_14px_30px_rgba(0,0,0,0.2)]" draggable="false" />
+                                class="h-[280px] w-full max-w-md rounded-2xl object-cover shadow-[0_14px_30px_rgba(0,0,0,0.2)]" draggable="false" loading="lazy" />
                         </div>
                     </div>
                 </section>
@@ -45,7 +44,7 @@
                 <section class="grid gap-10 lg:grid-cols-2 lg:items-center" data-aos="fade-up">
                     <div>
                         <img src="{{ asset('images/img_hero.webp') }}" alt="Talent acquisition team"
-                            class="h-[300px] w-full rounded-2xl object-cover shadow-[0_14px_30px_rgba(31,95,70,0.14)]" draggable="false" />
+                            class="h-[300px] w-full rounded-2xl object-cover shadow-[0_14px_30px_rgba(31,95,70,0.14)]" draggable="false" loading="lazy" />
                     </div>
                     <article class="rounded-[28px] bg-white p-10 shadow-[0_18px_44px_rgba(31,95,70,0.12)]">
                         <h2 class="text-3xl font-semibold text-[#1b1b18]">Talent Acquisition for Future-Ready Businesses</h2>
@@ -76,8 +75,8 @@
                         </a>
                     </article>
                     <div>
-                        <img src="{{ asset('images/single_img.png') }}" alt="StaffLink team members"
-                            class="h-[330px] w-full rounded-2xl object-cover shadow-[0_14px_30px_rgba(31,95,70,0.14)]" draggable="false" />
+                        <img src="{{ asset('images/single_img.webp') }}" alt="StaffLink team members"
+                            class="h-[330px] w-full rounded-2xl object-cover shadow-[0_14px_30px_rgba(31,95,70,0.14)]" draggable="false" loading="lazy" />
                     </div>
                 </section>
 
@@ -163,15 +162,13 @@
         </button>
         <a
             href="https://wa.me/6285739660906"
-            class="group relative flex h-14 w-14 items-center justify-center overflow-visible rounded-full bg-transparent transition"
+            class="group relative flex h-16 w-16 items-center justify-center overflow-visible rounded-full bg-transparent transition"
             aria-label="WhatsApp Chat"
         >
-            <img src="{{ asset('images/512px-WhatsApp.svg.webp') }}" alt="WhatsApp" class="h-[3.6rem] w-[3.6rem]" draggable="false" />
+            <img src="{{ asset('images/64px-WhatsApp.svg.png') }}" alt="WhatsApp" class="h-full w-full object-contain" draggable="false" loading="lazy" />
             <span class="pointer-events-none absolute right-full mr-3 flex items-center gap-2 whitespace-nowrap rounded-full bg-[#287854] px-4 py-2 text-[11px] font-semibold tracking-tight text-white shadow-lg opacity-0 transition duration-300 ease-out translate-x-6 scale-x-105 origin-right group-hover:translate-x-0 group-hover:opacity-100">
                 Click here to chat
             </span>
         </a>
-    </div>
-    <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
-</body>
+    </div></body>
 </html>

@@ -4,17 +4,35 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ \App\Models\SiteSetting::siteName() }}</title>
-    <link rel="icon" href="{{ asset('favicon.ico') }}">
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Google+Sans:wght@400;500;600;700&display=swap"
-        rel="stylesheet">
-    <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css">
-
+    @php
+        $faqStructuredDataNodes = [];
+        if (($faqs ?? collect())->isNotEmpty()) {
+            $faqStructuredDataNodes[] = [
+                '@type' => 'FAQPage',
+                '@id' => request()->url().'#faq',
+                'mainEntity' => ($faqs ?? collect())
+                    ->take(20)
+                    ->map(function ($faq) {
+                        return [
+                            '@type' => 'Question',
+                            'name' => (string) $faq->question,
+                            'acceptedAnswer' => [
+                                '@type' => 'Answer',
+                                'text' => strip_tags((string) $faq->answer),
+                            ],
+                        ];
+                    })
+                    ->values()
+                    ->all(),
+            ];
+        }
+    @endphp
+    @include('partials.seo-meta', [
+        'seoTitle' => \App\Models\SiteSetting::siteName().' | Global Staffing & Recruitment Services',
+        'seoDescription' => 'StaffLink Solutions helps businesses hire trusted global talent with tailored staffing, recruitment, and outsourcing support.',
+        'seoKeywords' => 'stafflink, recruitment agency, staffing solutions, outsourcing services, global hiring',
+        'seoStructuredDataNodes' => $faqStructuredDataNodes,
+    ])
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
@@ -27,6 +45,7 @@
             <x-industries :content="$industries" />
             <x-staffing :content="$staffing" :categories="$careerCategories" />
             <x-cta :content="$cta" />
+            <x-faq :items="$faqs" />
         </main>
         <x-site-footer />
     </div>
@@ -41,17 +60,15 @@
             </svg>
         </button>
         <a href="https://wa.me/6285739660906?text=Hello,%20I%E2%80%99m%20interested%20in%20learning%20more%20about%20your%20staffing%20services.%0A%0ACompany%20Name:%20%0AIndustry:%20%0APositions%20Needed:%20%0ANumber%20of%20Hires:%20%0AWork%20Arrangement%20(On-site%20/%20Remote%20/%20Hybrid):%20%0A%0APlease%20let%20me%20know%20how%20we%20can%20proceed%20with%20a%20consultation.%20Thank%20you."
-            class="group relative flex h-14 w-14 items-center justify-center overflow-visible rounded-full bg-transparent transition"
+            class="group relative flex h-16 w-16 items-center justify-center overflow-visible rounded-full bg-transparent transition"
             aria-label="WhatsApp Chat">
-            <img src="{{ asset('images/512px-WhatsApp.svg.webp') }}" alt="WhatsApp" class="h-[3.6rem] w-[3.6rem]"
-                draggable="false" />
+            <img src="{{ asset('images/64px-WhatsApp.svg.png') }}" alt="WhatsApp" class="h-full w-full object-contain"
+                draggable="false" loading="lazy" />
             <span
                 class="pointer-events-none absolute right-full mr-3 flex items-center gap-2 whitespace-nowrap rounded-full bg-[#287854] px-4 py-2 text-[11px] font-semibold tracking-tight text-white shadow-lg opacity-0 transition duration-300 ease-out translate-x-6 scale-x-105 origin-right group-hover:translate-x-0 group-hover:opacity-100">
                 Click here to chat
             </span>
         </a>
-    </div>
-    <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
-</body>
+    </div></body>
 
 </html>

@@ -43,7 +43,7 @@
                     </a>
                     <a href="{{ $inquiryUrl }}" target="_blank" rel="noopener" aria-label="Ask via WhatsApp"
                         class="inline-flex w-1/5 items-center justify-center rounded-full bg-[#25d366] px-2 py-2 text-white transition hover:bg-[#1eb95a]">
-                        <img src="{{ asset('images/64px-WhatsApp.svg.png') }}" alt="WhatsApp" class="h-5 w-5" draggable="false" />
+                        <img src="{{ asset('images/64px-WhatsApp.svg.png') }}" alt="WhatsApp" class="h-5 w-5" draggable="false" loading="lazy" />
                     </a>
                 </div>
             @else

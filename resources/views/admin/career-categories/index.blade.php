@@ -34,7 +34,7 @@
                                 <td class="px-6 py-4">
                                     <div class="flex items-start gap-3">
                                         @if ($category->image_path)
-                                            <img src="{{ \Illuminate\Support\Facades\Storage::url($category->image_path) }}" alt="{{ $category->name }}"
+                                            <img src="{{ \Illuminate\Support\Facades\Storage::url($category->image_path) }}" alt="{{ filled($category->name) ? $category->name : 'Category image' }}"
                                                 class="h-10 w-10 rounded-lg object-cover border border-gray-200" draggable="false" />
                                         @else
                                             <div class="h-10 w-10 rounded-lg border border-gray-200 bg-gray-50"></div>

@@ -5,32 +5,32 @@
         @php
             $items = [
                 [
-                    'icon' => 'fa-solid fa-comments',
+                    'icon' => 'comments',
                     'title' => 'Industry Qualified',
                     'description' => 'We match you with global professionals who have access to continuous learning & development opportunities.',
                 ],
                 [
-                    'icon' => 'fa-solid fa-book-open',
+                    'icon' => 'book',
                     'title' => 'Local Expertise',
                     'description' => 'Our team is equipped with a deep understanding of the local market to provide responsive solutions to your business.',
                 ],
                 [
-                    'icon' => 'fa-solid fa-check',
+                    'icon' => 'check',
                     'title' => 'All Done For You',
                     'description' => 'We match you with global professionals who have access to continuous learning & development opportunities.',
                 ],
                 [
-                    'icon' => 'fa-solid fa-headset',
+                    'icon' => 'headset',
                     'title' => 'Seamless Communications',
                     'description' => 'Reach out to our team anytime through easy-to-use platforms and communication channels.',
                 ],
                 [
-                    'icon' => 'fa-solid fa-user-shield',
+                    'icon' => 'shield',
                     'title' => 'Guaranteed Data Protection',
                     'description' => 'State-of-the-art security systems & internal SOPs ensure your business information is secured 24/7.',
                 ],
                 [
-                    'icon' => 'fa-solid fa-heart',
+                    'icon' => 'heart',
                     'title' => 'Inspiring Workplaces',
                     'description' => 'Our global facilities are fully equipped for ultimate productivity, efficiency and work quality.',
                 ],
@@ -52,7 +52,7 @@
                     <article class="rounded-2xl bg-white px-6 py-6 shadow-[0_18px_35px_rgba(31,95,70,0.12)]" data-aos="fade-up"
                         data-aos-delay="{{ 100 + ($index * 50) }}">
                         <div class="flex h-11 w-11 items-center justify-center rounded-full border border-[#287854]/30 text-[#287854]">
-                            <i class="{{ $item['icon'] ?? 'fa-solid fa-circle-check' }} text-[1.1rem] leading-none" aria-hidden="true"></i>
+                            <x-ui-icon :name="$item['icon'] ?? 'check-circle'" class="h-5 w-5" />
                         </div>
                         <h3 class="mt-4 text-lg font-semibold text-[#2e2e2e]">
                             {{ $item['title'] ?? '' }}
