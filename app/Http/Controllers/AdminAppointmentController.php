@@ -6,6 +6,7 @@ use App\Events\AppointmentApproved;
 use App\Models\Appointment;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class AdminAppointmentController extends Controller
@@ -70,5 +71,62 @@ class AdminAppointmentController extends Controller
         }
 
         return back()->with('success', 'Appointment approved successfully.');
+    }
+
+    public function cancel(Appointment $appointment, Request $request): RedirectResponse|JsonResponse
+    {
+        $updated = Appointment::query()
+            ->whereKey($appointment->id)
+            ->where('status', '!=', 'cancelled')
+            ->update(['status' => 'cancelled']);
+
+        if ($updated === 0) {
+            return $this->actionResponse(
+                $request,
+                'Appointment is already cancelled.',
+                $appointment->status,
+                $appointment->id
+            );
+        }
+
+        return $this->actionResponse(
+            $request,
+            'Appointment cancelled successfully.',
+            'cancelled',
+            $appointment->id
+        );
+    }
+
+    public function destroy(Appointment $appointment, Request $request): RedirectResponse|JsonResponse
+    {
+        $appointmentId = $appointment->id;
+        $appointment->delete();
+
+        if ($request->expectsJson() || $request->wantsJson()) {
+            return response()->json([
+                'message' => 'Appointment deleted successfully.',
+                'appointment_id' => $appointmentId,
+                'deleted' => true,
+            ]);
+        }
+
+        return back()->with('success', 'Appointment deleted successfully.');
+    }
+
+    private function actionResponse(
+        Request $request,
+        string $message,
+        string $status,
+        int $appointmentId
+    ): RedirectResponse|JsonResponse {
+        if ($request->expectsJson() || $request->wantsJson()) {
+            return response()->json([
+                'message' => $message,
+                'status' => $status,
+                'appointment_id' => $appointmentId,
+            ]);
+        }
+
+        return back()->with('success', $message);
     }
 }

@@ -110,6 +110,14 @@
                         </svg>
                         Appointments
                     </a>
+                    <a href="{{ route('admin.leads.index') }}"
+                        class="flex items-center px-6 py-3 hover:bg-[#287854] {{ request()->routeIs('admin.leads.*') ? 'bg-[#287854] border-l-4 border-[#b28b2e]' : '' }}">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M3 7h18M3 12h18M3 17h18" />
+                        </svg>
+                        Leads
+                    </a>
                     <a href="{{ route('admin.applicants.index') }}"
                         class="flex items-center px-6 py-3 hover:bg-[#287854] {{ request()->routeIs('admin.applicants.*') ? 'bg-[#287854] border-l-4 border-[#b28b2e]' : '' }}">
                         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">

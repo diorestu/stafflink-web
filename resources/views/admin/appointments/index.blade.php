@@ -70,12 +70,24 @@
                                     <article class="rounded-md bg-[#f2f8f5] px-2.5 py-2">
                                         <p class="text-xs font-semibold text-gray-800">{{ $appointment->name }}</p>
                                         <p class="mt-1 text-[11px] text-gray-600">{{ $appointment->starts_at->format('H:i') }} - {{ $appointment->ends_at->format('H:i') }}</p>
-                                        @if($appointment->status === 'pending')
-                                            <button type="button" data-approve-id="{{ $appointment->id }}"
-                                                class="mt-1.5 rounded border border-[#1f5f46]/20 bg-white px-2 py-0.5 text-[10px] font-semibold text-[#1f5f46] hover:bg-[#ecf6f1]">
-                                                Approve
+                                        <div class="mt-1.5 flex flex-wrap gap-1.5">
+                                            @if($appointment->status === 'pending')
+                                                <button type="button" data-approve-id="{{ $appointment->id }}"
+                                                    class="rounded border border-[#1f5f46]/20 bg-white px-2 py-0.5 text-[10px] font-semibold text-[#1f5f46] hover:bg-[#ecf6f1]">
+                                                    Approve
+                                                </button>
+                                            @endif
+                                            @if($appointment->status !== 'cancelled')
+                                                <button type="button" data-cancel-id="{{ $appointment->id }}"
+                                                    class="rounded border border-[#b42318]/20 bg-white px-2 py-0.5 text-[10px] font-semibold text-[#b42318] hover:bg-[#fdf3f2]">
+                                                    Cancel
+                                                </button>
+                                            @endif
+                                            <button type="button" data-delete-id="{{ $appointment->id }}"
+                                                class="rounded border border-gray-300 bg-white px-2 py-0.5 text-[10px] font-semibold text-gray-700 hover:bg-gray-100">
+                                                Delete
                                             </button>
-                                        @endif
+                                        </div>
                                     </article>
                                 @empty
                                     <p class="text-[11px] text-gray-400">No appointments</p>
@@ -105,8 +117,8 @@
                     <path d="M12 3a9 9 0 0 1 9 9" stroke="currentColor" stroke-width="3" stroke-linecap="round"></path>
                 </svg>
             </div>
-            <p class="mt-4 text-base font-semibold text-[#1f5f46]">Processing approval...</p>
-            <p class="mt-1 text-sm text-gray-600">Please wait while we update the appointment.</p>
+            <p id="appointment-processing-title" class="mt-4 text-base font-semibold text-[#1f5f46]">Processing request...</p>
+            <p id="appointment-processing-desc" class="mt-1 text-sm text-gray-600">Please wait while we update the appointment.</p>
         </div>
     </div>
 
@@ -144,8 +156,10 @@
             const dayEventsList = document.getElementById('day-events-list');
             const dayEventsClose = document.getElementById('day-events-close');
             const approveProcessingModal = document.getElementById('approve-processing-modal');
+            const processingTitle = document.getElementById('appointment-processing-title');
+            const processingDesc = document.getElementById('appointment-processing-desc');
             let currentDate = new Date();
-            let isApproving = false;
+            let isMutatingAppointment = false;
 
             const statusClass = (status) => {
                 if (status === 'confirmed') return 'bg-[#dff3e9] text-[#1f5f46]';
@@ -239,7 +253,9 @@
                 });
             };
 
-            const showProcessingModal = () => {
+            const showProcessingModal = (title = 'Processing request...', description = 'Please wait while we update the appointment.') => {
+                if (processingTitle) processingTitle.textContent = title;
+                if (processingDesc) processingDesc.textContent = description;
                 approveProcessingModal?.classList.remove('hidden');
                 approveProcessingModal?.classList.add('flex');
             };
@@ -256,6 +272,14 @@
                         item.status = status;
                     }
                 });
+            };
+
+            const removeAppointment = (appointmentId) => {
+                const targetId = Number(appointmentId);
+                const index = appointments.findIndex((item) => Number(item.id) === targetId);
+                if (index >= 0) {
+                    appointments.splice(index, 1);
+                }
             };
 
             const showToast = (text, isError = false) => {
@@ -277,46 +301,78 @@
                 }).showToast();
             };
 
-            const approveAppointment = async (appointmentId) => {
-                if (isApproving) {
-                    return;
-                }
-                isApproving = true;
-                showProcessingModal();
-
+            const mutateAppointment = async (appointmentId, config) => {
+                if (isMutatingAppointment) return false;
+                isMutatingAppointment = true;
+                showProcessingModal(config.processingTitle, config.processingDesc);
                 try {
-                    const response = await fetch(`/admin/appointments/${appointmentId}/approve`, {
-                        method: 'POST',
+                    const response = await fetch(config.url(appointmentId), {
+                        method: config.method,
                         headers: {
                             'Accept': 'application/json',
-                            'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
                             'X-CSRF-TOKEN': csrfToken,
                             'X-Requested-With': 'XMLHttpRequest',
                         },
-                        body: new URLSearchParams({
-                            _method: 'PATCH',
-                        }),
                     });
 
                     const payload = await response.json().catch(() => ({}));
                     if (!response.ok) {
-                        throw new Error(payload.message || 'Failed to approve appointment.');
+                        throw new Error(payload.message || config.errorMessage);
                     }
 
-                    updateAppointmentStatus(payload.appointment_id ?? appointmentId, payload.status || 'confirmed');
+                    if (config.onSuccess) {
+                        config.onSuccess(payload, appointmentId);
+                    }
                     renderCalendar();
                     if (currentOpenDayKey) {
                         openDayModal(currentOpenDayKey);
                     }
-
-                    showToast(payload.message || 'Appointment approved successfully.');
+                    showToast(payload.message || config.successMessage);
+                    return true;
                 } catch (error) {
-                    showToast(error.message || 'Failed to approve appointment.', true);
+                    showToast(error.message || config.errorMessage, true);
+                    return false;
                 } finally {
                     hideProcessingModal();
-                    isApproving = false;
+                    isMutatingAppointment = false;
                 }
             };
+
+            const approveAppointment = (appointmentId) => mutateAppointment(appointmentId, {
+                method: 'PATCH',
+                url: (id) => `/admin/appointments/${id}/approve`,
+                processingTitle: 'Approving appointment...',
+                processingDesc: 'Please wait while we confirm this appointment.',
+                successMessage: 'Appointment approved successfully.',
+                errorMessage: 'Failed to approve appointment.',
+                onSuccess: (payload, id) => {
+                    updateAppointmentStatus(payload.appointment_id ?? id, payload.status || 'confirmed');
+                },
+            });
+
+            const cancelAppointment = (appointmentId) => mutateAppointment(appointmentId, {
+                method: 'PATCH',
+                url: (id) => `/admin/appointments/${id}/cancel`,
+                processingTitle: 'Cancelling appointment...',
+                processingDesc: 'Please wait while we cancel this appointment.',
+                successMessage: 'Appointment cancelled successfully.',
+                errorMessage: 'Failed to cancel appointment.',
+                onSuccess: (payload, id) => {
+                    updateAppointmentStatus(payload.appointment_id ?? id, payload.status || 'cancelled');
+                },
+            });
+
+            const deleteAppointment = (appointmentId) => mutateAppointment(appointmentId, {
+                method: 'DELETE',
+                url: (id) => `/admin/appointments/${id}`,
+                processingTitle: 'Deleting appointment...',
+                processingDesc: 'Please wait while we remove this appointment.',
+                successMessage: 'Appointment deleted successfully.',
+                errorMessage: 'Failed to delete appointment.',
+                onSuccess: (payload, id) => {
+                    removeAppointment(payload.appointment_id ?? id);
+                },
+            });
 
             const openDayModal = (dateKey) => {
                 currentOpenDayKey = dateKey;
@@ -351,6 +407,18 @@
                                 </button>
                             `
                             : '';
+                        const cancelButton = item.status !== 'cancelled'
+                            ? `
+                                <button type="button" data-cancel-id="${item.id}" class="mt-3 rounded-md border border-[#b42318]/20 bg-white px-2.5 py-1 text-[11px] font-semibold text-[#b42318] hover:bg-[#fdf3f2]">
+                                    Cancel
+                                </button>
+                            `
+                            : '';
+                        const deleteButton = `
+                            <button type="button" data-delete-id="${item.id}" class="mt-3 rounded-md border border-gray-300 bg-white px-2.5 py-1 text-[11px] font-semibold text-gray-700 hover:bg-gray-100">
+                                Delete
+                            </button>
+                        `;
                         return `
                             <article class="rounded-md bg-[#f6faf8] px-4 py-3">
                                 <div class="flex items-center justify-between gap-2">
@@ -361,7 +429,11 @@
                                 </div>
                                 <p class="mt-2 text-sm text-gray-600">${start} - ${end}</p>
                                 <p class="mt-1 text-sm text-gray-600">${item.email} | ${item.phone}</p>
-                                ${approveButton}
+                                <div class="flex flex-wrap gap-2">
+                                    ${approveButton}
+                                    ${cancelButton}
+                                    ${deleteButton}
+                                </div>
                             </article>
                         `;
                     }).join('');
@@ -383,13 +455,33 @@
             });
 
             document.addEventListener('click', (event) => {
-                const button = event.target.closest('[data-approve-id]');
-                if (!button) return;
+                const approveButton = event.target.closest('[data-approve-id]');
+                if (approveButton) {
+                    const appointmentId = approveButton.getAttribute('data-approve-id');
+                    if (appointmentId) {
+                        approveAppointment(appointmentId);
+                    }
+                    return;
+                }
 
-                const appointmentId = button.getAttribute('data-approve-id');
-                if (!appointmentId) return;
+                const cancelButton = event.target.closest('[data-cancel-id]');
+                if (cancelButton) {
+                    const appointmentId = cancelButton.getAttribute('data-cancel-id');
+                    if (!appointmentId) return;
 
-                approveAppointment(appointmentId);
+                    if (!window.confirm('Cancel this appointment?')) return;
+                    cancelAppointment(appointmentId);
+                    return;
+                }
+
+                const deleteButton = event.target.closest('[data-delete-id]');
+                if (deleteButton) {
+                    const appointmentId = deleteButton.getAttribute('data-delete-id');
+                    if (!appointmentId) return;
+
+                    if (!window.confirm('Delete this appointment permanently? This cannot be undone.')) return;
+                    deleteAppointment(appointmentId);
+                }
             });
 
             prevBtn?.addEventListener('click', () => {

@@ -168,16 +168,38 @@
                                         {{ $appointment->ends_at->copy()->timezone($dashboardTimezone)->format('H:i') }}
                                         (UTC+8)
                                     </p>
-                                    @if($appointment->status === 'pending')
-                                        <form action="{{ route('admin.appointments.approve', $appointment) }}" method="POST" class="mt-1.5">
+                                    <div class="mt-1.5 flex flex-wrap gap-1.5">
+                                        @if($appointment->status === 'pending')
+                                            <form action="{{ route('admin.appointments.approve', $appointment) }}" method="POST">
+                                                @csrf
+                                                @method('PATCH')
+                                                <button type="submit"
+                                                    class="rounded border border-[#1f5f46]/20 bg-white px-2 py-0.5 text-[10px] font-semibold text-[#1f5f46] hover:bg-[#ecf6f1]">
+                                                    Approve
+                                                </button>
+                                            </form>
+                                        @endif
+                                        @if($appointment->status !== 'cancelled')
+                                            <form action="{{ route('admin.appointments.cancel', $appointment) }}" method="POST"
+                                                onsubmit="return confirm('Cancel this appointment?')">
+                                                @csrf
+                                                @method('PATCH')
+                                                <button type="submit"
+                                                    class="rounded border border-[#b42318]/20 bg-white px-2 py-0.5 text-[10px] font-semibold text-[#b42318] hover:bg-[#fdf3f2]">
+                                                    Cancel
+                                                </button>
+                                            </form>
+                                        @endif
+                                        <form action="{{ route('admin.appointments.destroy', $appointment) }}" method="POST"
+                                            onsubmit="return confirm('Delete this appointment permanently? This cannot be undone.')">
                                             @csrf
-                                            @method('PATCH')
+                                            @method('DELETE')
                                             <button type="submit"
-                                                class="rounded border border-[#1f5f46]/20 bg-white px-2 py-0.5 text-[10px] font-semibold text-[#1f5f46] hover:bg-[#ecf6f1]">
-                                                Approve
+                                                class="rounded border border-gray-300 bg-white px-2 py-0.5 text-[10px] font-semibold text-gray-700 hover:bg-gray-100">
+                                                Delete
                                             </button>
                                         </form>
-                                    @endif
+                                    </div>
                                 </article>
                             @empty
                                 <p class="text-[11px] text-gray-400">No appointments</p>

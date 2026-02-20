@@ -8,6 +8,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AdminFaqController;
 use App\Http\Controllers\AdminHeaderFooterController;
 use App\Http\Controllers\AdminJobApplicationController;
+use App\Http\Controllers\AdminLeadController;
 use App\Http\Controllers\AdminPageController;
 use App\Http\Controllers\AdminUserController;
 use App\Http\Controllers\AiAgentController;
@@ -73,6 +74,10 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
         Route::get('/applicants/{application}/documents/{type}', [AdminJobApplicationController::class, 'document'])->name('applicants.document');
         Route::get('/appointments', [AdminAppointmentController::class, 'index'])->name('appointments.index');
         Route::patch('/appointments/{appointment}/approve', [AdminAppointmentController::class, 'approve'])->name('appointments.approve');
+        Route::patch('/appointments/{appointment}/cancel', [AdminAppointmentController::class, 'cancel'])->name('appointments.cancel');
+        Route::delete('/appointments/{appointment}', [AdminAppointmentController::class, 'destroy'])->name('appointments.destroy');
+        Route::get('/leads', [AdminLeadController::class, 'index'])->name('leads.index');
+        Route::patch('/leads/{appointment}', [AdminLeadController::class, 'update'])->name('leads.update');
     });
 
     // Super admin only
