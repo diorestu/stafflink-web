@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminAppointmentController;
+use App\Http\Controllers\AdminAnalyticsController;
 use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\AdminBlogPostController;
 use App\Http\Controllers\AdminCareerController;
@@ -76,6 +77,7 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
         Route::patch('/appointments/{appointment}/approve', [AdminAppointmentController::class, 'approve'])->name('appointments.approve');
         Route::patch('/appointments/{appointment}/cancel', [AdminAppointmentController::class, 'cancel'])->name('appointments.cancel');
         Route::delete('/appointments/{appointment}', [AdminAppointmentController::class, 'destroy'])->name('appointments.destroy');
+        Route::get('/analytics', [AdminAnalyticsController::class, 'index'])->name('analytics.index');
         Route::get('/leads', [AdminLeadController::class, 'index'])->name('leads.index');
         Route::patch('/leads/{appointment}', [AdminLeadController::class, 'update'])->name('leads.update');
     });

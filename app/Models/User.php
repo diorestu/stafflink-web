@@ -6,8 +6,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use MeShaon\RequestAnalytics\Contracts\CanAccessAnalyticsDashboard;
 
-class User extends Authenticatable
+class User extends Authenticatable implements CanAccessAnalyticsDashboard
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
@@ -55,5 +56,10 @@ class User extends Authenticatable
     public function isAdmin(): bool
     {
         return in_array($this->role, ['super_admin', 'admin'], true);
+    }
+
+    public function canAccessAnalyticsDashboard(): bool
+    {
+        return $this->isAdmin();
     }
 }
