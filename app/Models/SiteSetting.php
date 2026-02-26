@@ -71,8 +71,8 @@ class SiteSetting extends Model
                 ['label' => 'Apply Now', 'url' => route('applications.create')],
             ],
             'footer_links' => [
-                ['label' => 'Terms & Condition', 'url' => '#'],
-                ['label' => 'Privacy Policy', 'url' => '#'],
+                ['label' => 'Terms & Condition', 'url' => route('terms-and-condition')],
+                ['label' => 'Privacy Policy', 'url' => route('privacy-policy')],
             ],
             'apply_now_label' => 'Apply now',
             'apply_now_url' => route('applications.create'),
@@ -107,6 +107,15 @@ class SiteSetting extends Model
 
         if ($hasOnlyPlaceholders) {
             $merged['user_links'] = $defaults['user_links'];
+        }
+
+        $footerLinks = $merged['footer_links'] ?? [];
+        $footerHasOnlyPlaceholders = is_array($footerLinks)
+            && count($footerLinks) > 0
+            && collect($footerLinks)->every(fn ($item) => ($item['url'] ?? '#') === '#');
+
+        if ($footerHasOnlyPlaceholders) {
+            $merged['footer_links'] = $defaults['footer_links'];
         }
 
         static::$runtimeHeaderFooter = $merged;

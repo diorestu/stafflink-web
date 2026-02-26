@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
+    @include('partials.gtag-head')
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     @php
@@ -42,6 +43,8 @@
 </head>
 
 <body class="text-[#2e2e2e]" id="page-top">
+    @include('partials.gtm-noscript')
+    @php($wording = \App\Support\PageWording::for('blog_show'))
     <div class="min-h-screen bg-[radial-gradient(circle_at_top,_#ffffff_0%,_#f4f5f3_52%,_#e6f1ec_100%)]">
         <x-site-header />
 
@@ -50,7 +53,7 @@
                 @include('partials.breadcrumbs', ['breadcrumbItems' => $breadcrumbItems])
             </section>
             <article class="mx-auto max-w-4xl rounded-[30px] bg-white p-8 shadow-[0_18px_44px_rgba(31,95,70,0.12)] lg:p-10">
-                <a href="{{ route('blog') }}" class="text-sm font-semibold text-[#287854] hover:text-[#1f5f46]">← Back to blog</a>
+                <a href="{{ route('blog') }}" class="text-sm font-semibold text-[#287854] hover:text-[#1f5f46]">← {{ $wording['back_to_blog'] ?? 'Back to blog' }}</a>
                 <p class="mt-4 text-xs uppercase tracking-[0.2em] text-[#287854]">
                     {{ $post->published_at?->format('F d, Y') }} · By {{ $post->author_name ?: 'StaffLink Editorial Team' }}
                 </p>
@@ -61,14 +64,14 @@
                         class="mt-6 block h-[320px] w-full rounded-2xl object-cover" draggable="false">
                 @endif
 
-                <div class="prose prose-lg mt-8 max-w-none text-[#3f3f3a]">
+                <div class="article-content mt-8 max-w-none text-[#3f3f3a]">
                     {!! $post->content !!}
                 </div>
             </article>
 
             @if ($relatedPosts->count() > 0)
                 <section class="mx-auto mt-10 max-w-6xl">
-                    <h2 class="text-2xl font-semibold text-[#1b1b18]">Related Articles</h2>
+                    <h2 class="text-2xl font-semibold text-[#1b1b18]">{{ $wording['related_heading'] ?? 'Related Articles' }}</h2>
                     <div class="mt-5 grid gap-6 md:grid-cols-3">
                         @foreach ($relatedPosts as $related)
                             <article class="overflow-hidden rounded-2xl border border-[#d9e3dc] bg-white shadow-[0_10px_24px_rgba(31,95,70,0.08)]">

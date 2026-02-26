@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Career;
+use App\Models\ServiceArea;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
@@ -10,7 +11,7 @@ use Illuminate\Support\Str;
 
 class ServiceAreaService
 {
-    private const CACHE_KEY = 'service_areas:all';
+    public const CACHE_KEY = 'service_areas:all';
 
     private const CACHE_MINUTES = 15;
 
@@ -40,6 +41,30 @@ class ServiceAreaService
 
     private function buildAreas(): Collection
     {
+        $databaseAreas = ServiceArea::query()
+            ->where('is_active', true)
+            ->orderBy('sort_order')
+            ->orderBy('label')
+            ->get(['slug', 'label', 'type', 'state', 'country', 'seo_label']);
+
+        if ($databaseAreas->isNotEmpty()) {
+            return $databaseAreas
+                ->map(function (ServiceArea $area): array {
+                    return [
+                        'slug' => trim((string) $area->slug),
+                        'label' => trim((string) $area->label),
+                        'type' => trim((string) $area->type) !== '' ? trim((string) $area->type) : 'state',
+                        'state' => filled($area->state) ? trim((string) $area->state) : null,
+                        'country' => filled($area->country) ? trim((string) $area->country) : null,
+                        'seo_label' => filled($area->seo_label)
+                            ? trim((string) $area->seo_label)
+                            : trim((string) $area->label),
+                    ];
+                })
+                ->filter(fn (array $area) => $area['slug'] !== '' && $area['label'] !== '')
+                ->values();
+        }
+
         $staticAreas = collect(self::STATIC_AREAS)
             ->map(function (string $area): array {
                 return [
@@ -103,6 +128,11 @@ class ServiceAreaService
             )
             ->unique('slug')
             ->values();
+    }
+
+    public static function flushCache(): void
+    {
+        Cache::forget(self::CACHE_KEY);
     }
 
     public function topAreas(int $limit = 12): Collection

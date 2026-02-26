@@ -2,6 +2,7 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
 <head>
+    @include('partials.gtag-head')
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     @php
@@ -34,9 +35,67 @@
         'seoStructuredDataNodes' => $faqStructuredDataNodes,
     ])
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @verbatim
+        <script type="application/ld+json">
+        {
+        "@context": "https://schema.org",
+        "@type": "EmploymentAgency",
+        "name": "Staff Link Solutions",
+        "description": "Premier staffing company specializing in providing top-tier nannies, cleaners, gardeners, handymen, office staff and specialised training to meet the diverse needs of individuals, hotels, residential properties, and businesses.",
+        "url": "https://stafflink.pro", 
+        "telephone": "+6285739660906",
+        "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "Jl. Drupadi 1 No.20, Seminyak",
+            "addressLocality": "Kec. Kuta, Kabupaten Badung",
+            "addressRegion": "Bali",
+            "postalCode": "80361",
+            "addressCountry": "ID"
+        },
+        "openingHours": "Mo,Tu,We,Th,Fr,Sa 09:00-17:00",
+        "areaServed": [
+            "Seminyak",
+            "Kuta",
+            "Badung",
+            "Bali"
+        ],
+        "makesOffer": [
+            {
+            "@type": "Offer",
+            "itemOffered": {
+                "@type": "Service",
+                "name": "Professional Nannies"
+            }
+            },
+            {
+            "@type": "Offer",
+            "itemOffered": {
+                "@type": "Service",
+                "name": "Cleaners & Housekeeping"
+            }
+            },
+            {
+            "@type": "Offer",
+            "itemOffered": {
+                "@type": "Service",
+                "name": "Gardeners & Handymen"
+            }
+            },
+            {
+            "@type": "Offer",
+            "itemOffered": {
+                "@type": "Service",
+                "name": "Office Staff & Specialised Training"
+            }
+            }
+        ]
+        }
+        </script>
+        @endverbatim
 </head>
 
 <body class="text-[#2e2e2e]" id="page-top">
+    @include('partials.gtm-noscript')
     <div class="min-h-screen bg-[radial-gradient(circle_at_top,_#ffffff_0%,_#f4f5f3_52%,_#e6f1ec_100%)]">
         <x-site-header />
         <main>
@@ -45,7 +104,41 @@
             <x-industries :content="$industries" />
             <x-staffing :content="$staffing" :categories="$careerCategories" />
             <x-cta :content="$cta" />
-            <x-faq :items="$faqs" />
+            @if (($faqs ?? collect())->isNotEmpty())
+                <section class="px-6 pb-16 pt-4">
+                    <div class="mx-auto grid max-w-6xl gap-6 lg:grid-cols-2 lg:items-stretch">
+                        <div class="overflow-hidden rounded-[30px] shadow-[0_20px_50px_rgba(31,95,70,0.12)]" data-aos="fade-up">
+                            <iframe
+                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3944.053958613446!2d115.16522599999999!3d-8.686418999999999!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dd247e6799ea107%3A0x11e082e1a331687!2sStaff%20Link!5e0!3m2!1sid!2sid!4v1771912308980!5m2!1sid!2sid"
+                                class="h-[400px] w-full lg:h-[560px]"
+                                style="border:0;"
+                                allowfullscreen=""
+                                loading="lazy"
+                                referrerpolicy="no-referrer-when-downgrade">
+                            </iframe>
+                        </div>
+
+                        <div class="rounded-[30px] bg-white p-6 shadow-[0_20px_50px_rgba(31,95,70,0.12)] sm:p-10 lg:h-[560px] lg:overflow-y-auto" data-aos="fade-up" data-aos-delay="120">
+                            <h2 class="mb-6 text-3xl font-semibold text-[#1b1b18] sm:text-4xl">Frequently Asked Questions (FAQs)</h2>
+                            <div class="space-y-3">
+                                @foreach ($faqs as $faq)
+                                    <details class="faq-item group rounded-2xl border border-[#dfe8e3] bg-[#f9fbfa] px-5 py-4">
+                                        <summary class="flex cursor-pointer list-none items-start justify-between gap-4 text-left">
+                                            <span class="text-base font-semibold text-[#1f5f46]">{{ $faq->question }}</span>
+                                            <span class="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[#c3dbce] text-[#287854] transition duration-300 group-open:rotate-45">+</span>
+                                        </summary>
+                                        <div class="faq-answer">
+                                            <div class="faq-answer-inner mt-3 border-t border-[#e4eee8] pt-3 text-sm leading-relaxed text-[#4f5e57]">
+                                                {!! nl2br(e((string) $faq->answer)) !!}
+                                            </div>
+                                        </div>
+                                    </details>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            @endif
         </main>
         <x-site-footer />
     </div>

@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
+    @include('partials.gtag-head')
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     @php
+        $wording = \App\Support\PageWording::for('nanny_concierge');
         $seoArea = $seoArea ?? null;
         $serviceAreas = $serviceAreas ?? collect();
         $areaLabel = $seoArea['seo_label'] ?? null;
@@ -42,6 +44,7 @@
 </head>
 
 <body class="text-[#2e2e2e]" id="page-top">
+    @include('partials.gtm-noscript')
     <div class="min-h-screen bg-[radial-gradient(circle_at_top,_#ffffff_0%,_#f4f5f3_52%,_#e6f1ec_100%)]">
         <x-site-header />
 
@@ -56,9 +59,9 @@
 
                     <div class="relative flex h-full items-center px-8 py-10 lg:px-12">
                         <div class="max-w-3xl rounded-[26px] border border-white/20 bg-black/35 p-6 text-white shadow-[0_14px_34px_rgba(0,0,0,0.25)] backdrop-blur-[2px] md:p-8">
-                            <p class="text-xs uppercase tracking-[0.3em] text-[#e9d29d]">Airport Services</p>
+                            <p class="text-xs uppercase tracking-[0.3em] text-[#e9d29d]">{{ $wording['badge'] ?? 'Airport Services' }}</p>
                             <h1 class="mt-4 text-4xl font-semibold leading-tight text-white md:text-5xl">
-                                International Childcare Recruitment Agency @if($areaLabel) in {{ $areaLabel }} @endif
+                                {{ $wording['title'] ?? 'International Childcare Recruitment Agency' }} @if($areaLabel) in {{ $areaLabel }} @endif
                             </h1>
                             <p class="mt-5 max-w-2xl text-sm leading-relaxed text-white/90">
                                 Staff Link is the first International VIP Agency specialising in the recruitment and placement of professional

@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
 <head>
+    @include('partials.gtag-head')
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Admin') - {{ \App\Models\SiteSetting::siteName() }} CMS</title>
+    <title>@yield('title', 'Admin') | {{ \App\Models\SiteSetting::siteName() }} CMS</title>
     <link rel="icon" href="{{ asset('favicon.ico') }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <style>
@@ -28,6 +29,7 @@
 </head>
 
 <body class="bg-gray-100">
+    @include('partials.gtm-noscript')
     @php
         $adminUser = auth()->user();
         $isSuperAdmin = $adminUser?->role === 'super_admin';
@@ -101,6 +103,15 @@
                             </svg>
                             Service Categories
                         </a>
+                        <a href="{{ route('admin.service-areas.index') }}"
+                            class="flex items-center px-6 py-3 hover:bg-[#287854] {{ request()->routeIs('admin.service-areas.*') ? 'bg-[#287854] border-l-4 border-[#b28b2e]' : '' }}">
+                            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M21 10c0 6-9 11-9 11s-9-5-9-11a9 9 0 1118 0z" />
+                                <circle cx="12" cy="10" r="3" />
+                            </svg>
+                            Service Areas
+                        </a>
                     @endif
                     <a href="{{ route('admin.appointments.index') }}"
                         class="flex items-center px-6 py-3 hover:bg-[#287854] {{ request()->routeIs('admin.appointments.*') ? 'bg-[#287854] border-l-4 border-[#b28b2e]' : '' }}">
@@ -162,6 +173,14 @@
                                     d="M4 6h16M4 12h16M4 18h16" />
                             </svg>
                             Header and Footer
+                        </a>
+                        <a href="{{ route('admin.page-wording.edit') }}"
+                            class="flex items-center px-6 py-3 hover:bg-[#287854] {{ request()->routeIs('admin.page-wording.*') ? 'bg-[#287854] border-l-4 border-[#b28b2e]' : '' }}">
+                            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 7h16M4 12h10M4 17h8" />
+                            </svg>
+                            Page Wording
                         </a>
                     @endif
                     <a href="{{ url('/') }}" target="_blank"

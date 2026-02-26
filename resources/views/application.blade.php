@@ -2,6 +2,7 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
 <head>
+    @include('partials.gtag-head')
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     @include('partials.seo-meta', [
@@ -48,17 +49,18 @@
 </head>
 
 <body class="text-[#2e2e2e]" id="page-top">
+    @include('partials.gtm-noscript')
+    @php($wording = \App\Support\PageWording::for('application'))
     <div class="min-h-screen bg-[radial-gradient(circle_at_top,_#ffffff_0%,_#f4f5f3_52%,_#e6f1ec_100%)]">
         <x-site-header />
         <main class="px-8 pb-24 pt-12">
             <section class="mx-auto max-w-5xl space-y-8">
                 <div class="rounded-[30px] bg-[#1f5f46] p-10 text-white shadow-[0_20px_50px_rgba(31,95,70,0.2)]"
                     data-aos="fade-up">
-                    <p class="text-xs uppercase tracking-[0.3em] text-[#e9d29d]">Careers</p>
-                    <h1 class="mt-4 text-4xl font-semibold">Apply now</h1>
+                    <p class="text-xs uppercase tracking-[0.3em] text-[#e9d29d]">{{ $wording['badge'] ?? 'Careers' }}</p>
+                    <h1 class="mt-4 text-4xl font-semibold">{{ $wording['title'] ?? 'Apply now' }}</h1>
                     <p class="mt-4 max-w-2xl text-sm text-white/85">
-                        Please complete this form and upload your required documents. Your application will be sent to careers@stafflink.pro
-                        and securely saved in our database for recruitment processing.
+                        {{ $wording['subtitle'] ?? 'Please complete this form and upload your required documents. Your application will be sent to careers@stafflink.pro and securely saved in our database for recruitment processing.' }}
                     </p>
                     <p class="mt-3 max-w-2xl text-sm text-white/90">
                         Fields marked with <span class="font-semibold">*</span> are required. Optional submissions include Cover Letter file,

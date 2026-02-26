@@ -2,6 +2,7 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
 <head>
+    @include('partials.gtag-head')
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     @include('partials.seo-meta', [
@@ -13,16 +14,18 @@
 </head>
 
 <body class="text-[#2e2e2e]" id="page-top">
+    @include('partials.gtm-noscript')
+    @php($wording = \App\Support\PageWording::for('jobs'))
     <div class="min-h-screen bg-[radial-gradient(circle_at_top,_#ffffff_0%,_#f4f5f3_52%,_#e6f1ec_100%)]">
         <x-site-header />
         <main class="px-10 pb-28 pt-3 lg:px-12">
             <section class="mx-auto max-w-7xl space-y-14">
                 <div class="rounded-[30px] bg-[#1f5f46] p-12 text-white shadow-[0_20px_50px_rgba(31,95,70,0.2)] lg:p-10 mb-5 mt-3"
                     data-aos="fade-up">
-                    <p class="text-xs uppercase tracking-[0.3em] text-[#e9d29d]">Careers</p>
-                    <h1 class="mt-4 text-4xl font-semibold">Available Jobs</h1>
+                    <p class="text-xs uppercase tracking-[0.3em] text-[#e9d29d]">{{ $wording['badge'] ?? 'Careers' }}</p>
+                    <h1 class="mt-4 text-4xl font-semibold">{{ $wording['title'] ?? 'Available Jobs' }}</h1>
                     <p class="mt-4 max-w-2xl text-sm text-white/85">
-                        Explore our current openings posted by StaffLink admin team. Find the right role and apply now.
+                        {{ $wording['subtitle'] ?? 'Explore our current openings posted by StaffLink admin team. Find the right role and apply now.' }}
                     </p>
                 </div>
 

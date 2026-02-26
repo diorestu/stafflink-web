@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
+    @include('partials.gtag-head')
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     @include('partials.seo-meta', [
@@ -13,6 +14,8 @@
 </head>
 
 <body class="text-[#2e2e2e]" id="page-top">
+    @include('partials.gtm-noscript')
+    @php($wording = \App\Support\PageWording::for('our_purpose'))
     <div class="min-h-screen bg-[radial-gradient(circle_at_top,_#ffffff_0%,_#f4f5f3_52%,_#e6f1ec_100%)]">
         <x-site-header />
         <main class="px-8 pb-28 pt-14 lg:px-10">
@@ -20,15 +23,7 @@
                 <section class="overflow-hidden rounded-[20px] bg-white shadow-[0_16px_40px_rgba(31,95,70,0.14)]" data-aos="fade-up">
                     <div class="grid lg:grid-cols-[260px_1fr]">
                         <div class="bg-black px-8 py-12 text-white lg:flex lg:items-center lg:justify-center">
-                            <h1 class="text-center text-3xl font-semibold leading-tight lg:text-4xl">
-                                Our Purpose
-                                <br>
-                                &amp;
-                                <br>
-                                Business
-                                <br>
-                                Principles
-                            </h1>
+                            <h1 class="text-center text-3xl font-semibold leading-tight lg:text-4xl">{{ $wording['title'] ?? 'Our Purpose & Business Principles' }}</h1>
                         </div>
                         <img src="{{ asset('images/img_hero.webp') }}" alt="Our purpose and principles"
                             class="h-[300px] w-full object-cover lg:h-[360px]" draggable="false" loading="lazy" />

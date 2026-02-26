@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
+    @include('partials.gtag-head')
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     @include('partials.seo-meta', [
@@ -13,6 +14,7 @@
 </head>
 
 <body class="text-[#2e2e2e]">
+    @include('partials.gtm-noscript')
     <div class="min-h-screen bg-[radial-gradient(circle_at_top,_#ffffff_0%,_#f4f5f3_52%,_#e6f1ec_100%)] px-6 py-10">
         <div class="mx-auto max-w-3xl rounded-[28px] bg-white p-8 shadow-[0_20px_50px_rgba(31,95,70,0.12)]">
             <p class="text-xs uppercase tracking-[0.25em] text-[#287854]">Reference Contact</p>

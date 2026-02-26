@@ -2,6 +2,7 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
 <head>
+    @include('partials.gtag-head')
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     @include('partials.seo-meta', [
@@ -46,6 +47,8 @@
 </head>
 
 <body class="text-[#2e2e2e]" id="page-top">
+    @include('partials.gtm-noscript')
+    @php($wording = \App\Support\PageWording::for('appointment'))
     <div class="min-h-screen bg-[radial-gradient(circle_at_top,_#ffffff_0%,_#f4f5f3_52%,_#e6f1ec_100%)]">
         <x-site-header />
         <main class="px-4 pb-20 pt-8 sm:px-8 sm:pb-24 sm:pt-12">
@@ -54,11 +57,10 @@
                     data-aos="fade-up">
                     <div class="grid gap-5 lg:grid-cols-[1.65fr_1fr] lg:gap-8">
                         <div class="min-w-0">
-                            <p class="text-xs uppercase tracking-[0.3em] text-[#e9d29d]">Schedule Appointment</p>
-                            <h1 class="mt-4 text-3xl font-semibold sm:text-4xl">Book a consultation</h1>
+                            <p class="text-xs uppercase tracking-[0.3em] text-[#e9d29d]">{{ $wording['badge'] ?? 'Schedule Appointment' }}</p>
+                            <h1 class="mt-4 text-3xl font-semibold sm:text-4xl">{{ $wording['title'] ?? 'Book a consultation' }}</h1>
                             <p class="mt-4 max-w-2xl text-[16.1px] leading-relaxed text-white">
-                                Select a date from the calendar, then choose an available time slot in the popup.
-                                <br />Each session lasts 1 hour.
+                                {{ $wording['subtitle'] ?? 'Select a date from the calendar, then choose an available time slot in the popup. Each session lasts 1 hour.' }}
                             </p>
                         </div>
                         <div

@@ -1,35 +1,26 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
+    @include('partials.gtag-head')
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     @include('partials.seo-meta', [
-        'seoTitle' => \App\Models\SiteSetting::siteName().' | Blog',
-        'seoDescription' => 'Read hiring insights, staffing tips, and workforce growth guides from StaffLink Solutions.',
-        'seoKeywords' => 'staffing blog, recruitment insights, hiring guide, workforce strategy',
+        'seoTitle' => \App\Models\SiteSetting::siteName().' | Hiring Insights & Workforce Growth Blog',
+        'seoDescription' => 'Read hiring insights, staffing tips, and workforce growth guides for scaling teams with StaffLink Solutions.',
+        'seoKeywords' => 'hiring insights blog, workforce growth blog, staffing tips, recruitment strategy',
     ])
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
 <body class="text-[#2e2e2e]" id="page-top">
+    @include('partials.gtm-noscript')
+    @php($wording = \App\Support\PageWording::for('blog'))
     <div class="min-h-screen bg-[radial-gradient(circle_at_top,_#ffffff_0%,_#f4f5f3_52%,_#e6f1ec_100%)]">
         <x-site-header />
 
         <main class="px-8 pb-28 pt-14 lg:px-10">
             <section class="mx-auto max-w-7xl space-y-14">
-                <div class="rounded-[32px] bg-[#dceae3] p-10 shadow-[0_20px_60px_rgba(31,95,70,0.16)] lg:p-14" data-aos="fade-up">
-                    <p class="text-xs uppercase tracking-[0.3em] text-[#287854]">Blog</p>
-                    <h1 class="mt-5 text-4xl font-semibold leading-tight text-[#1b1b18] md:text-5xl">
-                        Insights for Hiring
-                        <br>
-                        and Workforce Growth
-                    </h1>
-                    <p class="mt-6 max-w-3xl text-sm leading-relaxed text-[#3f3f3a]">
-                        Practical guides and updates from StaffLink to help you build better teams and make faster hiring decisions.
-                    </p>
-                </div>
-
                 @if ($featuredPost)
                     <section class="overflow-hidden rounded-[30px] bg-white shadow-[0_18px_44px_rgba(31,95,70,0.12)]" data-aos="fade-up">
                         <div class="grid gap-0 lg:grid-cols-2">
@@ -63,7 +54,7 @@
 
                 <section data-aos="fade-up">
                     <div class="flex items-end justify-between gap-4">
-                        <h2 class="text-3xl font-semibold text-[#1b1b18]">Latest Articles</h2>
+                        <h2 class="text-3xl font-semibold text-[#1b1b18]">{{ $wording['latest_heading'] ?? 'Latest Articles' }}</h2>
                         <span class="text-sm text-[#6b6b66]">{{ $posts->total() }} post{{ $posts->total() === 1 ? '' : 's' }}</span>
                     </div>
 
@@ -103,8 +94,8 @@
                         @endif
                     @else
                         <div class="mt-8 rounded-2xl border border-[#d9e3dc] bg-white p-10 text-center">
-                            <h3 class="text-xl font-semibold text-[#1b1b18]">No blog posts published yet</h3>
-                            <p class="mt-2 text-sm text-[#6b6b66]">Please check back soon for updates.</p>
+                            <h3 class="text-xl font-semibold text-[#1b1b18]">{{ $wording['empty_heading'] ?? 'No blog posts published yet' }}</h3>
+                            <p class="mt-2 text-sm text-[#6b6b66]">{{ $wording['empty_subtitle'] ?? 'Please check back soon for updates.' }}</p>
                         </div>
                     @endif
                 </section>

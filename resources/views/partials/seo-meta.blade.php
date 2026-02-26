@@ -11,8 +11,20 @@
     $seoModifiedTime = $seoModifiedTime ?? null;
     $seoAuthor = trim((string) ($seoAuthor ?? $siteName));
     $seoLocale = str_replace('_', '-', app()->getLocale());
+    $seoOgLocale = str_replace('-', '_', $seoLocale);
     $seoStructuredDataNodes = is_array($seoStructuredDataNodes ?? null) ? $seoStructuredDataNodes : [];
     $seoBreadcrumbItems = is_array($seoBreadcrumbItems ?? null) ? $seoBreadcrumbItems : [];
+
+    $titleParts = collect(explode('|', $seoTitle))
+        ->map(fn ($part) => trim((string) $part))
+        ->filter(fn ($part) => $part !== '' && strcasecmp($part, $siteName) !== 0)
+        ->values();
+
+    if ($titleParts->isEmpty()) {
+        $seoTitle = $siteName;
+    } else {
+        $seoTitle = $titleParts->first().' | '.$siteName;
+    }
 @endphp
 
 <title>{{ $seoTitle }}</title>
@@ -21,7 +33,10 @@
 <meta name="keywords" content="{{ $seoKeywords }}">
 <meta name="author" content="{{ $seoAuthor }}">
 <meta name="theme-color" content="#1f5f46">
+<meta http-equiv="content-language" content="{{ $seoLocale }}">
 <link rel="canonical" href="{{ $seoCanonical }}">
+<link rel="alternate" hreflang="{{ $seoLocale }}" href="{{ $seoCanonical }}">
+<link rel="alternate" hreflang="x-default" href="{{ $seoCanonical }}">
 <link rel="icon" href="{{ asset('favicon.ico') }}">
 
 <meta property="og:site_name" content="{{ $siteName }}">
@@ -30,7 +45,7 @@
 <meta property="og:description" content="{{ $seoDescription }}">
 <meta property="og:url" content="{{ $seoCanonical }}">
 <meta property="og:image" content="{{ $seoImage }}">
-<meta property="og:locale" content="{{ $seoLocale }}">
+<meta property="og:locale" content="{{ $seoOgLocale }}">
 @if ($seoPublishedTime)
     <meta property="article:published_time" content="{{ $seoPublishedTime }}">
 @endif

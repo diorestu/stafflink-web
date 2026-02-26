@@ -1,7 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
 <head>
+    @include('partials.gtag-head')
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     @include('partials.seo-meta', [
@@ -13,6 +14,7 @@
 </head>
 
 <body>
+    @include('partials.gtm-noscript')
     @if (!str_contains(strtolower((string) $page->content_html), '<h1'))
         <h1 style="position:absolute;left:-10000px;top:auto;width:1px;height:1px;overflow:hidden;">
             {{ $page->title }}

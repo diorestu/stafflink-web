@@ -10,6 +10,7 @@ use App\Services\ServiceAreaService;
 use DOMDocument;
 use Illuminate\Http\Response;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 
 class SitemapController extends Controller
@@ -17,25 +18,14 @@ class SitemapController extends Controller
     public function __invoke(ServiceAreaService $serviceAreaService): Response
     {
         $urls = collect();
+        $generatedAt = now()->toAtomString();
 
-        $staticRoutes = [
-            '/',
-            '/contact',
-            '/who-we-are',
-            '/what-we-offer',
-            '/our-people-your-dream-team',
-            '/our-purpose-business-principles',
-            '/airport-services/nanny-concierge',
-            '/blog',
-            '/jobs',
-            '/appointment',
-            '/apply-now',
-        ];
+        $staticRoutes = $this->publicStaticRoutes();
 
         foreach ($staticRoutes as $path) {
             $urls->push([
                 'loc' => url($path),
-                'lastmod' => now()->toAtomString(),
+                'lastmod' => $generatedAt,
                 'changefreq' => 'weekly',
                 'priority' => $path === '/' ? '1.0' : '0.8',
             ]);
@@ -44,10 +34,10 @@ class SitemapController extends Controller
         Page::query()
             ->where('status', 'published')
             ->get(['slug', 'updated_at'])
-            ->each(function (Page $page) use ($urls): void {
+            ->each(function (Page $page) use ($urls, $generatedAt): void {
                 $urls->push([
                     'loc' => route('pages.show', $page->slug),
-                    'lastmod' => optional($page->updated_at)->toAtomString() ?? now()->toAtomString(),
+                    'lastmod' => optional($page->updated_at)->toAtomString() ?? $generatedAt,
                     'changefreq' => 'weekly',
                     'priority' => '0.7',
                 ]);
@@ -56,10 +46,10 @@ class SitemapController extends Controller
         BlogPost::query()
             ->published()
             ->get(['slug', 'updated_at'])
-            ->each(function (BlogPost $post) use ($urls): void {
+            ->each(function (BlogPost $post) use ($urls, $generatedAt): void {
                 $urls->push([
                     'loc' => route('blog.show', $post->slug),
-                    'lastmod' => optional($post->updated_at)->toAtomString() ?? now()->toAtomString(),
+                    'lastmod' => optional($post->updated_at)->toAtomString() ?? $generatedAt,
                     'changefreq' => 'weekly',
                     'priority' => '0.7',
                 ]);
@@ -88,7 +78,7 @@ class SitemapController extends Controller
             ->unique()
             ->values();
 
-        $publishedCategoryIds->each(function ($categoryId) use ($categoryById, $urls): void {
+        $publishedCategoryIds->each(function ($categoryId) use ($categoryById, $urls, $generatedAt): void {
             $category = $categoryById->get($categoryId);
             if (!$category || trim((string) $category->slug) === '') {
                 return;
@@ -96,16 +86,16 @@ class SitemapController extends Controller
 
             $urls->push([
                 'loc' => route('services.sectors.show', $category->slug),
-                'lastmod' => optional($category->updated_at)->toAtomString() ?? now()->toAtomString(),
+                'lastmod' => optional($category->updated_at)->toAtomString() ?? $generatedAt,
                 'changefreq' => 'weekly',
                 'priority' => '0.8',
             ]);
         });
 
-        $roleSlugs->values()->each(function (string $roleSlug) use ($urls): void {
+        $roleSlugs->values()->each(function (string $roleSlug) use ($urls, $generatedAt): void {
             $urls->push([
                 'loc' => route('services.roles.show', $roleSlug),
-                'lastmod' => now()->toAtomString(),
+                'lastmod' => $generatedAt,
                 'changefreq' => 'weekly',
                 'priority' => '0.8',
             ]);
@@ -114,17 +104,17 @@ class SitemapController extends Controller
         $areas = $serviceAreaService->allAreas();
         $areaSlugSet = $areas->pluck('slug')->filter()->unique()->values();
 
-        $areaSlugSet->each(function (string $areaSlug) use ($urls): void {
+        $areaSlugSet->each(function (string $areaSlug) use ($urls, $generatedAt): void {
             $urls->push([
                 'loc' => route('services.areas.show', $areaSlug),
-                'lastmod' => now()->toAtomString(),
+                'lastmod' => $generatedAt,
                 'changefreq' => 'weekly',
                 'priority' => '0.8',
             ]);
 
             $urls->push([
                 'loc' => route('airport-services.nanny-concierge.area', $areaSlug),
-                'lastmod' => now()->toAtomString(),
+                'lastmod' => $generatedAt,
                 'changefreq' => 'weekly',
                 'priority' => '0.7',
             ]);
@@ -158,12 +148,12 @@ class SitemapController extends Controller
         $sectorAreaCombos
             ->unique()
             ->values()
-            ->each(function (string $combo) use ($urls): void {
+            ->each(function (string $combo) use ($urls, $generatedAt): void {
                 [$slug, $areaSlug] = explode('|', $combo);
 
                 $urls->push([
                     'loc' => route('services.sectors.areas.show', ['slug' => $slug, 'areaSlug' => $areaSlug]),
-                    'lastmod' => now()->toAtomString(),
+                    'lastmod' => $generatedAt,
                     'changefreq' => 'weekly',
                     'priority' => '0.7',
                 ]);
@@ -172,12 +162,12 @@ class SitemapController extends Controller
         $roleAreaCombos
             ->unique()
             ->values()
-            ->each(function (string $combo) use ($urls): void {
+            ->each(function (string $combo) use ($urls, $generatedAt): void {
                 [$slug, $areaSlug] = explode('|', $combo);
 
                 $urls->push([
                     'loc' => route('services.roles.areas.show', ['slug' => $slug, 'areaSlug' => $areaSlug]),
-                    'lastmod' => now()->toAtomString(),
+                    'lastmod' => $generatedAt,
                     'changefreq' => 'weekly',
                     'priority' => '0.7',
                 ]);
@@ -211,6 +201,39 @@ class SitemapController extends Controller
         return $slugs
             ->filter(fn ($slug) => $available->contains($slug))
             ->unique()
+            ->values();
+    }
+
+    private function publicStaticRoutes(): Collection
+    {
+        return collect(Route::getRoutes())
+            ->filter(function ($route): bool {
+                $methods = $route->methods();
+                $uri = trim((string) $route->uri(), '/');
+                $controller = (string) ($route->action['controller'] ?? '');
+
+                if (!in_array('GET', $methods, true)) {
+                    return false;
+                }
+
+                if (str_contains($uri, '{')) {
+                    return false;
+                }
+
+                if ($uri === 'sitemap.xml' || str_starts_with($uri, 'admin')) {
+                    return false;
+                }
+
+                if (str_contains($controller, 'RedirectController')) {
+                    return false;
+                }
+
+                return true;
+            })
+            ->map(fn ($route) => '/' . ltrim((string) $route->uri(), '/'))
+            ->map(fn (string $path) => $path === '/' ? '/' : rtrim($path, '/'))
+            ->unique()
+            ->sort()
             ->values();
     }
 

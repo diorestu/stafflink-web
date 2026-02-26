@@ -2,6 +2,7 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
 <head>
+    @include('partials.gtag-head')
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     @php
@@ -36,6 +37,7 @@
 </head>
 
 <body class="text-[#2e2e2e]" id="page-top">
+    @include('partials.gtm-noscript')
     <div class="min-h-screen bg-[radial-gradient(circle_at_top,_#ffffff_0%,_#f4f5f3_52%,_#e6f1ec_100%)]">
         <x-site-header />
         <main class="px-8 pb-28 pt-14 lg:px-10">
@@ -56,19 +58,9 @@
                             Book consultation
                         </a>
                     </div>
-                    @if (!empty($roleStats ?? []))
-                        <div class="mt-7 grid gap-3 sm:grid-cols-3">
-                            @foreach ($roleStats as $label => $value)
-                                <div class="rounded-xl border border-white/20 bg-white/10 px-4 py-3">
-                                    <p class="text-2xl font-semibold text-white">{{ $value }}</p>
-                                    <p class="text-xs uppercase tracking-[0.2em] text-white/80">{{ $label }}</p>
-                                </div>
-                            @endforeach
-                        </div>
-                    @endif
                 </div>
 
-                @if (($serviceAreas ?? collect())->isNotEmpty())
+                @if (($pageType ?? '') !== 'Role' && ($serviceAreas ?? collect())->isNotEmpty())
                     <section class="rounded-[28px] bg-white p-6 shadow-[0_20px_50px_rgba(31,95,70,0.12)]" data-aos="fade-up">
                         <div class="flex flex-wrap items-center justify-between gap-3">
                             <p class="text-xs uppercase tracking-[0.3em] text-[#287854]">Browse by area</p>
@@ -88,19 +80,21 @@
                     </section>
                 @endif
 
-                <section class="rounded-[28px] bg-white p-8 shadow-[0_20px_50px_rgba(31,95,70,0.12)]" data-aos="fade-up">
-                    <p class="text-xs uppercase tracking-[0.3em] text-[#287854]">{{ $highlightsLabel }}</p>
-                    <div class="mt-5 flex flex-wrap gap-3">
-                        @forelse ($highlights as $item)
-                            <span
-                                class="inline-flex rounded-full border border-[#dfe8e3] bg-[#f7faf8] px-4 py-2 text-sm font-semibold text-[#1f5f46]">
-                                {{ $item }}
-                            </span>
-                        @empty
-                            <p class="text-sm text-[#6b6b66]">No highlights available yet.</p>
-                        @endforelse
-                    </div>
-                </section>
+                @if (($pageType ?? '') !== 'Role')
+                    <section class="rounded-[28px] bg-white p-8 shadow-[0_20px_50px_rgba(31,95,70,0.12)]" data-aos="fade-up">
+                        <p class="text-xs uppercase tracking-[0.3em] text-[#287854]">{{ $highlightsLabel }}</p>
+                        <div class="mt-5 flex flex-wrap gap-3">
+                            @forelse ($highlights as $item)
+                                <span
+                                    class="inline-flex rounded-full border border-[#dfe8e3] bg-[#f7faf8] px-4 py-2 text-sm font-semibold text-[#1f5f46]">
+                                    {{ $item }}
+                                </span>
+                            @empty
+                                <p class="text-sm text-[#6b6b66]">No highlights available yet.</p>
+                            @endforelse
+                        </div>
+                    </section>
+                @endif
 
                 @if (($pageType ?? '') === 'Role')
                     @php
@@ -169,53 +163,91 @@
                     </section>
                 @endif
 
-                <section class="space-y-5" data-aos="fade-up">
-                    <div class="flex items-end justify-between gap-4">
-                        <div>
-                            <p class="text-xs uppercase tracking-[0.3em] text-[#b28b2e]">Open opportunities</p>
-                            <h2 class="mt-2 text-3xl font-semibold text-[#1b1b18]">Explore matching opportunities</h2>
-                        </div>
-                        <a href="{{ route('jobs.index') }}" class="text-sm font-semibold text-[#287854] hover:text-[#1f5f46]">
-                            View all jobs
-                        </a>
-                    </div>
-
-                    <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                        @forelse ($relatedCareers as $career)
-                            <article class="rounded-2xl border border-[#dfe8e3] bg-white p-5 shadow-[0_16px_36px_rgba(31,95,70,0.08)]">
-                                <div class="flex items-start justify-between gap-3">
-                                    <h3 class="text-lg font-semibold text-[#1b1b18]">{{ $career->title }}</h3>
-                                    <span
-                                        class="shrink-0 rounded-full border border-[#b5d6c5] bg-[#ecf7f1] px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-[#1f5f46]">
-                                        {{ ucwords(str_replace('-', ' ', $career->type)) }}
-                                    </span>
-                                </div>
-                                <p class="mt-2 text-sm leading-relaxed text-[#6b6b66]">
-                                    {{ $career->location_display ?: 'Location to be discussed' }}
-                                </p>
-                                @if (trim((string) $career->description) !== '')
-                                    <p class="mt-2 text-sm leading-relaxed text-[#6b6b66]">
-                                        {{ \Illuminate\Support\Str::limit(strip_tags((string) $career->description), 140) }}
-                                    </p>
-                                @endif
-                                @if ($career->category)
-                                    <p class="mt-2 text-xs uppercase tracking-[0.2em] text-[#287854]">
-                                        {{ $career->category->name }}
-                                    </p>
-                                @endif
-                                <a href="{{ route('appointments.create') }}"
-                                    class="mt-5 inline-flex rounded-full border border-[#287854] px-4 py-2 text-xs font-semibold text-[#287854] transition hover:bg-[#287854] hover:text-white">
-                                    Discuss this role
-                                </a>
-                            </article>
-                        @empty
-                            <div class="col-span-full rounded-2xl bg-white p-10 text-center shadow-[0_20px_50px_rgba(31,95,70,0.12)]">
-                                <h3 class="text-2xl font-semibold text-[#1b1b18]">No opportunities available</h3>
-                                <p class="mt-3 text-sm text-[#6b6b66]">Our consultants can still help you with custom recruitment needs.</p>
+                @if (($pageType ?? '') !== 'Role')
+                    <section class="space-y-5" data-aos="fade-up">
+                        <div class="flex items-end justify-between gap-4">
+                            <div>
+                                <p class="text-xs uppercase tracking-[0.3em] text-[#b28b2e]">Open opportunities</p>
+                                <h2 class="mt-2 text-3xl font-semibold text-[#1b1b18]">Explore matching opportunities</h2>
                             </div>
-                        @endforelse
-                    </div>
-                </section>
+                            <a href="{{ route('jobs.index') }}" class="text-sm font-semibold text-[#287854] hover:text-[#1f5f46]">
+                                View all jobs
+                            </a>
+                        </div>
+
+                        <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                            @forelse ($relatedCareers as $career)
+                                <article class="rounded-2xl border border-[#dfe8e3] bg-white p-5 shadow-[0_16px_36px_rgba(31,95,70,0.08)]">
+                                    <div class="flex items-start justify-between gap-3">
+                                        <h3 class="text-lg font-semibold text-[#1b1b18]">{{ $career->title }}</h3>
+                                        <span
+                                            class="shrink-0 rounded-full border border-[#b5d6c5] bg-[#ecf7f1] px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-[#1f5f46]">
+                                            {{ ucwords(str_replace('-', ' ', $career->type)) }}
+                                        </span>
+                                    </div>
+                                    <p class="mt-2 text-sm leading-relaxed text-[#6b6b66]">
+                                        {{ $career->location_display ?: 'Location to be discussed' }}
+                                    </p>
+                                    @if (trim((string) $career->description) !== '')
+                                        <p class="mt-2 text-sm leading-relaxed text-[#6b6b66]">
+                                            {{ \Illuminate\Support\Str::limit(strip_tags((string) $career->description), 140) }}
+                                        </p>
+                                    @endif
+                                    @if ($career->category)
+                                        <p class="mt-2 text-xs uppercase tracking-[0.2em] text-[#287854]">
+                                            {{ $career->category->name }}
+                                        </p>
+                                    @endif
+                                    <a href="{{ route('appointments.create') }}"
+                                        class="mt-5 inline-flex rounded-full border border-[#287854] px-4 py-2 text-xs font-semibold text-[#287854] transition hover:bg-[#287854] hover:text-white">
+                                        Discuss this role
+                                    </a>
+                                </article>
+                            @empty
+                                <div class="col-span-full rounded-2xl bg-white p-10 text-center shadow-[0_20px_50px_rgba(31,95,70,0.12)]">
+                                    <h3 class="text-2xl font-semibold text-[#1b1b18]">No opportunities available</h3>
+                                    <p class="mt-3 text-sm text-[#6b6b66]">Our consultants can still help you with custom recruitment needs.</p>
+                                </div>
+                            @endforelse
+                        </div>
+                    </section>
+                @endif
+
+                @if (($pageType ?? '') === 'Role' && ($serviceAreas ?? collect())->isNotEmpty())
+                    <section class="rounded-[28px] bg-white p-6 shadow-[0_20px_50px_rgba(31,95,70,0.12)]" data-aos="fade-up">
+                        <div class="flex flex-wrap items-center justify-between gap-3">
+                            <p class="text-xs uppercase tracking-[0.3em] text-[#287854]">Browse by area</p>
+                            @if (!empty($currentArea))
+                                <a href="{{ route($baseRouteName, $baseSlug) }}" class="inline-flex rounded-full border border-[#dfe8e3] bg-white px-4 py-2 text-xs font-semibold text-[#3f4b45] transition hover:border-[#bcd7c8] hover:bg-[#f4faf7]">
+                                    View all areas
+                                </a>
+                            @endif
+                        </div>
+                        <div class="mt-4 flex flex-wrap gap-2.5">
+                            @foreach ($serviceAreas as $areaItem)
+                                <a href="{{ route($areaRouteName, ['slug' => $baseSlug, 'areaSlug' => $areaItem['slug']]) }}" class="inline-flex rounded-full border px-4 py-2 text-xs font-semibold transition {{ ($currentArea['slug'] ?? null) === $areaItem['slug'] ? 'border-[#287854] bg-[#ecf7f1] text-[#1f5f46]' : 'border-[#dfe8e3] bg-white text-[#3f4b45] hover:border-[#bcd7c8] hover:bg-[#f4faf7]' }}">
+                                    {{ $areaItem['label'] }}
+                                </a>
+                            @endforeach
+                        </div>
+                    </section>
+                @endif
+
+                @if (($pageType ?? '') === 'Role')
+                    <section class="rounded-[28px] bg-white p-8 shadow-[0_20px_50px_rgba(31,95,70,0.12)]" data-aos="fade-up">
+                        <p class="text-xs uppercase tracking-[0.3em] text-[#287854]">{{ $highlightsLabel }}</p>
+                        <div class="mt-5 flex flex-wrap gap-3">
+                            @forelse ($highlights as $item)
+                                <span
+                                    class="inline-flex rounded-full border border-[#dfe8e3] bg-[#f7faf8] px-4 py-2 text-sm font-semibold text-[#1f5f46]">
+                                    {{ $item }}
+                                </span>
+                            @empty
+                                <p class="text-sm text-[#6b6b66]">No highlights available yet.</p>
+                            @endforelse
+                        </div>
+                    </section>
+                @endif
             </section>
         </main>
         <x-site-footer />

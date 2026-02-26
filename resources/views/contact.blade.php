@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
+    @include('partials.gtag-head')
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         @include('partials.seo-meta', [
@@ -13,6 +14,8 @@
     </head>
 
 <body class="text-[#2e2e2e]" id="page-top">
+    @include('partials.gtm-noscript')
+        @php($wording = \App\Support\PageWording::for('contact'))
         <div class="min-h-screen bg-[radial-gradient(circle_at_top,_#ffffff_0%,_#f4f5f3_52%,_#e6f1ec_100%)]">
             <x-site-header />
             <main class="px-6 pb-24 pt-12">
@@ -39,8 +42,8 @@
 
                     <div class="grid gap-12 lg:grid-cols-[1fr_1.1fr]">
                         <div data-aos="fade-up">
-                            <p class="text-xs uppercase tracking-[0.3em] text-[#b28b2e]">Contact us</p>
-                            <h1 class="mt-4 text-4xl font-semibold">Contact us</h1>
+                            <p class="text-xs uppercase tracking-[0.3em] text-[#b28b2e]">{{ $wording['badge'] ?? 'Contact us' }}</p>
+                            <h1 class="mt-4 text-4xl font-semibold">{{ $wording['title'] ?? 'Contact us' }}</h1>
                             <p class="mt-6 text-sm text-[#6b6b66]">
                                 Are you new to our site and interested in learning more about our comprehensive global outsourcing
                                 solutions?
@@ -49,7 +52,7 @@
                                 Are you a current client of Stafflink Solutions and want to send us your questions, feedback and
                                 suggestions?
                             </p>
-                            <p class="mt-4 text-sm text-[#6b6b66]">Simply fill out the form, and we’ll promptly respond to your enquiry.</p>
+                            <p class="mt-4 text-sm text-[#6b6b66]">{{ $wording['subtitle'] ?? 'Simply fill out the form, and we’ll promptly respond to your enquiry.' }}</p>
 
                             <div class="mt-10 space-y-5 text-sm text-[#2e2e2e]">
                                 <div class="flex items-center gap-3">
@@ -150,6 +153,12 @@
                                     </button>
                                 </div>
                             </form>
+                        </div>
+                    </div>
+
+                    <div class="overflow-hidden rounded-lg" data-aos="fade-up">
+                        <div class="h-[400px] w-full">
+                            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3944.053958613446!2d115.16522599999999!3d-8.686418999999999!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dd247e6799ea107%3A0x11e082e1a331687!2sStaff%20Link!5e0!3m2!1sid!2sid!4v1771912308980!5m2!1sid!2sid" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
                         </div>
                     </div>
                 </section>

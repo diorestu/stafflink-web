@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
+    @include('partials.gtag-head')
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     @include('partials.seo-meta', [
@@ -13,6 +14,8 @@
 </head>
 
 <body class="text-[#2e2e2e]" id="page-top">
+    @include('partials.gtm-noscript')
+    @php($wording = \App\Support\PageWording::for('our_people'))
     <div class="min-h-screen bg-[radial-gradient(circle_at_top,_#ffffff_0%,_#f4f5f3_52%,_#e6f1ec_100%)]">
         <x-site-header />
         <main class="px-8 pb-28 pt-14 lg:px-10">
@@ -20,10 +23,9 @@
                 <section class="overflow-hidden rounded-[32px] bg-[#2f8b62] px-10 py-12 text-white shadow-[0_20px_60px_rgba(31,95,70,0.2)] lg:px-14 lg:py-16" data-aos="fade-up">
                     <div class="grid gap-10 lg:grid-cols-[1fr_0.9fr] lg:items-start">
                         <div>
-                            <h1 class="text-4xl font-semibold leading-tight md:text-5xl">Meet Your Team</h1>
+                            <h1 class="text-4xl font-semibold leading-tight md:text-5xl">{{ $wording['title'] ?? 'Meet Your Team' }}</h1>
                             <p class="mt-5 max-w-xl text-sm leading-relaxed text-white/90">
-                                Business growth starts with strong people. We build dedicated offshore teams that align with your goals,
-                                your company culture, and your quality standards.
+                                {{ $wording['subtitle'] ?? 'Business growth starts with strong people. We build dedicated offshore teams that align with your goals, your company culture, and your quality standards.' }}
                             </p>
                             <p class="mt-4 max-w-xl text-sm leading-relaxed text-white/90">
                                 Our team sourcing process is transparent, efficient, and designed to deliver high-performing talent

@@ -1,15 +1,17 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
 <head>
+    @include('partials.gtag-head')
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Admin Login — {{ \App\Models\SiteSetting::siteName() }}</title>
+    <title>Admin Login | {{ \App\Models\SiteSetting::siteName() }}</title>
     <link rel="icon" href="{{ asset('favicon.ico') }}">    @vite(['resources/css/app.css'])
 </head>
 
 <body
     class="flex min-h-screen items-center justify-center bg-[radial-gradient(circle_at_top,_#ffffff_0%,_#f4f5f3_52%,_#e6f1ec_100%)]">
+    @include('partials.gtm-noscript')
     <div class="w-full max-w-md px-6">
         <div class="rounded-3xl bg-white px-8 py-10 shadow-[0_30px_80px_rgba(31,95,70,0.15)]">
             <div class="mb-8 text-center">

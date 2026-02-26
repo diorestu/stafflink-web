@@ -11,12 +11,15 @@ use App\Http\Controllers\AdminHeaderFooterController;
 use App\Http\Controllers\AdminJobApplicationController;
 use App\Http\Controllers\AdminLeadController;
 use App\Http\Controllers\AdminPageController;
+use App\Http\Controllers\AdminPageWordingController;
+use App\Http\Controllers\AdminServiceAreaController;
 use App\Http\Controllers\AdminUserController;
 use App\Http\Controllers\AiAgentController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\CareerCategoryController;
 use App\Http\Controllers\CareerController;
+use App\Http\Controllers\GlobalStaffingController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\JobApplicationController;
 use App\Http\Controllers\JobController;
@@ -25,6 +28,7 @@ use App\Http\Controllers\PageController;
 use App\Http\Controllers\ReferenceController;
 use App\Http\Controllers\ServiceDetailController;
 use App\Http\Controllers\SitemapController;
+use App\Http\Controllers\SitemapPageController;
 use App\Http\Middleware\EnsureUserRole;
 use Illuminate\Support\Facades\Route;
 
@@ -35,11 +39,15 @@ Route::view('/who-we-are', 'who-we-are')->name('who-we-are');
 Route::view('/what-we-offer', 'what-we-offer')->name('what-we-offer');
 Route::view('/our-people-your-dream-team', 'our-people-your-dream-team')->name('our-people-your-dream-team');
 Route::view('/our-purpose-business-principles', 'our-purpose-business-principles')->name('our-purpose-business-principles');
+Route::view('/terms-and-condition', 'terms-and-condition')->name('terms-and-condition');
+Route::view('/privacy-policy', 'privacy-policy')->name('privacy-policy');
 Route::get('/airport-services/nanny-concierge', [ServiceDetailController::class, 'airportServices'])->name('airport-services.nanny-concierge');
 Route::get('/airport-services/nanny-concierge/areas/{areaSlug}', [ServiceDetailController::class, 'airportServicesArea'])->name('airport-services.nanny-concierge.area');
 Route::redirect('/airport-services', '/airport-services/nanny-concierge');
+Route::view('/services/sectors/remote-worker', 'roles.remote-worker')->name('services.sectors.remote-worker');
 Route::get('/services/sectors/{slug}', [ServiceDetailController::class, 'sector'])->name('services.sectors.show');
 Route::get('/services/sectors/{slug}/areas/{areaSlug}', [ServiceDetailController::class, 'sectorArea'])->name('services.sectors.areas.show');
+Route::redirect('/services/roles/remote-worker', '/services/sectors/remote-worker');
 Route::get('/services/roles/{slug}', [ServiceDetailController::class, 'role'])->name('services.roles.show');
 Route::get('/services/roles/{slug}/areas/{areaSlug}', [ServiceDetailController::class, 'roleArea'])->name('services.roles.areas.show');
 Route::get('/services/areas/{areaSlug}', [ServiceDetailController::class, 'area'])->name('services.areas.show');
@@ -53,7 +61,12 @@ Route::get('/apply-now', [JobApplicationController::class, 'create'])->name('app
 Route::post('/apply-now', [JobApplicationController::class, 'store'])->name('applications.store');
 Route::get('/references/{token}', [ReferenceController::class, 'show'])->name('references.show');
 Route::get('/p/{slug}', [PageController::class, 'show'])->name('pages.show');
+Route::get('/sitemap', SitemapPageController::class)->name('sitemap.page');
 Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
+Route::get('/global-staffing/{country}', [GlobalStaffingController::class, 'show'])->name('global-staffing.country');
+Route::redirect('/p/australia', '/global-staffing/australia');
+Route::get('/{country}', [GlobalStaffingController::class, 'show'])
+    ->where('country', 'australia|america|usa|us|united-states|united-states-of-america|indonesia');
 
 // Admin auth
 Route::get('/admin/login', [AdminAuthController::class, 'showLogin'])->name('admin.login');
@@ -99,6 +112,9 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
         Route::resource('career-categories', CareerCategoryController::class)
             ->parameters(['career-categories' => 'careerCategory'])
             ->except(['show']);
+        Route::resource('service-areas', AdminServiceAreaController::class)
+            ->parameters(['service-areas' => 'serviceArea'])
+            ->except(['show']);
         Route::prefix('locations')->name('locations.')->group(function () {
             Route::get('/db/countries', [LocationController::class, 'countriesFromDatabase'])->name('db.countries');
             Route::get('/db/states', [LocationController::class, 'statesFromDatabase'])->name('db.states');
@@ -115,6 +131,8 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
         // Header & Footer
         Route::get('/header-footer', [AdminHeaderFooterController::class, 'edit'])->name('header-footer.edit');
         Route::put('/header-footer', [AdminHeaderFooterController::class, 'update'])->name('header-footer.update');
+        Route::get('/page-wording', [AdminPageWordingController::class, 'edit'])->name('page-wording.edit');
+        Route::put('/page-wording', [AdminPageWordingController::class, 'update'])->name('page-wording.update');
 
         Route::post('/ai-agent/chat', [AiAgentController::class, 'chat'])->name('ai-agent.chat');
     });

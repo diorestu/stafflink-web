@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
+    @include('partials.gtag-head')
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     @include('partials.seo-meta', [
@@ -13,6 +14,8 @@
 </head>
 
 <body class="text-[#2e2e2e]" id="page-top">
+    @include('partials.gtm-noscript')
+    @php($wording = \App\Support\PageWording::for('who_we_are'))
     <div class="min-h-screen bg-[radial-gradient(circle_at_top,_#ffffff_0%,_#f4f5f3_52%,_#e6f1ec_100%)]">
         <x-site-header />
         <main class="px-8 pb-28 pt-14 lg:px-10">
@@ -20,15 +23,14 @@
                 <div class="overflow-hidden rounded-[32px] bg-[#dceae3] shadow-[0_20px_60px_rgba(31,95,70,0.16)]" data-aos="fade-up">
                     <div class="grid gap-12 p-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:p-14">
                         <div>
-                            <p class="text-xs uppercase tracking-[0.3em] text-[#287854]">Who We Are</p>
+                            <p class="text-xs uppercase tracking-[0.3em] text-[#287854]">{{ $wording['badge'] ?? 'Who We Are' }}</p>
                             <h1 class="mt-5 text-4xl font-semibold leading-tight text-[#1b1b18] md:text-5xl">
-                                Your Global Talent
+                                {{ $wording['title_line_1'] ?? 'Your Global Talent' }}
                                 <br>
-                                Outsourcing Partner
+                                {{ $wording['title_line_2'] ?? 'Outsourcing Partner' }}
                             </h1>
                             <p class="mt-6 max-w-2xl text-sm leading-relaxed text-[#3f3f3a]">
-                                StaffLink Solutions delivers practical, reliable staffing support to businesses that need strong teams fast.
-                                We focus on quality hiring, consistent communication, and long-term partnerships that help you scale with confidence.
+                                {{ $wording['subtitle'] ?? 'StaffLink Solutions delivers practical, reliable staffing support to businesses that need strong teams fast. We focus on quality hiring, consistent communication, and long-term partnerships that help you scale with confidence.' }}
                             </p>
                             <a href="{{ route('appointments.create') }}"
                                 class="mt-8 inline-flex rounded-full bg-[#287854] px-7 py-3 text-sm font-semibold text-white transition hover:bg-[#1f5f46]">

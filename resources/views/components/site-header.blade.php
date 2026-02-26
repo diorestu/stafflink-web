@@ -11,7 +11,7 @@
         ['title' => 'Book a call', 'url' => route('appointments.create')],
     ]);
 
-    $headerData = \Illuminate\Support\Facades\Cache::remember('site_header:menu:v2', now()->addMinutes(10), function () {
+    $headerData = \Illuminate\Support\Facades\Cache::remember('site_header:menu:v4', now()->addHour(), function () {
         $categories = \App\Models\CareerCategory::query()
             ->where('is_active', true)
             ->with([
@@ -48,22 +48,14 @@
             ->values()
             ->all();
 
-        $countrySlugs = ['australia', 'indonesia', 'usa'];
-        $countryPages = \App\Models\Page::query()
-            ->where('status', 'published')
-            ->whereIn('slug', $countrySlugs)
-            ->pluck('slug')
-            ->all();
-
-        $countryPageLookup = array_fill_keys($countryPages, true);
         $traditionalRecruitmentCards = collect([
             ['title' => 'Australia', 'slug' => 'australia'],
             ['title' => 'Indonesia', 'slug' => 'indonesia'],
-            ['title' => 'USA', 'slug' => 'usa'],
-        ])->map(function ($card) use ($countryPageLookup) {
+            ['title' => 'America', 'slug' => 'america'],
+        ])->map(function ($card) {
             return [
                 'title' => $card['title'],
-                'url' => isset($countryPageLookup[$card['slug']]) ? route('pages.show', $card['slug']) : route('blog'),
+                'url' => route('global-staffing.country', ['country' => $card['slug']]),
             ];
         })->values()->all();
 
@@ -164,7 +156,7 @@
                                         class="flex w-full items-center justify-between rounded-xl px-3 py-3 text-left text-[1.05rem] font-semibold text-[#2e2e2e] transition hover:bg-[#eef5f1] hover:text-[#1f5f46]"
                                         data-services-tab="traditional-recruitment"
                                         aria-controls="services-panel-traditional-recruitment" aria-selected="false">
-                                        <span>Traditional Recruitment</span>
+                                        <span>Global Staffing</span>
                                         <span class="text-base leading-none">&gt;</span>
                                     </button>
                                 </li>
@@ -187,6 +179,10 @@
                                 <div class="rounded-2xl border border-[#e3ebe6] bg-[#f9fbfa] p-6">
                                     <p class="text-xs uppercase tracking-[0.2em] text-[#287854]">Sectors</p>
                                     <div class="mt-4 grid gap-3 sm:grid-cols-2">
+                                        <a href="{{ route('services.sectors.remote-worker') }}"
+                                            class="rounded-xl border border-[#bcd7c8] bg-[#ecf7f1] px-4 py-3 text-sm font-semibold text-[#1f5f46] transition hover:border-[#9ec6b0] hover:bg-[#e3f2ea]">
+                                            Remote Worker
+                                        </a>
                                         @forelse ($serviceCategories as $category)
                                             <a href="{{ route('services.sectors.show', $category['slug']) }}"
                                                 class="rounded-xl border border-[#dfe8e3] bg-white px-4 py-3 text-sm font-semibold text-[#2e2e2e] transition hover:border-[#bcd7c8] hover:bg-[#f4faf7] hover:text-[#1f5f46]">
@@ -249,7 +245,7 @@
                             <section id="services-panel-traditional-recruitment" class="hidden"
                                 data-services-panel="traditional-recruitment">
                                 <div class="rounded-2xl border border-[#e3ebe6] bg-[#f9fbfa] p-6">
-                                    <p class="text-xs uppercase tracking-[0.2em] text-[#287854]">Traditional Recruitment</p>
+                                    <p class="text-xs uppercase tracking-[0.2em] text-[#287854]">Global Staffing</p>
                                     <div class="mt-4 grid gap-3 sm:grid-cols-3">
                                         @foreach ($traditionalRecruitmentCards as $card)
                                             <a href="{{ $card['url'] }}"
