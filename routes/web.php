@@ -10,6 +10,7 @@ use App\Http\Controllers\AdminFaqController;
 use App\Http\Controllers\AdminHeaderFooterController;
 use App\Http\Controllers\AdminJobApplicationController;
 use App\Http\Controllers\AdminLeadController;
+use App\Http\Controllers\AdminNannyInquiryController;
 use App\Http\Controllers\AdminPageController;
 use App\Http\Controllers\AdminPageWordingController;
 use App\Http\Controllers\AdminServiceAreaController;
@@ -24,10 +25,10 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\JobApplicationController;
 use App\Http\Controllers\JobController;
 use App\Http\Controllers\LocationController;
+use App\Http\Controllers\NannyInquiryController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\ReferenceController;
 use App\Http\Controllers\ServiceDetailController;
-use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\SitemapPageController;
 use App\Http\Middleware\EnsureUserRole;
 use Illuminate\Support\Facades\Route;
@@ -35,6 +36,8 @@ use Illuminate\Support\Facades\Route;
 // Public
 Route::get('/', [HomeController::class, 'index']);
 Route::view('/contact', 'contact')->name('contact');
+Route::get('/forms/nannies-inquiry', [NannyInquiryController::class, 'create'])->name('forms.nannies-inquiry');
+Route::post('/forms/nannies-inquiry', [NannyInquiryController::class, 'store'])->name('forms.nannies-inquiry.store');
 Route::view('/who-we-are', 'who-we-are')->name('who-we-are');
 Route::view('/what-we-offer', 'what-we-offer')->name('what-we-offer');
 Route::view('/our-people-your-dream-team', 'our-people-your-dream-team')->name('our-people-your-dream-team');
@@ -42,8 +45,11 @@ Route::view('/our-purpose-business-principles', 'our-purpose-business-principles
 Route::view('/terms-and-condition', 'terms-and-condition')->name('terms-and-condition');
 Route::view('/privacy-policy', 'privacy-policy')->name('privacy-policy');
 Route::get('/airport-services/nanny-concierge', [ServiceDetailController::class, 'airportServices'])->name('airport-services.nanny-concierge');
+Route::view('/airport-services/baggage-drop-off', 'airport-baggage-drop-off')->name('airport-services.baggage-drop-off');
 Route::get('/airport-services/nanny-concierge/areas/{areaSlug}', [ServiceDetailController::class, 'airportServicesArea'])->name('airport-services.nanny-concierge.area');
 Route::redirect('/airport-services', '/airport-services/nanny-concierge');
+Route::view('/services/wedding-organizer', 'wedding-organizer')->name('services.wedding-organizer');
+Route::view('/services/destination-weddings-australians-bali', 'destination-weddings-australians-bali')->name('services.destination-weddings-australians-bali');
 Route::view('/services/sectors/remote-worker', 'roles.remote-worker')->name('services.sectors.remote-worker');
 Route::get('/services/sectors/{slug}', [ServiceDetailController::class, 'sector'])->name('services.sectors.show');
 Route::get('/services/sectors/{slug}/areas/{areaSlug}', [ServiceDetailController::class, 'sectorArea'])->name('services.sectors.areas.show');
@@ -62,11 +68,10 @@ Route::post('/apply-now', [JobApplicationController::class, 'store'])->name('app
 Route::get('/references/{token}', [ReferenceController::class, 'show'])->name('references.show');
 Route::get('/p/{slug}', [PageController::class, 'show'])->name('pages.show');
 Route::get('/sitemap', SitemapPageController::class)->name('sitemap.page');
-Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
 Route::get('/global-staffing/{country}', [GlobalStaffingController::class, 'show'])->name('global-staffing.country');
 Route::redirect('/p/australia', '/global-staffing/australia');
 Route::get('/{country}', [GlobalStaffingController::class, 'show'])
-    ->where('country', 'australia|america|usa|us|united-states|united-states-of-america|indonesia');
+    ->where('country', 'australia|america|usa|us|united-states|united-states-of-america|america-usa|indonesia|bali|canada|malaysia|germany|singapore');
 
 // Admin auth
 Route::get('/admin/login', [AdminAuthController::class, 'showLogin'])->name('admin.login');
@@ -93,6 +98,11 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
         Route::get('/analytics', [AdminAnalyticsController::class, 'index'])->name('analytics.index');
         Route::get('/leads', [AdminLeadController::class, 'index'])->name('leads.index');
         Route::patch('/leads/{appointment}', [AdminLeadController::class, 'update'])->name('leads.update');
+        Route::get('/nanny-inquiries', [AdminNannyInquiryController::class, 'index'])->name('nanny-inquiries.index');
+        Route::post('/nanny-inquiries/wedding-events', [AdminNannyInquiryController::class, 'storeWeddingEvent'])->name('nanny-inquiries.wedding-events.store');
+        Route::delete('/nanny-inquiries/wedding-events/{weddingEvent}', [AdminNannyInquiryController::class, 'destroyWeddingEvent'])->name('nanny-inquiries.wedding-events.destroy');
+        Route::get('/nanny-inquiries/export-wedding', [AdminNannyInquiryController::class, 'exportWedding'])->name('nanny-inquiries.export-wedding');
+        Route::delete('/nanny-inquiries/{nannyInquiry}', [AdminNannyInquiryController::class, 'destroy'])->name('nanny-inquiries.destroy');
     });
 
     // Super admin only

@@ -5,7 +5,10 @@
     @include('partials.gtag-head')
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Admin') | {{ \App\Models\SiteSetting::siteName() }} CMS</title>
+    @php
+        $adminTitle = trim((string) (view()->yieldContent('title', 'Admin').' | '.\App\Models\SiteSetting::siteName().' CMS'));
+    @endphp
+    <title>{{ \Illuminate\Support\Str::limit($adminTitle, 60, '') }}</title>
     <link rel="icon" href="{{ asset('favicon.ico') }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <style>
@@ -61,14 +64,6 @@
                             </svg>
                             Pages
                         </a>
-                        <a href="{{ route('admin.jobs.index') }}"
-                            class="flex items-center px-6 py-3 hover:bg-[#287854] {{ request()->routeIs('admin.jobs.*') ? 'bg-[#287854] border-l-4 border-[#b28b2e]' : '' }}">
-                            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                            </svg>
-                            Career
-                        </a>
                     @endif
                     <a href="{{ route('admin.careers.index') }}"
                         class="flex items-center px-6 py-3 hover:bg-[#287854] {{ request()->routeIs('admin.careers.*') ? 'bg-[#287854] border-l-4 border-[#b28b2e]' : '' }}">
@@ -77,22 +72,6 @@
                                 d="M9 12h6m-6 4h6M7 4h10a2 2 0 012 2v12a2 2 0 01-2 2H7a2 2 0 01-2-2V6a2 2 0 012-2z" />
                         </svg>
                         Services
-                    </a>
-                    <a href="{{ route('admin.blog-posts.index') }}"
-                        class="flex items-center px-6 py-3 hover:bg-[#287854] {{ request()->routeIs('admin.blog-posts.*') ? 'bg-[#287854] border-l-4 border-[#b28b2e]' : '' }}">
-                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M19 5H5a2 2 0 00-2 2v10a2 2 0 002 2h14a2 2 0 002-2V7a2 2 0 00-2-2zM8 9h8M8 13h6" />
-                        </svg>
-                        Blog Posts
-                    </a>
-                    <a href="{{ route('admin.faqs.index') }}"
-                        class="flex items-center px-6 py-3 hover:bg-[#287854] {{ request()->routeIs('admin.faqs.*') ? 'bg-[#287854] border-l-4 border-[#b28b2e]' : '' }}">
-                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M8 10h8M8 14h5m6 6H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v12a2 2 0 01-2 2z" />
-                        </svg>
-                        FAQs
                     </a>
                     @if ($isSuperAdmin)
                         <a href="{{ route('admin.career-categories.index') }}"
@@ -113,6 +92,64 @@
                             Service Areas
                         </a>
                     @endif
+                    <a href="{{ route('admin.blog-posts.index') }}"
+                        class="flex items-center px-6 py-3 hover:bg-[#287854] {{ request()->routeIs('admin.blog-posts.*') ? 'bg-[#287854] border-l-4 border-[#b28b2e]' : '' }}">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19 5H5a2 2 0 00-2 2v10a2 2 0 002 2h14a2 2 0 002-2V7a2 2 0 00-2-2zM8 9h8M8 13h6" />
+                        </svg>
+                        Blog Posts
+                    </a>
+                    <a href="{{ route('admin.faqs.index') }}"
+                        class="flex items-center px-6 py-3 hover:bg-[#287854] {{ request()->routeIs('admin.faqs.*') ? 'bg-[#287854] border-l-4 border-[#b28b2e]' : '' }}">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 10h8M8 14h5m6 6H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v12a2 2 0 01-2 2z" />
+                        </svg>
+                        FAQs
+                    </a>
+                </div>
+
+                <div class="mt-4">
+                    <p class="px-6 text-[10px] uppercase text-white/60 font-semibold mb-2">Recruitment</p>
+                    @if ($isSuperAdmin)
+                        <a href="{{ route('admin.jobs.index') }}"
+                            class="flex items-center px-6 py-3 hover:bg-[#287854] {{ request()->routeIs('admin.jobs.*') ? 'bg-[#287854] border-l-4 border-[#b28b2e]' : '' }}">
+                            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
+                            Career
+                        </a>
+                    @endif
+                    <a href="{{ route('admin.applicants.index') }}"
+                        class="flex items-center px-6 py-3 hover:bg-[#287854] {{ request()->routeIs('admin.applicants.*') ? 'bg-[#287854] border-l-4 border-[#b28b2e]' : '' }}">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M17 20h5V4H2v16h5m10 0v-3a3 3 0 0 0-3-3H10a3 3 0 0 0-3 3v3m10 0H7m5-9a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" />
+                        </svg>
+                        Applicants
+                    </a>
+                    <a href="{{ route('admin.leads.index') }}"
+                        class="flex items-center px-6 py-3 hover:bg-[#287854] {{ request()->routeIs('admin.leads.*') ? 'bg-[#287854] border-l-4 border-[#b28b2e]' : '' }}">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M3 7h18M3 12h18M3 17h18" />
+                        </svg>
+                        Leads
+                    </a>
+                    <a href="{{ route('admin.nanny-inquiries.index') }}"
+                        class="flex items-center px-6 py-3 hover:bg-[#287854] {{ request()->routeIs('admin.nanny-inquiries.*') ? 'bg-[#287854] border-l-4 border-[#b28b2e]' : '' }}">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 7h8M8 11h8M8 15h5m-7 6h12a2 2 0 002-2V5a2 2 0 00-2-2H6a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                        </svg>
+                        Nanny Inquiries
+                    </a>
+                </div>
+
+                <div class="mt-4">
+                    <p class="px-6 text-[10px] uppercase text-white/60 font-semibold mb-2">Operations</p>
                     <a href="{{ route('admin.appointments.index') }}"
                         class="flex items-center px-6 py-3 hover:bg-[#287854] {{ request()->routeIs('admin.appointments.*') ? 'bg-[#287854] border-l-4 border-[#b28b2e]' : '' }}">
                         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -121,6 +158,10 @@
                         </svg>
                         Appointments
                     </a>
+                </div>
+
+                <div class="mt-4">
+                    <p class="px-6 text-[10px] uppercase text-white/60 font-semibold mb-2">Analytics</p>
                     <a href="{{ route('admin.analytics.index') }}"
                         class="flex items-center px-6 py-3 hover:bg-[#287854] {{ request()->routeIs('admin.analytics.*') ? 'bg-[#287854] border-l-4 border-[#b28b2e]' : '' }}">
                         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -136,22 +177,6 @@
                                 d="M4 6h16M4 12h16M4 18h16" />
                         </svg>
                         Request Analytics
-                    </a>
-                    <a href="{{ route('admin.leads.index') }}"
-                        class="flex items-center px-6 py-3 hover:bg-[#287854] {{ request()->routeIs('admin.leads.*') ? 'bg-[#287854] border-l-4 border-[#b28b2e]' : '' }}">
-                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M3 7h18M3 12h18M3 17h18" />
-                        </svg>
-                        Leads
-                    </a>
-                    <a href="{{ route('admin.applicants.index') }}"
-                        class="flex items-center px-6 py-3 hover:bg-[#287854] {{ request()->routeIs('admin.applicants.*') ? 'bg-[#287854] border-l-4 border-[#b28b2e]' : '' }}">
-                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M17 20h5V4H2v16h5m10 0v-3a3 3 0 0 0-3-3H10a3 3 0 0 0-3 3v3m10 0H7m5-9a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" />
-                        </svg>
-                        Applicants
                     </a>
                 </div>
 

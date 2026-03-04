@@ -12,7 +12,7 @@
             <form action="{{ route('admin.careers.store') }}" method="POST" enctype="multipart/form-data" class="p-8 space-y-8">
                 @csrf
 
-                @include('admin.careers._form')
+                @include('admin.careers._form', ['showMetaFields' => false])
 
                 <div class="flex items-center justify-between pt-6 border-t">
                     <a href="{{ route('admin.careers.index') }}" class="text-gray-600 hover:text-gray-800 font-medium">Cancel</a>

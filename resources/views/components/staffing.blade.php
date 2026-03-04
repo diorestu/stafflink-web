@@ -58,25 +58,29 @@
         <div class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             @foreach ($categoryCards as $i => $category)
                 <button
-                    class="group overflow-hidden rounded-2xl bg-white text-left shadow-sm transition duration-300 ease-out hover:-translate-y-1 hover:shadow-md"
+                    class="group flex h-full flex-col overflow-hidden rounded-2xl bg-white text-left shadow-sm transition duration-300 ease-out hover:-translate-y-1 hover:shadow-md"
                     data-modal-target="talent" data-talent-title="{{ $category['title'] ?? '' }}"
                     data-talent-description="{{ $category['description'] ?? '' }}"
                     data-talent-jobs='@json($category['jobs'] ?? [])'
                     data-aos="fade-up"
                     data-aos-delay="{{ 100 + $i * 50 }}">
-                    @if (!empty($category['image_path']))
-                        <img src="{{ \Illuminate\Support\Facades\Storage::url($category['image_path']) }}"
-                            alt="{{ filled($category['title'] ?? null) ? $category['title'] : 'Service category image' }}"
-                            class="block h-40 w-full object-cover transition duration-300 ease-out group-hover:scale-105"
-                            draggable="false" loading="lazy" />
-                    @else
-                        <div class="flex h-40 w-full items-center justify-center bg-[#ecf7f1] text-[#287854]">
-                            <x-ui-icon name="briefcase" class="h-10 w-10" />
-                        </div>
-                    @endif
-                    <div class="p-5">
-                        <h3 class="text-base font-semibold text-[#2e2e2e]">{{ $category['title'] ?? '' }}</h3>
-                        <p class="mt-2 text-sm text-[#6b6b66]">{{ $category['description'] ?? '' }}</p>
+                    <div class="relative aspect-[16/9] w-full overflow-hidden">
+                        @if (!empty($category['image_path']))
+                            <img src="{{ \Illuminate\Support\Facades\Storage::url($category['image_path']) }}"
+                                alt="{{ filled($category['title'] ?? null) ? $category['title'] : 'Service category image' }}"
+                                class="absolute inset-0 h-full w-full object-cover object-center transition duration-300 ease-out group-hover:scale-105"
+                                draggable="false" loading="lazy" />
+                        @else
+                            <div class="flex h-full w-full items-center justify-center bg-[#ecf7f1] text-[#287854]">
+                                <x-ui-icon name="briefcase" class="h-10 w-10" />
+                            </div>
+                        @endif
+                    </div>
+                    <div class="flex flex-1 flex-col p-5">
+                        <h3 class="min-h-[3.5rem] text-base font-semibold leading-snug text-[#2e2e2e]">
+                            {{ $category['title'] ?? '' }}
+                        </h3>
+                        <p class="mt-2 line-clamp-4 text-sm text-[#6b6b66]">{{ $category['description'] ?? '' }}</p>
                     </div>
                 </button>
             @endforeach

@@ -5,24 +5,24 @@
         @php
             $defaultCards = [
                 [
-                    'title' => 'Scale your business to new heights',
+                    'title' => 'Scale Global Operations with Confidence',
                     'description' =>
-                        'See your business grow and prosper - minus the challenges and huge costs of finding & integrating the top talent you need to make that happen.',
+                        'Accelerate business growth without the high cost and complexity of hiring, integrating, and managing international talent alone.',
                 ],
                 [
-                    'title' => 'Partner with professionals committed to your success.',
+                    'title' => 'Work with Vetted International Talent',
                     'description' =>
-                        'Work with talented individuals who are not only highly experienced & exceptionally qualified, but also with a heart to care for your business as much as you do.',
+                        'Build reliable teams with pre-screened professionals who bring role-specific expertise, strong accountability, and long-term performance.',
                 ],
                 [
-                    'title' => 'Seamless services managed in our Indonesia headquarters',
+                    'title' => 'Structured Delivery with Regional Support',
                     'description' =>
-                        'Get access to our international talent pool, selected & vetted by our local Australia-based hiring team.',
+                        'Access a global talent pool managed through standardized systems and responsive regional coordination for consistent execution.',
                 ],
                 [
-                    'title' => 'Tailored solutions designed for your unique needs',
+                    'title' => 'Tailored Workforce Solutions for Scalable Growth',
                     'description' =>
-                        'We make it possible for businesses all over the world to deliver next-level services to their clients and enjoy increased revenue.',
+                        'Align staffing strategy to your business goals, delivery model, and growth stage so you can improve efficiency and expand sustainably.',
                 ],
             ];
             $cards = $content['cards'] ?? $defaultCards;

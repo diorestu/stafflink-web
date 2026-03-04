@@ -22,8 +22,7 @@
                         <tr>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Urutan</th>
                             <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                         </tr>
                     </thead>
@@ -35,12 +34,7 @@
                                     <p class="text-sm text-gray-500">{{ \Illuminate\Support\Str::limit(strip_tags($career->description), 80) }}</p>
                                 </td>
                                 <td class="px-6 py-4 text-sm text-gray-500">{{ $career->category?->name ?? '—' }}</td>
-                                <td class="px-6 py-4 text-sm text-gray-500">{{ $career->location_display ?? '—' }}</td>
-                                <td class="px-6 py-4">
-                                    <span class="px-2 py-1 text-xs font-medium rounded-full {{ $career->status === 'published' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}">
-                                        {{ ucfirst($career->status) }}
-                                    </span>
-                                </td>
+                                <td class="px-6 py-4 text-sm text-gray-500">{{ $career->sort_order ?? 0 }}</td>
                                 <td class="px-6 py-4 text-right text-sm">
                                     <div class="inline-flex items-center gap-1">
                                         <a href="{{ route('admin.careers.edit', $career) }}"

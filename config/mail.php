@@ -118,6 +118,7 @@ return [
 
     'notifications' => [
         'appointments' => env('APPOINTMENT_NOTIFICATION_TO', env('MAIL_FROM_ADDRESS')),
+        'nanny_inquiries' => env('NANNY_INQUIRY_NOTIFICATION_TO', env('APPOINTMENT_NOTIFICATION_TO', env('MAIL_FROM_ADDRESS'))),
     ],
 
 ];

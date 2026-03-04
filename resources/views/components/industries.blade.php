@@ -6,33 +6,33 @@
             $items = [
                 [
                     'icon' => 'comments',
-                    'title' => 'Industry Qualified',
-                    'description' => 'We match you with global professionals who have access to continuous learning & development opportunities.',
+                    'title' => 'Strategic, Industry-Qualified Talent',
+                    'description' => 'Access pre-vetted international professionals with role-specific expertise to support global operations from day one.',
                 ],
                 [
                     'icon' => 'book',
-                    'title' => 'Local Expertise',
-                    'description' => 'Our team is equipped with a deep understanding of the local market to provide responsive solutions to your business.',
+                    'title' => 'Local Insight, Global Execution',
+                    'description' => 'Combine global talent delivery with local market knowledge to keep expansion practical, compliant, and growth-focused.',
                 ],
                 [
                     'icon' => 'check',
-                    'title' => 'All Done For You',
-                    'description' => 'We match you with global professionals who have access to continuous learning & development opportunities.',
+                    'title' => 'End-to-End Workforce Delivery',
+                    'description' => 'From sourcing and screening to onboarding coordination, we manage the full process so you can scale faster with less risk.',
                 ],
                 [
                     'icon' => 'headset',
-                    'title' => 'Seamless Communications',
-                    'description' => 'Reach out to our team anytime through easy-to-use platforms and communication channels.',
+                    'title' => 'Seamless Stakeholder Communication',
+                    'description' => 'Maintain clear, responsive communication across your team, our consultants, and your remote workforce.',
                 ],
                 [
                     'icon' => 'shield',
-                    'title' => 'Guaranteed Data Protection',
-                    'description' => 'State-of-the-art security systems & internal SOPs ensure your business information is secured 24/7.',
+                    'title' => 'Structured Governance and Data Protection',
+                    'description' => 'Protect your operations through standardized SOPs, confidentiality safeguards, and secure data handling at every stage.',
                 ],
                 [
                     'icon' => 'heart',
-                    'title' => 'Inspiring Workplaces',
-                    'description' => 'Our global facilities are fully equipped for ultimate productivity, efficiency and work quality.',
+                    'title' => 'Performance-Driven Workforce Systems',
+                    'description' => 'Enable consistency, accountability, and measurable results through structured operational support.',
                 ],
             ];
         @endphp

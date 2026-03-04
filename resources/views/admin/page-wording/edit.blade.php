@@ -16,6 +16,11 @@
             @foreach ($pageKeys as $pageKey)
                 <div>
                     <label class="mb-2 block text-sm font-semibold text-gray-700">{{ $pageKey }}</label>
+                    @if ($pageKey === 'sector_detail')
+                        <p class="mb-2 text-xs text-gray-500">
+                            Use key <code>content</code>. You can use placeholders: <code>{sector}</code> and <code>{area}</code>.
+                        </p>
+                    @endif
                     <textarea name="wordings[{{ $pageKey }}]" rows="8" class="w-full rounded-lg border border-gray-300 px-4 py-3 font-mono text-xs">{{ old("wordings.$pageKey", json_encode($wordings[$pageKey] ?? [], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)) }}</textarea>
                 </div>
             @endforeach

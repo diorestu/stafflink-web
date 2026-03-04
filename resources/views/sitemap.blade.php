@@ -34,6 +34,7 @@
                 <h2 class="text-2xl font-semibold text-[#1b1b18]">{{ $servicesHeading }}</h2>
                 <ul class="mt-5 list-disc space-y-2 pl-5 text-sm text-[#2e2e2e]">
                     <li><a class="text-[#287854] hover:text-[#1f5f46]" href="{{ route('airport-services.nanny-concierge') }}">Airport Services - Nanny Concierge</a></li>
+                    <li><a class="text-[#287854] hover:text-[#1f5f46]" href="{{ route('airport-services.baggage-drop-off') }}">Airport Services - Baggage Drop Off</a></li>
                     <li><a class="text-[#287854] hover:text-[#1f5f46]" href="{{ route('blog') }}">Blog</a></li>
                     <li><a class="text-[#287854] hover:text-[#1f5f46]" href="{{ route('jobs.index') }}">Jobs</a></li>
                 </ul>

@@ -8,8 +8,6 @@ use App\Models\Appointment;
 use App\Models\Country;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Throwable;
@@ -42,8 +40,6 @@ class AppointmentController extends Controller
 
         return view('appointment', [
             'phoneCodes' => $phoneCodes,
-            'turnstileEnabled' => (bool) config('services.cloudflare_turnstile.enabled', false),
-            'turnstileSiteKey' => (string) config('services.cloudflare_turnstile.site_key', ''),
         ]);
     }
 
@@ -106,12 +102,6 @@ class AppointmentController extends Controller
 
     public function store(Request $request)
     {
-        if ($turnstileError = $this->validateTurnstile($request)) {
-            return $this->validationErrorResponse($request, [
-                'captcha' => [$turnstileError],
-            ]);
-        }
-
         if (filled($request->input('website'))) {
             return $this->validationErrorResponse(
                 $request,
@@ -335,57 +325,5 @@ class AppointmentController extends Controller
         }
 
         return back()->withInput()->withErrors($errors);
-    }
-
-    private function validateTurnstile(Request $request): ?string
-    {
-        $enabled = (bool) config('services.cloudflare_turnstile.enabled', false);
-        if (!$enabled) {
-            return null;
-        }
-
-        $token = (string) $request->input('cf-turnstile-response', '');
-        if ($token === '') {
-            return 'Please complete the Cloudflare verification.';
-        }
-
-        $secret = (string) config('services.cloudflare_turnstile.secret_key', '');
-        $verifyUrl = (string) config('services.cloudflare_turnstile.verify_url', '');
-        if ($secret === '' || $verifyUrl === '') {
-            Log::warning('Cloudflare Turnstile is enabled but not fully configured.');
-            return 'Captcha verification is currently unavailable. Please try again later.';
-        }
-
-        try {
-            $response = Http::asForm()
-                ->timeout(10)
-                ->post($verifyUrl, [
-                    'secret' => $secret,
-                    'response' => $token,
-                    'remoteip' => $request->ip(),
-                ]);
-
-            if (!$response->ok()) {
-                Log::warning('Cloudflare Turnstile verification failed with non-200 response.', [
-                    'status' => $response->status(),
-                ]);
-                return 'Captcha verification failed. Please try again.';
-            }
-
-            $result = $response->json();
-            if (!is_array($result) || !($result['success'] ?? false)) {
-                Log::warning('Cloudflare Turnstile verification failed.', [
-                    'error_codes' => $result['error-codes'] ?? [],
-                ]);
-                return 'Captcha verification failed. Please try again.';
-            }
-        } catch (Throwable $e) {
-            Log::warning('Cloudflare Turnstile request error.', [
-                'error' => $e->getMessage(),
-            ]);
-            return 'Captcha verification failed. Please try again.';
-        }
-
-        return null;
     }
 }

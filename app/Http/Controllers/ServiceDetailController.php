@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Career;
 use App\Models\CareerCategory;
 use App\Services\ServiceAreaService;
+use App\Support\PageWording;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
@@ -113,22 +114,21 @@ class ServiceDetailController extends Controller
             ->orderBy('title')
             ->get();
 
-        $highlights = $relatedCareers
-            ->pluck('title')
-            ->filter()
-            ->unique()
-            ->take(6)
-            ->values();
+        $sectorWording = PageWording::for('sector_detail');
+        $contentTemplate = trim((string) ($sectorWording['content'] ?? ''));
 
-        if ($highlights->isEmpty()) {
-            $highlights = collect([$category->name]);
+        if ($contentTemplate !== '') {
+            $subtitle = strtr($contentTemplate, [
+                '{sector}' => $category->name,
+                '{area}' => $area['seo_label'] ?? 'Indonesia',
+            ]);
+        } else {
+            $subtitle = trim((string) $category->description) !== ''
+                ? $category->description
+                : 'Staff Link helps families and employers find trusted childcare talent tailored to this sector.';
         }
 
-        $subtitle = trim((string) $category->description) !== ''
-            ? $category->description
-            : 'Staff Link helps families and employers find trusted childcare talent tailored to this sector.';
-
-        if ($area !== null) {
+        if ($area !== null && $contentTemplate === '') {
             $subtitle = "Browse {$category->name} opportunities in {$area['seo_label']}. {$subtitle}";
         }
 
@@ -145,8 +145,6 @@ class ServiceDetailController extends Controller
             'pageType' => 'Sector',
             'pageTitle' => $pageTitle,
             'subtitle' => $subtitle,
-            'highlights' => $highlights,
-            'highlightsLabel' => 'Popular roles in this sector',
             'relatedCareers' => $relatedCareers,
             'currentArea' => $area,
             'serviceAreas' => $this->serviceAreaService->topAreas(18),

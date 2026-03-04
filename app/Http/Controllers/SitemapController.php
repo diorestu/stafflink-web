@@ -220,7 +220,14 @@ class SitemapController extends Controller
                     return false;
                 }
 
-                if ($uri === 'sitemap.xml' || str_starts_with($uri, 'admin')) {
+                if (
+                    $uri === 'sitemap.xml' ||
+                    $uri === 'sitemap' ||
+                    $uri === 'up' ||
+                    $uri === 'appointment/availability' ||
+                    str_starts_with($uri, 'admin') ||
+                    str_starts_with($uri, 'api')
+                ) {
                     return false;
                 }
 

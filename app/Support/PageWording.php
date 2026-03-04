@@ -71,6 +71,9 @@ class PageWording
                 'services_heading' => 'Service Links',
                 'areas_heading' => 'Service per Area',
             ],
+            'sector_detail' => [
+                'content' => 'Staff Link helps families and employers find trusted childcare talent tailored to each sector.',
+            ],
         ];
     }
 

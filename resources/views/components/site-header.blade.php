@@ -5,13 +5,7 @@
         $consultationUrl = route('appointments.create');
     }
 
-    $getStartedLinks = collect([
-        ['title' => 'Try the outsourcing calculator', 'url' => route('contact')],
-        ['title' => 'Get 3 free quotes', 'url' => route('contact')],
-        ['title' => 'Book a call', 'url' => route('appointments.create')],
-    ]);
-
-    $headerData = \Illuminate\Support\Facades\Cache::remember('site_header:menu:v4', now()->addHour(), function () {
+    $headerData = \Illuminate\Support\Facades\Cache::remember('site_header:menu:v5', now()->addHour(), function () {
         $categories = \App\Models\CareerCategory::query()
             ->where('is_active', true)
             ->with([
@@ -51,7 +45,12 @@
         $traditionalRecruitmentCards = collect([
             ['title' => 'Australia', 'slug' => 'australia'],
             ['title' => 'Indonesia', 'slug' => 'indonesia'],
-            ['title' => 'America', 'slug' => 'america'],
+            ['title' => 'Bali', 'slug' => 'bali'],
+            ['title' => 'America (USA)', 'slug' => 'america'],
+            ['title' => 'Canada', 'slug' => 'canada'],
+            ['title' => 'Malaysia', 'slug' => 'malaysia'],
+            ['title' => 'Germany', 'slug' => 'germany'],
+            ['title' => 'Singapore', 'slug' => 'singapore'],
         ])->map(function ($card) {
             return [
                 'title' => $card['title'],
@@ -114,7 +113,7 @@
                                         class="flex w-full items-center justify-between rounded-xl bg-[#e7f2ec] px-3 py-3 text-left text-[1.05rem] font-semibold text-[#287854] transition"
                                         data-services-tab="airport-services" aria-controls="services-panel-airport-services"
                                         aria-selected="true">
-                                        <span>Airport Services</span>
+                                        <span>Our Services</span>
                                         <span class="text-base leading-none">&gt;</span>
                                     </button>
                                 </li>
@@ -145,15 +144,6 @@
                                 <li>
                                     <button type="button"
                                         class="flex w-full items-center justify-between rounded-xl px-3 py-3 text-left text-[1.05rem] font-semibold text-[#2e2e2e] transition hover:bg-[#eef5f1] hover:text-[#1f5f46]"
-                                        data-services-tab="get-started" aria-controls="services-panel-get-started"
-                                        aria-selected="false">
-                                        <span>Get Started</span>
-                                        <span class="text-base leading-none">&gt;</span>
-                                    </button>
-                                </li>
-                                <li>
-                                    <button type="button"
-                                        class="flex w-full items-center justify-between rounded-xl px-3 py-3 text-left text-[1.05rem] font-semibold text-[#2e2e2e] transition hover:bg-[#eef5f1] hover:text-[#1f5f46]"
                                         data-services-tab="traditional-recruitment"
                                         aria-controls="services-panel-traditional-recruitment" aria-selected="false">
                                         <span>Global Staffing</span>
@@ -165,12 +155,33 @@
                         <div class="p-5">
                             <section id="services-panel-airport-services" data-services-panel="airport-services">
                                 <div class="rounded-2xl border border-[#e3ebe6] bg-[#f9fbfa] p-6">
-                                    <p class="text-xs uppercase tracking-[0.2em] text-[#287854]">Airport Services</p>
-                                    <div class="mt-4">
-                                        <a href="{{ route('airport-services.nanny-concierge') }}"
-                                            class="inline-flex rounded-xl border border-[#dfe8e3] bg-white px-4 py-3 text-sm font-semibold text-[#2e2e2e] transition hover:border-[#bcd7c8] hover:bg-[#f4faf7] hover:text-[#1f5f46]">
-                                            Nanny - Concierge Services
-                                        </a>
+                                    <div class="grid gap-5 lg:grid-cols-2">
+                                        <div>
+                                            <p class="text-xs uppercase tracking-[0.2em] text-[#287854]">Airport Services</p>
+                                            <div class="mt-4 grid gap-3">
+                                                <a href="{{ route('airport-services.nanny-concierge') }}"
+                                                    class="inline-flex rounded-xl border border-[#dfe8e3] bg-white px-4 py-3 text-sm font-semibold text-[#2e2e2e] transition hover:border-[#bcd7c8] hover:bg-[#f4faf7] hover:text-[#1f5f46]">
+                                                    Nanny - Concierge Services
+                                                </a>
+                                                <a href="{{ route('airport-services.baggage-drop-off') }}"
+                                                    class="inline-flex rounded-xl border border-[#dfe8e3] bg-white px-4 py-3 text-sm font-semibold text-[#2e2e2e] transition hover:border-[#bcd7c8] hover:bg-[#f4faf7] hover:text-[#1f5f46]">
+                                                    Baggage Drop Off
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <p class="text-xs uppercase tracking-[0.2em] text-[#287854]">Wedding Planner</p>
+                                            <div class="mt-4 grid gap-3">
+                                                <a href="{{ route('services.wedding-organizer') }}"
+                                                    class="inline-flex rounded-xl border border-[#dfe8e3] bg-white px-4 py-3 text-sm font-semibold text-[#2e2e2e] transition hover:border-[#bcd7c8] hover:bg-[#f4faf7] hover:text-[#1f5f46]">
+                                                    Wedding Organizer
+                                                </a>
+                                                <a href="{{ route('services.destination-weddings-australians-bali') }}"
+                                                    class="inline-flex rounded-xl border border-[#dfe8e3] bg-white px-4 py-3 text-sm font-semibold text-[#2e2e2e] transition hover:border-[#bcd7c8] hover:bg-[#f4faf7] hover:text-[#1f5f46]">
+                                                    Destination Weddings (Australians in Bali)
+                                                </a>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </section>
@@ -227,26 +238,11 @@
                                 </div>
                             </section>
 
-                            <section id="services-panel-get-started" class="hidden" data-services-panel="get-started">
-                                <div class="rounded-2xl border border-[#e3ebe6] bg-[#f9fbfa] p-6">
-                                    <p class="text-xs uppercase tracking-[0.2em] text-[#287854]">Get Started</p>
-                                    <div class="mt-4 space-y-2">
-                                        @foreach ($getStartedLinks as $item)
-                                            <a href="{{ $item['url'] }}"
-                                                class="flex items-center justify-between rounded-xl border border-[#dfe8e3] bg-white px-4 py-3 text-sm font-semibold text-[#2e2e2e] transition hover:border-[#bcd7c8] hover:bg-[#f4faf7] hover:text-[#1f5f46]">
-                                                <span>{{ $item['title'] }}</span>
-                                                <span class="text-base leading-none">&gt;</span>
-                                            </a>
-                                        @endforeach
-                                    </div>
-                                </div>
-                            </section>
-
                             <section id="services-panel-traditional-recruitment" class="hidden"
                                 data-services-panel="traditional-recruitment">
                                 <div class="rounded-2xl border border-[#e3ebe6] bg-[#f9fbfa] p-6">
                                     <p class="text-xs uppercase tracking-[0.2em] text-[#287854]">Global Staffing</p>
-                                    <div class="mt-4 grid gap-3 sm:grid-cols-3">
+                                    <div class="mt-4 grid gap-3 sm:grid-cols-3 lg:grid-cols-4">
                                         @foreach ($traditionalRecruitmentCards as $card)
                                             <a href="{{ $card['url'] }}"
                                                 class="rounded-xl border border-[#dfe8e3] bg-white px-4 py-5 text-center text-base font-semibold text-[#2e2e2e] transition hover:border-[#bcd7c8] hover:bg-[#f4faf7] hover:text-[#1f5f46]">
@@ -299,8 +295,19 @@
             <details class="rounded-xl border border-[#e3ebe6] p-2">
                 <summary class="cursor-pointer list-none px-2 py-2 text-[#1f5f46]">Services</summary>
                 <div class="space-y-3 px-2 pb-1 pt-2 text-sm">
+                    <p class="px-2 pt-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#287854]">Airport Services</p>
                     <a href="{{ route('airport-services.nanny-concierge') }}" class="block rounded-lg px-2 py-2 transition hover:bg-[#f3f8f5]">
-                        Airport Services
+                        Nanny Concierge Services
+                    </a>
+                    <a href="{{ route('airport-services.baggage-drop-off') }}" class="block rounded-lg px-2 py-2 transition hover:bg-[#f3f8f5]">
+                        Baggage Drop Off
+                    </a>
+                    <p class="px-2 pt-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#287854]">Wedding Planner</p>
+                    <a href="{{ route('services.wedding-organizer') }}" class="block rounded-lg px-2 py-2 transition hover:bg-[#f3f8f5]">
+                        Wedding Organizer
+                    </a>
+                    <a href="{{ route('services.destination-weddings-australians-bali') }}" class="block rounded-lg px-2 py-2 transition hover:bg-[#f3f8f5]">
+                        Destination Weddings (Australians in Bali)
                     </a>
                     @foreach ($serviceCategories->take(6) as $category)
                         <a href="{{ route('services.sectors.show', $category['slug']) }}" class="block rounded-lg px-2 py-2 transition hover:bg-[#f3f8f5]">

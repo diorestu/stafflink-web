@@ -12,12 +12,27 @@
         }
         $breadcrumbItems[] = ['name' => $pageTitle, 'url' => request()->url()];
 
+        $isGardenerLanding = ($pageType ?? '') === 'Role'
+            && in_array(($baseSlug ?? ''), ['gardener', 'gardeners'], true)
+            && empty($currentArea);
+
+        $heroBadge = $isGardenerLanding ? 'Gardeners in Bali' : $pageType;
+        $heroTitle = $isGardenerLanding ? 'Professional Gardeners in Bali' : $pageTitle;
+        $heroSubtitle = $isGardenerLanding
+            ? 'A beautiful garden is not created in a day, it is maintained with consistency and care. Our professional gardeners in Bali offer reliable and structured garden maintenance services for private villas and residences throughout the island. Each placement is carefully matched to your property\'s specific needs to ensure your outdoor space remains healthy, balanced, and beautifully maintained.'
+            : $subtitle;
+
+        $primaryCtaLabel = $isGardenerLanding ? 'Book a Consultation with Us' : 'Contact specialist';
+        $primaryCtaUrl = $isGardenerLanding ? route('appointments.create') : route('contact');
+        $secondaryCtaLabel = $isGardenerLanding ? 'Contact Us' : 'Book consultation';
+        $secondaryCtaUrl = $isGardenerLanding ? route('contact') : route('appointments.create');
+
         $serviceSchema = [
             '@type' => 'Service',
             '@id' => request()->url().'#service',
-            'name' => $pageTitle,
+            'name' => $heroTitle,
             'serviceType' => $pageType.' Staffing',
-            'description' => $metaDescription ?? $subtitle,
+            'description' => $metaDescription ?? $heroSubtitle,
             'provider' => ['@id' => url('/').'#organization'],
             'url' => request()->url(),
             'areaServed' => [
@@ -45,17 +60,17 @@
                 @include('partials.breadcrumbs', ['breadcrumbItems' => $breadcrumbItems])
                 <div class="rounded-[30px] bg-[#1f5f46] p-10 text-white shadow-[0_20px_50px_rgba(31,95,70,0.2)] lg:p-12"
                     data-aos="fade-up">
-                    <p class="text-xs uppercase tracking-[0.3em] text-[#e9d29d]">{{ $pageType }}</p>
-                    <h1 class="mt-4 text-4xl font-semibold leading-tight md:text-5xl">{{ $pageTitle }}</h1>
-                    <p class="mt-5 max-w-3xl text-sm leading-relaxed text-white/85">{{ $subtitle }}</p>
+                    <p class="text-xs uppercase tracking-[0.3em] text-[#e9d29d]">{{ $heroBadge }}</p>
+                    <h1 class="mt-4 text-4xl font-semibold leading-tight md:text-5xl">{{ $heroTitle }}</h1>
+                    <p class="mt-5 max-w-3xl text-sm leading-relaxed text-white/85">{{ $heroSubtitle }}</p>
                     <div class="mt-7 flex flex-wrap gap-3">
-                        <a href="{{ route('contact') }}"
+                        <a href="{{ $primaryCtaUrl }}"
                             class="inline-flex rounded-full bg-white px-6 py-3 text-sm font-semibold text-[#1f5f46] transition hover:bg-[#e7f2ec]">
-                            Contact specialist
+                            {{ $primaryCtaLabel }}
                         </a>
-                        <a href="{{ route('appointments.create') }}"
+                        <a href="{{ $secondaryCtaUrl }}"
                             class="inline-flex rounded-full border border-white px-6 py-3 text-sm font-semibold text-white transition hover:bg-white hover:text-[#1f5f46]">
-                            Book consultation
+                            {{ $secondaryCtaLabel }}
                         </a>
                     </div>
                 </div>
@@ -80,87 +95,144 @@
                     </section>
                 @endif
 
-                @if (($pageType ?? '') !== 'Role')
-                    <section class="rounded-[28px] bg-white p-8 shadow-[0_20px_50px_rgba(31,95,70,0.12)]" data-aos="fade-up">
-                        <p class="text-xs uppercase tracking-[0.3em] text-[#287854]">{{ $highlightsLabel }}</p>
-                        <div class="mt-5 flex flex-wrap gap-3">
-                            @forelse ($highlights as $item)
-                                <span
-                                    class="inline-flex rounded-full border border-[#dfe8e3] bg-[#f7faf8] px-4 py-2 text-sm font-semibold text-[#1f5f46]">
-                                    {{ $item }}
-                                </span>
-                            @empty
-                                <p class="text-sm text-[#6b6b66]">No highlights available yet.</p>
-                            @endforelse
-                        </div>
-                    </section>
-                @endif
-
                 @if (($pageType ?? '') === 'Role')
                     @php
                         $featureImage = $relatedCareers
                             ->first(fn ($career) => !empty($career->thumbnail_path))
                             ?->thumbnail_path;
                     @endphp
-                    @include('partials.role-services')
-
-                    <section class="space-y-6 rounded-[28px] bg-white p-8 shadow-[0_20px_50px_rgba(31,95,70,0.12)]" data-aos="fade-up">
-                        <div class="grid gap-8 lg:grid-cols-[1.25fr_1fr] lg:items-stretch">
-                            <div class="overflow-hidden rounded-2xl border border-[#dfe8e3] bg-[#f7faf8]">
-                                <img src="{{ $featureImage ? \Illuminate\Support\Facades\Storage::url($featureImage) : asset('images/img_hero.webp') }}" alt="Service support"
-                                    class="h-full w-full object-cover" loading="lazy" draggable="false" />
-                            </div>
-                            <div class="space-y-8">
-                                <article class="flex items-start gap-4">
-                                    <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-full border-2 border-[#b28b2e] text-[#b28b2e]">
-                                        <svg class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
-                                            <path d="M4 19h16" />
-                                            <path d="M7 16V5h10v11" />
-                                            <path d="M9 8h6" />
-                                            <path d="M9 11h6" />
-                                        </svg>
-                                    </div>
-                                    <div>
-                                        <h3 class="text-3xl font-semibold text-[#1b1b18]">Choose Your Service</h3>
-                                        <p class="mt-3 text-lg leading-relaxed text-[#6b6b66]">
-                                            Contact us directly to discuss your needs and schedule a service. We tailor every booking to ensure you receive the best experience, with a personalized touch. Simply call, WhatsApp, or message us to arrange a time that suits you.
-                                        </p>
-                                    </div>
+                    @if ($isGardenerLanding)
+                        <section class="space-y-6 rounded-[28px] bg-white p-8 shadow-[0_20px_50px_rgba(31,95,70,0.12)]" data-aos="fade-up">
+                            <h2 class="text-3xl font-semibold text-[#1b1b18]">Garden Maintenance by Professional Gardeners in Bali</h2>
+                            <div class="grid gap-4 lg:grid-cols-3">
+                                <article class="rounded-2xl border border-[#dfe8e3] bg-[#f7faf8] p-6">
+                                    <h3 class="text-xl font-semibold text-[#1f5f46]">Routine Maintenance by Gardeners in Bali</h3>
+                                    <p class="mt-3 text-sm leading-relaxed text-[#5a5a55]">
+                                        Regular lawn mowing, pruning, trimming, and plant care are carried out by experienced gardeners in Bali to keep your landscape neat and thriving.
+                                    </p>
                                 </article>
-
-                                <article class="flex items-start gap-4">
-                                    <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-full border-2 border-[#b28b2e] text-[#b28b2e]">
-                                        <svg class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
-                                            <path d="M6 12a4 4 0 0 1 4-4h4a4 4 0 1 1 0 8H10a4 4 0 0 1-4-4z" />
-                                            <path d="M9 12h6" />
-                                        </svg>
-                                    </div>
-                                    <div>
-                                        <h3 class="text-3xl font-semibold text-[#1b1b18]">Manage Everything With Ease</h3>
-                                        <p class="mt-3 text-lg leading-relaxed text-[#6b6b66]">
-                                            Need to reschedule or make a special request? Just reach out! We are here to personally assist you with any changes or additional services - no automated systems, just real support from our team.
-                                        </p>
-                                    </div>
+                                <article class="rounded-2xl border border-[#dfe8e3] bg-[#f7faf8] p-6">
+                                    <h3 class="text-xl font-semibold text-[#1f5f46]">Landscape Care from Gardeners in Bali</h3>
+                                    <p class="mt-3 text-sm leading-relaxed text-[#5a5a55]">
+                                        Ongoing maintenance of trees, shrubs, and decorative plants managed by dedicated Staff Link gardeners in Bali who understand your garden's structure.
+                                    </p>
                                 </article>
-
-                                <article class="flex items-start gap-4">
-                                    <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-full border-2 border-[#b28b2e] text-[#b28b2e]">
-                                        <svg class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
-                                            <path d="M12 7v10" />
-                                            <path d="M7 12h10" />
-                                            <circle cx="12" cy="12" r="9" />
-                                        </svg>
-                                    </div>
-                                    <div>
-                                        <h3 class="text-3xl font-semibold text-[#1b1b18]">Sit Back and Relax</h3>
-                                        <p class="mt-3 text-lg leading-relaxed text-[#6b6b66]">
-                                            Need to reschedule or make a special request? Just reach out! We are here to personally assist you with any changes or additional services - no automated systems, just real support from our team.
-                                        </p>
-                                    </div>
+                                <article class="rounded-2xl border border-[#dfe8e3] bg-[#f7faf8] p-6">
+                                    <h3 class="text-xl font-semibold text-[#1f5f46]">Seasonal Care by Gardeners in Bali</h3>
+                                    <p class="mt-3 text-sm leading-relaxed text-[#5a5a55]">
+                                        Weather-based treatments and seasonal adjustments are provided by skilled gardeners in Bali to maintain your garden throughout the year.
+                                    </p>
                                 </article>
                             </div>
-                        </div>
-                    </section>
+                        </section>
+
+                        <section class="space-y-4 rounded-[28px] bg-white p-8 shadow-[0_20px_50px_rgba(31,95,70,0.12)]" data-aos="fade-up">
+                            <h2 class="text-3xl font-semibold text-[#1b1b18]">Choose Your Gardeners in Bali</h2>
+                            <p class="text-sm leading-relaxed text-[#5a5a55]">
+                                Every property is unique. Contact us directly to discuss your garden size, maintenance schedule, and expectations.
+                            </p>
+                            <p class="text-sm leading-relaxed text-[#5a5a55]">
+                                At Staff Link, we tailor each service arrangement personally simply call, WhatsApp, or message us to schedule a time that suits you.
+                            </p>
+                        </section>
+
+                        <section class="space-y-4 rounded-[28px] bg-white p-8 shadow-[0_20px_50px_rgba(31,95,70,0.12)]" data-aos="fade-up">
+                            <h2 class="text-3xl font-semibold text-[#1b1b18]">Easy Service Management with Gardeners in Bali</h2>
+                            <p class="text-sm leading-relaxed text-[#5a5a55]">
+                                Need to adjust the schedule or request additional garden work? Just reach out.
+                            </p>
+                            <p class="text-sm leading-relaxed text-[#5a5a55]">
+                                At Staff Link, we coordinate directly with your assigned gardeners in Bali to ensure your outdoor space remains consistently maintained without disruption.
+                            </p>
+                            <p class="text-sm leading-relaxed text-[#5a5a55]">
+                                No automated systems. Only responsive support from our team.
+                            </p>
+                        </section>
+
+                        <section class="space-y-6 rounded-[28px] bg-white p-8 shadow-[0_20px_50px_rgba(31,95,70,0.12)]" data-aos="fade-up">
+                            <h2 class="text-3xl font-semibold text-[#1b1b18]">More Than Hiring Gardeners in Bali</h2>
+                            <div class="grid gap-4 lg:grid-cols-3">
+                                <article class="rounded-2xl border border-[#dfe8e3] bg-[#f7faf8] p-6">
+                                    <h3 class="text-xl font-semibold text-[#1f5f46]">Detail-Focused Gardeners in Bali</h3>
+                                    <p class="mt-3 text-sm leading-relaxed text-[#5a5a55]">
+                                        Every lawn edge, plant, and pathway is maintained with precision by professional Staff Link gardeners in Bali.
+                                    </p>
+                                </article>
+                                <article class="rounded-2xl border border-[#dfe8e3] bg-[#f7faf8] p-6">
+                                    <h3 class="text-xl font-semibold text-[#1f5f46]">Discreet Gardeners in Bali</h3>
+                                    <p class="mt-3 text-sm leading-relaxed text-[#5a5a55]">
+                                        Staff Link gardeners in Bali work respectfully and professionally within your private residence/Villa.
+                                    </p>
+                                </article>
+                                <article class="rounded-2xl border border-[#dfe8e3] bg-[#f7faf8] p-6">
+                                    <h3 class="text-xl font-semibold text-[#1f5f46]">Long-Term Gardeners in Bali</h3>
+                                    <p class="mt-3 text-sm leading-relaxed text-[#5a5a55]">
+                                        We prioritize consistent placements so the same gardeners in Bali understand your property and standards over time.
+                                    </p>
+                                </article>
+                            </div>
+                        </section>
+                    @else
+                        @include('partials.role-services')
+
+                        <section class="space-y-6 rounded-[28px] bg-white p-8 shadow-[0_20px_50px_rgba(31,95,70,0.12)]" data-aos="fade-up">
+                            <div class="grid gap-8 lg:grid-cols-[1.25fr_1fr] lg:items-stretch">
+                                <div class="overflow-hidden rounded-2xl border border-[#dfe8e3] bg-[#f7faf8]">
+                                    <img src="{{ $featureImage ? \Illuminate\Support\Facades\Storage::url($featureImage) : asset('images/img_hero.webp') }}" alt="Service support"
+                                        class="h-full w-full object-cover" loading="lazy" draggable="false" />
+                                </div>
+                                <div class="space-y-8">
+                                    <article class="flex items-start gap-4">
+                                        <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-full border-2 border-[#b28b2e] text-[#b28b2e]">
+                                            <svg class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                                                <path d="M4 19h16" />
+                                                <path d="M7 16V5h10v11" />
+                                                <path d="M9 8h6" />
+                                                <path d="M9 11h6" />
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <h3 class="text-3xl font-semibold text-[#1b1b18]">Choose Your Service</h3>
+                                            <p class="mt-3 text-lg leading-relaxed text-[#6b6b66]">
+                                                Contact us directly to discuss your needs and schedule a service. We tailor every booking to ensure you receive the best experience, with a personalized touch. Simply call, WhatsApp, or message us to arrange a time that suits you.
+                                            </p>
+                                        </div>
+                                    </article>
+
+                                    <article class="flex items-start gap-4">
+                                        <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-full border-2 border-[#b28b2e] text-[#b28b2e]">
+                                            <svg class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                                                <path d="M6 12a4 4 0 0 1 4-4h4a4 4 0 1 1 0 8H10a4 4 0 0 1-4-4z" />
+                                                <path d="M9 12h6" />
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <h3 class="text-3xl font-semibold text-[#1b1b18]">Manage Everything With Ease</h3>
+                                            <p class="mt-3 text-lg leading-relaxed text-[#6b6b66]">
+                                                Need to reschedule or make a special request? Just reach out! We are here to personally assist you with any changes or additional services - no automated systems, just real support from our team.
+                                            </p>
+                                        </div>
+                                    </article>
+
+                                    <article class="flex items-start gap-4">
+                                        <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-full border-2 border-[#b28b2e] text-[#b28b2e]">
+                                            <svg class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                                                <path d="M12 7v10" />
+                                                <path d="M7 12h10" />
+                                                <circle cx="12" cy="12" r="9" />
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <h3 class="text-3xl font-semibold text-[#1b1b18]">Sit Back and Relax</h3>
+                                            <p class="mt-3 text-lg leading-relaxed text-[#6b6b66]">
+                                                Need to reschedule or make a special request? Just reach out! We are here to personally assist you with any changes or additional services - no automated systems, just real support from our team.
+                                            </p>
+                                        </div>
+                                    </article>
+                                </div>
+                            </div>
+                        </section>
+                    @endif
                 @endif
 
                 @if (($pageType ?? '') !== 'Role')

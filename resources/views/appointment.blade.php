@@ -48,7 +48,9 @@
 
 <body class="text-[#2e2e2e]" id="page-top">
     @include('partials.gtm-noscript')
-    @php($wording = \App\Support\PageWording::for('appointment'))
+    @php
+        $wording = \App\Support\PageWording::for('appointment');
+    @endphp
     <div class="min-h-screen bg-[radial-gradient(circle_at_top,_#ffffff_0%,_#f4f5f3_52%,_#e6f1ec_100%)]">
         <x-site-header />
         <main class="px-4 pb-20 pt-8 sm:px-8 sm:pb-24 sm:pt-12">
@@ -203,12 +205,6 @@
 
                             <p id="slot-error" class="sm:col-span-2 hidden text-sm text-red-600">Please select an
                                 available date and time from the calendar.</p>
-
-                            @if (($turnstileEnabled ?? false) && filled($turnstileSiteKey ?? ''))
-                                <div class="sm:col-span-2">
-                                    <div class="cf-turnstile" data-sitekey="{{ $turnstileSiteKey }}"></div>
-                                </div>
-                            @endif
 
                             <div class="sm:col-span-2">
                                 <button type="submit"
@@ -500,9 +496,6 @@
                             'Your appointment request has been submitted successfully.', 'success');
 
                         form.reset();
-                        if (window.turnstile && typeof window.turnstile.reset === 'function') {
-                            window.turnstile.reset();
-                        }
                         dateInput.value = '';
                         timeInput.value = '';
                         activeDate = null;
@@ -535,9 +528,6 @@
             renderCalendar();
         })();
     </script>
-    @if (($turnstileEnabled ?? false) && filled($turnstileSiteKey ?? ''))
-        <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-    @endif
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js" defer></script>
     <script>

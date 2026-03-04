@@ -151,6 +151,7 @@
                         <p class="mt-3 text-sm leading-relaxed text-[#6b6b66]">We customise recruitment daily and introduce only those candidates who perfectly meet your expectations.</p>
                         <div class="mt-6 flex flex-wrap gap-3">
                             <a href="{{ route('appointments.create') }}" class="inline-flex rounded-full bg-[#287854] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#1f5f46]">Schedule a Call</a>
+                            <a href="{{ route('forms.nannies-inquiry') }}" class="inline-flex rounded-full border border-[#287854] px-6 py-3 text-sm font-semibold text-[#287854] transition hover:bg-[#ecf7f1]">Book a Wedding Nanny Package for your Special day</a>
                         </div>
                     </div>
                     <div class="overflow-hidden rounded-[24px] shadow-[0_20px_50px_rgba(31,95,70,0.16)]">

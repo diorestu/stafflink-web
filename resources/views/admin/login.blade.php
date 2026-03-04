@@ -5,7 +5,7 @@
     @include('partials.gtag-head')
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Admin Login | {{ \App\Models\SiteSetting::siteName() }}</title>
+    <title>{{ \Illuminate\Support\Str::limit('Admin Login | '.\App\Models\SiteSetting::siteName(), 60, '') }}</title>
     <link rel="icon" href="{{ asset('favicon.ico') }}">    @vite(['resources/css/app.css'])
 </head>
 

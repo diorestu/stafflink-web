@@ -13,6 +13,7 @@ class AdminCareerController extends Controller
     {
         $careers = Career::query()
             ->with('category')
+            ->orderBy('sort_order')
             ->latest()
             ->paginate(10);
 
@@ -36,28 +37,37 @@ class AdminCareerController extends Controller
             'career_category_id' => 'required|exists:career_categories,id',
             'title' => 'required|string|max:255',
             'description' => 'required|string',
+            'sort_order' => 'nullable|integer|min:0',
             'thumbnail' => 'nullable|image|max:4096',
-            'country' => 'required|string|max:255',
-            'state' => 'required|string|max:255',
-            'type' => 'required|in:full-time,part-time,contract',
+            'country' => 'nullable|string|max:255',
+            'state' => 'nullable|string|max:255',
+            'type' => 'nullable|in:full-time,part-time,contract',
             'minimum_salary' => 'nullable|integer|min:0|required_with:maximum_salary',
             'maximum_salary' => 'nullable|integer|min:0|gte:minimum_salary|required_with:minimum_salary',
-            'status' => 'required|in:draft,published',
+            'status' => 'nullable|in:draft,published',
         ]);
+
+        $validated['country'] = $validated['country'] ?? null;
+        $validated['state'] = $validated['state'] ?? null;
+        $validated['type'] = $validated['type'] ?? 'full-time';
+        $validated['status'] = $validated['status'] ?? 'published';
+        $validated['sort_order'] = array_key_exists('sort_order', $validated)
+            ? (int) $validated['sort_order']
+            : ((int) Career::query()->max('sort_order') + 1);
 
         $minimumSalary = isset($validated['minimum_salary']) ? (int) $validated['minimum_salary'] : null;
         $maximumSalary = isset($validated['maximum_salary']) ? (int) $validated['maximum_salary'] : null;
         $validated['minimum_salary'] = $minimumSalary;
         $validated['maximum_salary'] = $maximumSalary;
         $validated['salary_range'] = $this->formatSalaryRange($minimumSalary, $maximumSalary);
-        $validated['location'] = $this->composeLocation($validated['state'], $validated['country']);
+        $validated['location'] = $this->composeLocation($validated['state'] ?? null, $validated['country'] ?? null);
         unset($validated['thumbnail']);
 
         if ($request->hasFile('thumbnail')) {
             $validated['thumbnail_path'] = $request->file('thumbnail')->store('careers', 'public');
         }
 
-        if ($request->status === 'published' && !$request->published_at) {
+        if (($validated['status'] ?? 'published') === 'published' && !$request->published_at) {
             $validated['published_at'] = now();
         }
 
@@ -84,21 +94,34 @@ class AdminCareerController extends Controller
             'career_category_id' => 'required|exists:career_categories,id',
             'title' => 'required|string|max:255',
             'description' => 'required|string',
+            'sort_order' => 'nullable|integer|min:0',
             'thumbnail' => 'nullable|image|max:4096',
-            'country' => 'required|string|max:255',
-            'state' => 'required|string|max:255',
-            'type' => 'required|in:full-time,part-time,contract',
+            'country' => 'nullable|string|max:255',
+            'state' => 'nullable|string|max:255',
+            'type' => 'nullable|in:full-time,part-time,contract',
             'minimum_salary' => 'nullable|integer|min:0|required_with:maximum_salary',
             'maximum_salary' => 'nullable|integer|min:0|gte:minimum_salary|required_with:minimum_salary',
-            'status' => 'required|in:draft,published',
+            'status' => 'nullable|in:draft,published',
         ]);
 
-        $minimumSalary = isset($validated['minimum_salary']) ? (int) $validated['minimum_salary'] : null;
-        $maximumSalary = isset($validated['maximum_salary']) ? (int) $validated['maximum_salary'] : null;
+        $validated['country'] = array_key_exists('country', $validated) ? ($validated['country'] ?: null) : $career->country;
+        $validated['state'] = array_key_exists('state', $validated) ? ($validated['state'] ?: null) : $career->state;
+        $validated['type'] = $validated['type'] ?? $career->type ?? 'full-time';
+        $validated['status'] = $validated['status'] ?? $career->status ?? 'published';
+        $validated['sort_order'] = array_key_exists('sort_order', $validated)
+            ? (int) $validated['sort_order']
+            : (int) ($career->sort_order ?? 0);
+
+        $minimumSalary = array_key_exists('minimum_salary', $validated)
+            ? (isset($validated['minimum_salary']) ? (int) $validated['minimum_salary'] : null)
+            : $career->minimum_salary;
+        $maximumSalary = array_key_exists('maximum_salary', $validated)
+            ? (isset($validated['maximum_salary']) ? (int) $validated['maximum_salary'] : null)
+            : $career->maximum_salary;
         $validated['minimum_salary'] = $minimumSalary;
         $validated['maximum_salary'] = $maximumSalary;
         $validated['salary_range'] = $this->formatSalaryRange($minimumSalary, $maximumSalary);
-        $validated['location'] = $this->composeLocation($validated['state'], $validated['country']);
+        $validated['location'] = $this->composeLocation($validated['state'] ?? null, $validated['country'] ?? null);
         unset($validated['thumbnail']);
 
         if ($request->hasFile('thumbnail')) {
@@ -108,7 +131,7 @@ class AdminCareerController extends Controller
             $validated['thumbnail_path'] = $request->file('thumbnail')->store('careers', 'public');
         }
 
-        if ($request->status === 'published' && !$career->published_at) {
+        if (($validated['status'] ?? 'published') === 'published' && !$career->published_at) {
             $validated['published_at'] = now();
         }
 

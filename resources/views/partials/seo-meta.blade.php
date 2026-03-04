@@ -1,5 +1,6 @@
 @php
     $siteName = \App\Models\SiteSetting::siteName();
+    $baseWebTitle = 'Staff Link Solutions - Build and Scale Your Global Workforce Seamlessly';
     $seoTitle = trim((string) ($seoTitle ?? $siteName));
     $seoDescription = trim((string) ($seoDescription ?? 'StaffLink Solutions provides trusted staffing, recruitment, and consultation services across Bali and beyond.'));
     $seoCanonical = $seoCanonical ?? request()->url();
@@ -11,20 +12,27 @@
     $seoModifiedTime = $seoModifiedTime ?? null;
     $seoAuthor = trim((string) ($seoAuthor ?? $siteName));
     $seoLocale = str_replace('_', '-', app()->getLocale());
+    $seoHreflang = match (strtolower((string) app()->getLocale())) {
+        'id', 'id_id' => 'id-ID',
+        default => 'en-US',
+    };
     $seoOgLocale = str_replace('-', '_', $seoLocale);
     $seoStructuredDataNodes = is_array($seoStructuredDataNodes ?? null) ? $seoStructuredDataNodes : [];
     $seoBreadcrumbItems = is_array($seoBreadcrumbItems ?? null) ? $seoBreadcrumbItems : [];
 
-    $titleParts = collect(explode('|', $seoTitle))
+    $titleParts = collect(preg_split('/[|]+/', $seoTitle) ?: [])
         ->map(fn ($part) => trim((string) $part))
-        ->filter(fn ($part) => $part !== '' && strcasecmp($part, $siteName) !== 0)
+        ->filter(fn ($part) => $part !== '')
+        ->filter(fn ($part) => strcasecmp($part, $siteName) !== 0)
+        ->filter(fn ($part) => strcasecmp($part, $baseWebTitle) !== 0)
         ->values();
 
-    if ($titleParts->isEmpty()) {
-        $seoTitle = $siteName;
-    } else {
-        $seoTitle = $titleParts->first().' | '.$siteName;
-    }
+    $pageTitle = $titleParts->first();
+    $seoTitle = $pageTitle ? $baseWebTitle.' - '.$pageTitle : $baseWebTitle;
+
+    // Keep page titles readable while preserving the required brand title.
+    $seoTitle = trim(\Illuminate\Support\Str::limit($seoTitle, 160, ''));
+    $seoTitle = rtrim($seoTitle, " \t\n\r\0\x0B|:-");
 @endphp
 
 <title>{{ $seoTitle }}</title>
@@ -35,7 +43,7 @@
 <meta name="theme-color" content="#1f5f46">
 <meta http-equiv="content-language" content="{{ $seoLocale }}">
 <link rel="canonical" href="{{ $seoCanonical }}">
-<link rel="alternate" hreflang="{{ $seoLocale }}" href="{{ $seoCanonical }}">
+<link rel="alternate" hreflang="{{ $seoHreflang }}" href="{{ $seoCanonical }}">
 <link rel="alternate" hreflang="x-default" href="{{ $seoCanonical }}">
 <link rel="icon" href="{{ asset('favicon.ico') }}">
 
@@ -70,15 +78,6 @@
                     '@type' => 'ImageObject',
                     'url' => asset('images/logo.webp'),
                 ],
-            ],
-            [
-                '@type' => 'LocalBusiness',
-                '@id' => url('/').'#localbusiness',
-                'name' => $siteName,
-                'url' => url('/'),
-                'image' => asset('images/logo.webp'),
-                'areaServed' => ['@type' => 'Place', 'name' => 'Bali'],
-                'telephone' => '+6285739660906',
             ],
             [
                 '@type' => 'WebSite',

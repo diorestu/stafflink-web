@@ -4,9 +4,60 @@
     @include('partials.gtag-head')
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    @php
+        $countryCurrencyBySlug = [
+            'australia' => 'AUD',
+            'america' => 'USD',
+            'indonesia' => 'IDR',
+            'bali' => 'IDR',
+            'canada' => 'CAD',
+            'malaysia' => 'MYR',
+            'germany' => 'EUR',
+            'singapore' => 'SGD',
+        ];
+
+        $bniAudRates = [
+            'AUD' => 1,
+            'USD' => 0.65,
+            'IDR' => 10150,
+            'CAD' => 0.89,
+            'MYR' => 3.06,
+            'EUR' => 0.60,
+            'SGD' => 0.87,
+        ];
+
+        $pageSlug = (string) ($countrySlug ?? '');
+        $minimumRateAmount = $pageSlug === 'australia' ? 10.0 : 8.0;
+        $minimumRateCurrency = $pageSlug === 'australia' ? 'AUD' : 'USD';
+        $serviceFeeRate = 0.11;
+
+        $convertCurrency = function (float $amount, string $fromCurrency, string $toCurrency) use ($bniAudRates): float {
+            $from = strtoupper($fromCurrency);
+            $to = strtoupper($toCurrency);
+
+            if (!isset($bniAudRates[$from], $bniAudRates[$to])) {
+                return $amount;
+            }
+
+            $amountInAud = $amount / (float) $bniAudRates[$from];
+
+            return $amountInAud * (float) $bniAudRates[$to];
+        };
+
+        $pageCurrencyCode = $countryCurrencyBySlug[$pageSlug] ?? 'AUD';
+        $pageBaseValue = $convertCurrency($minimumRateAmount, $minimumRateCurrency, $pageCurrencyCode);
+        $pageFeeValue = $pageBaseValue * $serviceFeeRate;
+        $pageTotalValue = $pageBaseValue + $pageFeeValue;
+
+        $formatAmount = fn (float $value, string $currencyCode): string => $currencyCode . ' ' . number_format($value, 2, '.', ',');
+        $pageBaseLabel = $formatAmount($pageBaseValue, $pageCurrencyCode) . '/hour';
+        $pageFeeLabel = $formatAmount($pageFeeValue, $pageCurrencyCode) . '/hour';
+        $pageTotalLabel = $formatAmount($pageTotalValue, $pageCurrencyCode) . '/hour';
+        $pageHeadlineLabel = 'From ' . $formatAmount($pageBaseValue, $pageCurrencyCode) . '/hour + 11% service fee';
+    @endphp
     @include('partials.seo-meta', [
         'seoTitle' => \App\Models\SiteSetting::siteName().' | Hire Remote Staff for '.$countryAdjective.' Companies',
-        'seoDescription' => 'Build your offshore team in Bali with trusted, English-speaking remote staff for '.$countryAdjective.' businesses, starting from $8/hour.',
+        'seoDescription' => 'Build your offshore team in Bali with trusted, English-speaking remote staff for '.$countryAdjective.' businesses, starting from '.$pageBaseLabel.' + 11% service fee.',
         'seoKeywords' => 'remote staff '.\Illuminate\Support\Str::lower($countryName).', offshore staffing bali, hire remote worker, virtual assistant '.\Illuminate\Support\Str::lower($countryName),
     ])
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -20,11 +71,11 @@
                 <header class="rounded-[28px] bg-[#1f5f46] p-8 text-white shadow-[0_20px_60px_rgba(31,95,70,0.3)] lg:p-12">
                     <p class="inline-flex items-center rounded-full border border-[#f0dba8] bg-[#f0dba8]/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-[#f0dba8]">{{ $countryName }}</p>
                     <h1 class="mt-4 text-3xl font-semibold leading-tight text-white lg:text-5xl">Hire Remote Staff for {{ $countryAdjective }} Companies</h1>
-                    <p class="mt-3 text-xl font-semibold text-[#9de6c3]">$8/hour</p>
+                    <p class="mt-3 text-xl font-semibold text-[#9de6c3]" data-price-headline>{{ $pageHeadlineLabel }}</p>
                     <h2 class="mt-8 text-2xl font-semibold text-[#f0dba8]">Build Your Offshore Team in Bali</h2>
                     <p class="mt-2 text-sm font-semibold uppercase tracking-[0.2em] text-[#f6e7c1]">Trusted by {{ $countryOwnerLabel }} Business Owners</p>
                     <p class="mt-5 text-sm italic leading-relaxed text-white/90">
-                        {{ $countryAdjective }} businesses are scaling smarter by hiring remote staff in Bali. Get reliable, English-speaking professionals just $8/hour, without lock-in contracts. We help {{ $countryOwnerLabel }} companies reduce overhead, improve efficiency, and build long-term offshore teams that actually feel like part of your business.
+                        {{ $countryAdjective }} businesses are scaling smarter by hiring remote staff in Bali. Get reliable, English-speaking professionals from {{ $pageBaseLabel }} + 11% service fee, without lock-in contracts. We help {{ $countryOwnerLabel }} companies reduce overhead, improve efficiency, and build long-term offshore teams that actually feel like part of your business.
                     </p>
                 </header>
 
@@ -74,10 +125,28 @@
                     </div>
                 </section>
 
-                <section class="space-y-4 rounded-[24px] bg-[#287854] p-8 text-white shadow-[0_16px_46px_rgba(31,95,70,0.2)] lg:p-10">
-                    <h2 class="text-2xl font-semibold">Transparent Staff Hire Pricing: $8/hour</h2>
+                <section class="space-y-4 rounded-[24px] bg-[#287854] p-8 text-white shadow-[0_16px_46px_rgba(31,95,70,0.2)] lg:p-10"
+                    data-dynamic-pricing data-base-amount="{{ $minimumRateAmount }}" data-base-currency="{{ $minimumRateCurrency }}" data-service-fee-rate="0.11" data-default-currency="{{ $pageCurrencyCode }}" data-country-slug="{{ $countrySlug }}">
+                    <h2 class="text-2xl font-semibold">Transparent Staff Hire Pricing</h2>
                     <p class="text-sm leading-relaxed text-white/90">
-                        We offer dedicated remote staff $8 per hour. You can hire part-time or full-time depending on your needs.
+                        Minimum hourly rate starts from <span class="font-semibold text-[#f0dba8]" data-price-base>{{ $pageBaseLabel }}</span> + <span class="font-semibold text-[#f0dba8]">11% service fee</span>.
+                    </p>
+                    <div class="grid gap-3 rounded-2xl border border-white/20 bg-white/10 p-4 text-sm sm:grid-cols-3">
+                        <div class="rounded-xl border border-white/15 bg-black/10 p-3">
+                            <p class="text-white/80">Base</p>
+                            <p class="mt-1 text-base font-semibold text-[#f0dba8]" data-price-base>{{ $pageBaseLabel }}</p>
+                        </div>
+                        <div class="rounded-xl border border-white/15 bg-black/10 p-3">
+                            <p class="text-white/80">Service Fee (11%)</p>
+                            <p class="mt-1 text-base font-semibold text-[#f0dba8]" data-price-fee>{{ $pageFeeLabel }}</p>
+                        </div>
+                        <div class="rounded-xl border border-white/15 bg-black/10 p-3">
+                            <p class="text-white/80">Total Minimum</p>
+                            <p class="mt-1 text-base font-semibold text-[#f0dba8]" data-price-total>{{ $pageTotalLabel }}</p>
+                        </div>
+                    </div>
+                    <p class="text-xs leading-relaxed text-white/80">
+                        Currency: <span class="font-semibold text-[#f0dba8]" data-price-currency-code>{{ $pageCurrencyCode }}</span>. Exchange-rate reference: BNI (Bank Negara Indonesia), updated periodically.
                     </p>
                     <ul class="space-y-2 text-sm font-semibold text-[#f0dba8]">
                         <li class="flex items-center gap-2">
@@ -161,8 +230,8 @@
                         <p class="mt-1 text-sm leading-relaxed text-[#5a5a55]">No. We operate on a flexible month-to-month model. There are no long-term lock-in contracts, giving {{ $countryAdjective }} businesses the flexibility to scale up or down as needed.</p>
                     </article>
                     <article>
-                        <h4 class="text-base font-semibold text-[#1f5f46]">What is included in the $8/hour rate?</h4>
-                        <p class="mt-1 text-sm leading-relaxed text-[#5a5a55]">The hourly rate covers the dedicated staff member's salary and basic HR administration. Depending on the role and level of experience required, rates may vary slightly. During your discovery call, we'll provide a clear breakdown with no hidden fees.</p>
+                        <h4 class="text-base font-semibold text-[#1f5f46]">What is included in the {{ $pageBaseLabel }} minimum + 11% service fee?</h4>
+                        <p class="mt-1 text-sm leading-relaxed text-[#5a5a55]">The base hourly rate covers the dedicated staff member's salary and core HR administration. The 11% service fee covers staffing operations and support. Depending on the role and level of experience required, rates may vary. During your discovery call, we'll provide a clear breakdown with no hidden fees.</p>
                     </article>
                     <article>
                         <h4 class="text-base font-semibold text-[#1f5f46]">Can I hire part-time or full-time?</h4>
@@ -213,8 +282,8 @@
                         <p class="mt-1 text-sm leading-relaxed text-[#5a5a55]">The best way for {{ $countryAdjective }} SMEs to hire remote staff is through a structured process: clearly define the role and outcomes, partner with a reliable offshore staffing provider, interview shortlisted candidates, set measurable performance indicators, and start with a flexible engagement model. SMEs benefit most when they treat offshore staff as long-term team members rather than short-term freelancers. A dedicated remote professional integrated into daily operations will deliver far stronger results than ad-hoc outsourcing. For many {{ $countryAdjective }} small and medium businesses, starting with one dedicated remote staff member is often the smartest first step.</p>
                     </article>
                     <article>
-                        <h4 class="text-base font-semibold text-[#1f5f46]">Is $8/hour realistic for quality staff?</h4>
-                        <p class="mt-1 text-sm leading-relaxed text-[#5a5a55]">Yes, in the right market. The cost of living and salary standards in Indonesia are significantly lower than in {{ $countryName }}, which makes $8/hour a competitive and fair rate locally while still being highly cost-effective for {{ $countryAdjective }} businesses. At this rate, you can hire experienced professionals for roles such as virtual assistants, admin support, marketing assistants, bookkeeping support, and lead generation specialists. However, more specialised roles or senior-level positions may require a higher rate depending on experience and complexity. The key factor is not just the hourly rate, it is proper screening, clear KPIs, and structured onboarding that ensure you get real performance, not just affordability.</p>
+                        <h4 class="text-base font-semibold text-[#1f5f46]">Is the {{ $pageBaseLabel }} minimum realistic for quality staff?</h4>
+                        <p class="mt-1 text-sm leading-relaxed text-[#5a5a55]">Yes, in the right market. The cost of living and salary standards in Indonesia are significantly lower than in {{ $countryName }}, which makes {{ $pageBaseLabel }} plus service fee a competitive and fair entry point while still being cost-effective for {{ $countryAdjective }} businesses. At this level, you can hire experienced professionals for roles such as virtual assistants, admin support, marketing assistants, bookkeeping support, and lead generation specialists. More specialised or senior-level positions may require a higher rate depending on experience and complexity.</p>
                     </article>
                     <article>
                         <h4 class="text-base font-semibold text-[#1f5f46]">What are the risks of hiring offshore?</h4>
@@ -222,7 +291,7 @@
                     </article>
                     <article>
                         <h4 class="text-base font-semibold text-[#1f5f46]">How much can {{ $countryAdjective }} businesses actually save with offshore staff?</h4>
-                        <p class="mt-1 text-sm leading-relaxed text-[#5a5a55]">Savings depend on the role, but many {{ $countryAdjective }} businesses reduce staffing costs by 50-70% compared to hiring locally. For example, an entry-level admin or support role in {{ $countryName }} may cost $55,000-$70,000 per year plus superannuation, payroll tax, leave entitlements, and office overhead. With offshore staffing starting from $8/hour, businesses can significantly reduce salary expenses while still maintaining dedicated, full-time support. Beyond salary savings, companies also reduce superannuation contributions, payroll tax, office space costs, equipment overhead, and recruitment delays. For growing {{ $countryAdjective }} SMEs, this can free up capital to reinvest into sales, marketing, or expansion.</p>
+                        <p class="mt-1 text-sm leading-relaxed text-[#5a5a55]">Savings depend on the role, but many {{ $countryAdjective }} businesses reduce staffing costs by 50-70% compared to hiring locally. For example, an entry-level admin or support role in {{ $countryName }} may cost $55,000-$70,000 per year plus superannuation, payroll tax, leave entitlements, and office overhead. With offshore staffing starting from {{ $pageBaseLabel }} plus 11% service fee, businesses can significantly reduce salary expenses while still maintaining dedicated, full-time support. Beyond salary savings, companies also reduce superannuation contributions, payroll tax, office space costs, equipment overhead, and recruitment delays.</p>
                     </article>
                     <article>
                         <h4 class="text-base font-semibold text-[#1f5f46]">What happens if my business grows and I need more staff?</h4>
@@ -240,6 +309,89 @@
     @once
         <script>
             (() => {
+                const pricingCard = document.querySelector('[data-dynamic-pricing]');
+
+                if (pricingCard) {
+                    const baseAmount = Number(pricingCard.dataset.baseAmount || '10');
+                    const baseCurrency = String(pricingCard.dataset.baseCurrency || 'AUD').toUpperCase();
+                    const serviceFeeRate = Number(pricingCard.dataset.serviceFeeRate || '0.11');
+                    const countrySlug = String(pricingCard.dataset.countrySlug || '').toLowerCase();
+                    const defaultCurrencyCode = String(pricingCard.dataset.defaultCurrency || 'AUD').toUpperCase();
+                    const locale = (navigator.languages && navigator.languages[0]) || navigator.language || 'en-AU';
+
+                    // Reference rates for 1 AUD in target currencies (BNI reference, periodically updated).
+                    const bniAudRates = {
+                        AUD: 1,
+                        USD: 0.65,
+                        IDR: 10150,
+                        CAD: 0.89,
+                        MYR: 3.06,
+                        EUR: 0.6,
+                        SGD: 0.87,
+                    };
+
+                    const pageCurrencyBySlug = {
+                        australia: 'AUD',
+                        america: 'USD',
+                        indonesia: 'IDR',
+                        bali: 'IDR',
+                        canada: 'CAD',
+                        malaysia: 'MYR',
+                        germany: 'EUR',
+                        singapore: 'SGD',
+                    };
+
+                    const setText = (selector, value) => {
+                        document.querySelectorAll(selector).forEach((element) => {
+                            element.textContent = value;
+                        });
+                    };
+
+                    const formatCurrency = (value, currencyCode) => {
+                        try {
+                            return new Intl.NumberFormat(locale, {
+                                style: 'currency',
+                                currency: currencyCode,
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                            }).format(value);
+                        } catch (error) {
+                            return `${currencyCode} ${value.toFixed(2)}`;
+                        }
+                    };
+
+                    const convertAmount = (amount, fromCurrency, toCurrency) => {
+                        const from = String(fromCurrency || '').toUpperCase();
+                        const to = String(toCurrency || '').toUpperCase();
+
+                        if (!Object.prototype.hasOwnProperty.call(bniAudRates, from) || !Object.prototype.hasOwnProperty.call(bniAudRates, to)) {
+                            return amount;
+                        }
+
+                        const amountInAud = amount / bniAudRates[from];
+                        return amountInAud * bniAudRates[to];
+                    };
+
+                    const updatePricing = (rawCurrencyCode) => {
+                        const requestedCurrencyCode = String(rawCurrencyCode || 'AUD').toUpperCase();
+                        const currencyCode = Object.prototype.hasOwnProperty.call(bniAudRates, requestedCurrencyCode)
+                            ? requestedCurrencyCode
+                            : 'AUD';
+                        const baseValue = convertAmount(baseAmount, baseCurrency, currencyCode);
+                        const feeValue = baseValue * serviceFeeRate;
+                        const totalValue = baseValue + feeValue;
+
+                        setText('[data-price-base]', `${formatCurrency(baseValue, currencyCode)}/hour`);
+                        setText('[data-price-fee]', `${formatCurrency(feeValue, currencyCode)}/hour`);
+                        setText('[data-price-total]', `${formatCurrency(totalValue, currencyCode)}/hour`);
+                        setText('[data-price-currency-code]', currencyCode);
+                        setText('[data-price-headline]', `From ${formatCurrency(baseValue, currencyCode)}/hour + 11% service fee`);
+                    };
+
+                    const pageCurrency = pageCurrencyBySlug[countrySlug] || defaultCurrencyCode || 'AUD';
+                    updatePricing(pageCurrency);
+                }
+
                 const faq = document.querySelector('[data-faq-accordion]');
                 if (!faq) return;
 

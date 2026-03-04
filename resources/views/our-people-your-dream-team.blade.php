@@ -99,10 +99,10 @@
                 <section class="rounded-[28px] bg-white p-10 shadow-[0_20px_50px_rgba(31,95,70,0.12)] lg:p-12" data-aos="fade-up">
                     <div class="grid gap-8 lg:grid-cols-[1fr_1.1fr]">
                         <div>
-                            <h3 class="text-3xl font-semibold text-[#1b1b18]">Scale your business to new heights today</h3>
+                            <h3 class="text-3xl font-semibold text-[#1b1b18]">Scale your global workforce with confidence</h3>
                             <p class="mt-4 text-sm leading-relaxed text-[#6b6b66]">
-                                Share your requirements and we will map the right team structure, timeline, and budget.
-                                Our team will guide you from planning to launch.
+                                Share your hiring goals and we will design the right team structure, delivery timeline, and budget framework.
+                                From planning to launch, our consultants support structured execution for reliable, scalable growth.
                             </p>
                             <div class="mt-6 space-y-2 text-sm text-[#2e2e2e]">
                                 <p>info@stafflink.pro</p>

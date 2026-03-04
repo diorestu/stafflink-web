@@ -26,6 +26,10 @@ class ServiceAreaService
         'Ubud',
         'Bedugul',
         'Ungasan',
+        'Amed',
+        'Lovina',
+        'Nusa Penida',
+        'Nusa Lembongan',
     ];
 
     public function allAreas(): Collection

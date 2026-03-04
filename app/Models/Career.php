@@ -11,6 +11,7 @@ class Career extends Model
         'career_category_id',
         'title',
         'description',
+        'sort_order',
         'thumbnail_path',
         'location',
         'country',
@@ -25,6 +26,7 @@ class Career extends Model
 
     protected $casts = [
         'published_at' => 'datetime',
+        'sort_order' => 'integer',
     ];
 
     public function category(): BelongsTo
