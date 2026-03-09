@@ -8,6 +8,7 @@ class NannyInquiry extends Model
 {
     protected $fillable = [
         'wedding_couple_names',
+        'unique_code',
         'wedding_date',
         'wedding_start_time',
         'wedding_location_address',

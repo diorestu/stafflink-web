@@ -3,6 +3,21 @@
 @section('page-title', 'Services')
 
 @section('content')
+    @php
+        $search = $search ?? '';
+        $sortBy = $sortBy ?? 'sort_order';
+        $sortDir = $sortDir ?? 'asc';
+        $sortUrl = function (string $column) use ($sortBy, $sortDir) {
+            $nextDir = ($sortBy === $column && $sortDir === 'asc') ? 'desc' : 'asc';
+            return request()->fullUrlWithQuery(['sort_by' => $column, 'sort_dir' => $nextDir, 'page' => 1]);
+        };
+        $sortIcon = function (string $column) use ($sortBy, $sortDir) {
+            if ($sortBy !== $column) {
+                return '↕';
+            }
+            return $sortDir === 'asc' ? '↑' : '↓';
+        };
+    @endphp
     <div class="bg-white rounded-lg shadow">
         <div class="p-6 border-b flex justify-between items-center">
             <h3 class="text-lg font-semibold">All Services</h3>
@@ -14,15 +29,45 @@
                 Add Service
             </a>
         </div>
+        <div class="px-6 py-4 border-b bg-gray-50/60">
+            <form method="GET" action="{{ route('admin.careers.index') }}" class="flex flex-wrap items-center gap-2">
+                <input type="text" name="search" value="{{ $search }}"
+                    placeholder="Search title, category, or description"
+                    class="w-full max-w-md rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-[#1f5f46] focus:outline-none">
+                <input type="hidden" name="sort_by" value="{{ $sortBy }}">
+                <input type="hidden" name="sort_dir" value="{{ $sortDir }}">
+                <button type="submit"
+                    class="rounded-md bg-[#1f5f46] px-4 py-2 text-sm font-semibold text-white hover:bg-[#287854]">
+                    Search
+                </button>
+                <a href="{{ route('admin.careers.index') }}"
+                    class="rounded-md border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50">
+                    Reset
+                </a>
+            </form>
+        </div>
 
         @if ($careers->count() > 0)
             <div class="overflow-x-auto">
                 <table class="w-full">
                     <thead class="bg-[#e6f1ec]">
                         <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <a href="{{ $sortUrl('title') }}" class="inline-flex items-center gap-1 hover:text-[#1f5f46]">
+                                    Title <span>{{ $sortIcon('title') }}</span>
+                                </a>
+                            </th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Urutan</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <a href="{{ $sortUrl('sort_order') }}" class="inline-flex items-center gap-1 hover:text-[#1f5f46]">
+                                    Urutan <span>{{ $sortIcon('sort_order') }}</span>
+                                </a>
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <a href="{{ $sortUrl('created_at') }}" class="inline-flex items-center gap-1 hover:text-[#1f5f46]">
+                                    Dibuat <span>{{ $sortIcon('created_at') }}</span>
+                                </a>
+                            </th>
                             <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                         </tr>
                     </thead>
@@ -35,6 +80,7 @@
                                 </td>
                                 <td class="px-6 py-4 text-sm text-gray-500">{{ $career->category?->name ?? '—' }}</td>
                                 <td class="px-6 py-4 text-sm text-gray-500">{{ $career->sort_order ?? 0 }}</td>
+                                <td class="px-6 py-4 text-sm text-gray-500">{{ $career->created_at?->format('d M Y') }}</td>
                                 <td class="px-6 py-4 text-right text-sm">
                                     <div class="inline-flex items-center gap-1">
                                         <a href="{{ route('admin.careers.edit', $career) }}"
@@ -60,7 +106,7 @@
             </div>
             @if ($careers->hasPages())
                 <div class="px-6 py-4 border-t">
-                    {{ $careers->links() }}
+                    {{ $careers->withQueryString()->links() }}
                 </div>
             @endif
         @else

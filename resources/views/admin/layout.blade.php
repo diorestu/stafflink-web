@@ -138,6 +138,16 @@
                         </svg>
                         Leads
                     </a>
+                    <a href="{{ route('admin.contact-inquiries.index') }}"
+                        class="flex items-center px-6 py-3 hover:bg-[#287854] {{ request()->routeIs('admin.contact-inquiries.*') ? 'bg-[#287854] border-l-4 border-[#b28b2e]' : '' }}">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6h16v12H4z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 7l8 6 8-6" />
+                        </svg>
+                        Contact Inquiries
+                    </a>
                     <a href="{{ route('admin.nanny-inquiries.index') }}"
                         class="flex items-center px-6 py-3 hover:bg-[#287854] {{ request()->routeIs('admin.nanny-inquiries.*') ? 'bg-[#287854] border-l-4 border-[#b28b2e]' : '' }}">
                         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -206,6 +216,14 @@
                                     d="M4 7h16M4 12h10M4 17h8" />
                             </svg>
                             Page Wording
+                        </a>
+                        <a href="{{ route('admin.role-page-wording.index') }}"
+                            class="flex items-center px-6 py-3 hover:bg-[#287854] {{ request()->routeIs('admin.role-page-wording.*') ? 'bg-[#287854] border-l-4 border-[#b28b2e]' : '' }}">
+                            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 6v12m6-6H6m2-7h8a2 2 0 012 2v10a2 2 0 01-2 2H8a2 2 0 01-2-2V7a2 2 0 012-2z" />
+                            </svg>
+                            Role Page Copy
                         </a>
                     @endif
                     <a href="{{ url('/') }}" target="_blank"

@@ -6,6 +6,7 @@ use App\Models\Career;
 use App\Models\CareerCategory;
 use App\Services\ServiceAreaService;
 use App\Support\PageWording;
+use App\Support\RolePageWording;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
@@ -215,6 +216,9 @@ class ServiceDetailController extends Controller
             "Explore {$roleTitle} roles in " . ($area['seo_label'] ?? 'Indonesia') . " with tailored staffing support.",
             155
         );
+        $roleSlug = Str::slug($roleTitle);
+        $rolePageCopy = $area === null ? RolePageWording::for($roleSlug) : [];
+        $rolePageMode = $area === null ? RolePageWording::mode($roleSlug) : 'template';
 
         return view('service-detail', [
             'pageType' => 'Role',
@@ -230,6 +234,8 @@ class ServiceDetailController extends Controller
             'baseRouteName' => 'services.roles.show',
             'areaRouteName' => 'services.roles.areas.show',
             'metaDescription' => $metaDescription,
+            'rolePageCopy' => $rolePageCopy,
+            'rolePageMode' => $rolePageMode,
         ]);
     }
 

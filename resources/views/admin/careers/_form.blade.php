@@ -1,6 +1,8 @@
 @php
     $career = $career ?? null;
     $showMetaFields = $showMetaFields ?? true;
+    $rolePageMode = $rolePageMode ?? old('role_page_mode', 'template');
+    $rolePageCopyUrl = $rolePageCopyUrl ?? null;
 @endphp
 
 <div class="space-y-6">
@@ -36,6 +38,27 @@
             class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#287854] focus:border-transparent"
             placeholder="Describe this career role">{{ old('description', $career?->description) }}</textarea>
         @error('description')
+            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+        @enderror
+    </div>
+
+    <div class="rounded-xl border border-[#d7e8df] bg-[#f6faf8] p-5">
+        <label for="role_page_mode" class="block text-sm font-medium text-gray-700 mb-2">Role Page Builder</label>
+        <select name="role_page_mode" id="role_page_mode"
+            class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#287854] focus:border-transparent bg-white">
+            <option value="template" {{ $rolePageMode === 'template' ? 'selected' : '' }}>Use default template</option>
+            <option value="custom" {{ $rolePageMode === 'custom' ? 'selected' : '' }}>Build with CMS</option>
+        </select>
+        <p class="mt-2 text-xs text-gray-500">Default template memakai layout service bawaan. Build with CMS memakai Role Page Copy builder yang baru.</p>
+        @if ($rolePageCopyUrl)
+            <div class="mt-3 flex items-center gap-3">
+                <a href="{{ $rolePageCopyUrl }}" class="inline-flex rounded-lg border border-[#287854] px-4 py-2 text-sm font-semibold text-[#287854] hover:bg-white">
+                    Open Role Page Copy
+                </a>
+                <p class="text-xs text-gray-500">Gunakan ini kalau memilih `Build with CMS`.</p>
+            </div>
+        @endif
+        @error('role_page_mode')
             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
         @enderror
     </div>

@@ -8,6 +8,7 @@ class WeddingEvent extends Model
 {
     protected $fillable = [
         'couple_names',
+        'unique_code',
         'wedding_date',
         'wedding_start_time',
         'wedding_location_address',
@@ -21,4 +22,3 @@ class WeddingEvent extends Model
         'is_active' => 'bool',
     ];
 }
-

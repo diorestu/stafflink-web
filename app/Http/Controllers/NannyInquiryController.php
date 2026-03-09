@@ -10,6 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use Throwable;
 
 class NannyInquiryController extends Controller
@@ -28,6 +29,7 @@ class NannyInquiryController extends Controller
             if ($event) {
                 $prefillWedding = [
                     'wedding_couple_names' => $event->couple_names,
+                    'unique_code' => $event->unique_code ?: Str::upper($event->share_token),
                     'wedding_date' => $event->wedding_date?->format('Y-m-d'),
                     'wedding_start_time' => $event->wedding_start_time,
                     'wedding_location_address' => $event->wedding_location_address,
@@ -56,6 +58,7 @@ class NannyInquiryController extends Controller
 
         $validated = $request->validate([
             'wedding_couple_names' => ['required', 'string', 'max:190'],
+            'unique_code' => ['required', 'string', 'max:40', 'regex:/^[A-Za-z0-9-]+$/'],
             'wedding_date' => ['required', 'date'],
             'wedding_start_time' => ['required', 'date_format:H:i'],
             'wedding_location_address' => ['required', 'string', 'max:2000'],
@@ -108,9 +111,11 @@ class NannyInquiryController extends Controller
         $accommodationDetail = trim((string) ($validated['accommodation_detail'] ?? ''));
         $additionalHours = trim((string) ($validated['additional_hours'] ?? ''));
         $weddingVenueName = trim((string) ($validated['wedding_venue_name'] ?? ''));
+        $uniqueCode = strtoupper(trim((string) $validated['unique_code']));
         $weddingGroupKey = NannyInquiryWeddingCsv::groupKey(
             (string) $validated['wedding_couple_names'],
             (string) $validated['wedding_date'],
+            $uniqueCode,
         );
 
         $childLines = array_map(function (array $child, int $index): string {
@@ -124,6 +129,7 @@ class NannyInquiryController extends Controller
             '',
             '*Wedding Details*',
             'Wedding Of: ' . $validated['wedding_couple_names'],
+            'Unique Code: ' . $uniqueCode,
             'Wedding Date: ' . $validated['wedding_date'],
             'Wedding Start Time: ' . $validated['wedding_start_time'],
             'Wedding Location Address: ' . $validated['wedding_location_address'],
@@ -152,6 +158,7 @@ class NannyInquiryController extends Controller
 
         $inquiry = NannyInquiry::create([
             'wedding_couple_names' => $validated['wedding_couple_names'],
+            'unique_code' => $uniqueCode,
             'wedding_date' => $validated['wedding_date'],
             'wedding_start_time' => $validated['wedding_start_time'],
             'wedding_location_address' => $validated['wedding_location_address'],

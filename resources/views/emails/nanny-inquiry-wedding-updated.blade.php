@@ -38,6 +38,10 @@
                                     <td style="padding:10px 14px; font-size:14px; color:#173f31; border-top:1px solid #e8efeb;">{{ $inquiry->wedding_couple_names }}</td>
                                 </tr>
                                 <tr>
+                                    <td style="width:38%; padding:10px 14px; font-size:13px; color:#4b5b53; border-top:1px solid #e8efeb;">Unique Code</td>
+                                    <td style="padding:10px 14px; font-size:14px; color:#173f31; border-top:1px solid #e8efeb;">{{ $inquiry->unique_code ?: '-' }}</td>
+                                </tr>
+                                <tr>
                                     <td style="width:38%; padding:10px 14px; font-size:13px; color:#4b5b53; border-top:1px solid #e8efeb;">Wedding Date</td>
                                     <td style="padding:10px 14px; font-size:14px; color:#173f31; border-top:1px solid #e8efeb;">{{ $weddingDate }}</td>
                                 </tr>

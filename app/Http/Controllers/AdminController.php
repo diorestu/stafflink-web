@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Appointment;
+use App\Models\ContactInquiry;
 use App\Models\Job;
 use App\Models\PageSection;
 use Carbon\Carbon;
@@ -30,6 +31,7 @@ class AdminController extends Controller
                 ->where('starts_at', '>=', now())
                 ->whereIn('status', ['pending', 'confirmed'])
                 ->count(),
+            'contact_inquiries' => ContactInquiry::query()->count(),
         ];
 
         $startOfWeek = Carbon::now()->startOfWeek(Carbon::MONDAY);

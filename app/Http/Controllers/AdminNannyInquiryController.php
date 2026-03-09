@@ -23,6 +23,7 @@ class AdminNannyInquiryController extends Controller
                         ->orWhere('guardian_email', 'like', "%{$search}%")
                         ->orWhere('guardian_phone', 'like', "%{$search}%")
                         ->orWhere('wedding_couple_names', 'like', "%{$search}%")
+                        ->orWhere('unique_code', 'like', "%{$search}%")
                         ->orWhere('wedding_date', 'like', "%{$search}%");
                 });
             });
@@ -34,11 +35,11 @@ class AdminNannyInquiryController extends Controller
 
         $groupedBookings = (clone $baseQuery)
             ->whereNotNull('wedding_group_key')
-            ->select('wedding_group_key', 'wedding_couple_names', 'wedding_date')
+            ->select('wedding_group_key', 'wedding_couple_names', 'unique_code', 'wedding_date')
             ->selectRaw('COUNT(*) as total_families')
             ->selectRaw("SUM(CASE WHEN children_count = '4+' THEN 4 ELSE CAST(children_count AS UNSIGNED) END) as total_children")
             ->selectRaw("SUM(CASE WHEN nannies_required = '5+' THEN 5 ELSE CAST(COALESCE(nannies_required, '0') AS UNSIGNED) END) as total_nannies")
-            ->groupBy('wedding_group_key', 'wedding_couple_names', 'wedding_date')
+            ->groupBy('wedding_group_key', 'wedding_couple_names', 'unique_code', 'wedding_date')
             ->orderByDesc('wedding_date')
             ->get();
 
@@ -60,13 +61,15 @@ class AdminNannyInquiryController extends Controller
     {
         $validated = $request->validate([
             'couple_names' => ['required', 'string', 'max:190'],
+            'unique_code' => ['required', 'string', 'max:40', 'regex:/^[A-Za-z0-9-]+$/', 'unique:wedding_events,unique_code'],
             'wedding_date' => ['required', 'date'],
             'wedding_start_time' => ['required', 'date_format:H:i'],
             'wedding_location_address' => ['required', 'string', 'max:2000'],
             'wedding_venue_name' => ['nullable', 'string', 'max:190'],
         ]);
 
-        $tokenBase = Str::slug((string) $validated['couple_names']).'-'.$validated['wedding_date'];
+        $uniqueCode = strtoupper(trim((string) $validated['unique_code']));
+        $tokenBase = Str::slug((string) $validated['couple_names']).'-'.$validated['wedding_date'].'-'.Str::slug($uniqueCode);
         $shareToken = $tokenBase;
         $counter = 1;
         while (WeddingEvent::query()->where('share_token', $shareToken)->exists()) {
@@ -76,6 +79,7 @@ class AdminNannyInquiryController extends Controller
 
         WeddingEvent::create([
             'couple_names' => $validated['couple_names'],
+            'unique_code' => $uniqueCode,
             'wedding_date' => $validated['wedding_date'],
             'wedding_start_time' => $validated['wedding_start_time'],
             'wedding_location_address' => $validated['wedding_location_address'],

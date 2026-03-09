@@ -92,6 +92,16 @@
                                     @if ($prefillWedding) readonly @endif
                                     class="w-full rounded-xl border border-[#d1d5db] px-4 py-3 text-sm focus:border-[#287854] focus:outline-none {{ $prefillWedding ? 'bg-[#f7faf8] text-[#4b5b53]' : '' }}">
                             </div>
+
+                            <div class="grid gap-2">
+                                <label class="text-sm font-semibold" for="unique_code">Unique Code</label>
+                                <input id="unique_code" name="unique_code" type="text" required
+                                    value="{{ old('unique_code', $prefillWedding['unique_code'] ?? '') }}"
+                                    placeholder="Example: WED-BALI-001"
+                                    @if ($prefillWedding) readonly @endif
+                                    class="w-full rounded-xl border border-[#d1d5db] px-4 py-3 text-sm uppercase focus:border-[#287854] focus:outline-none {{ $prefillWedding ? 'bg-[#f7faf8] text-[#4b5b53]' : '' }}">
+                                <p class="text-xs text-[#5a5a55]">Code ini akan dipakai di link event dan pengelompokan inquiry agar wedding dengan nama atau tanggal sama tidak tercampur.</p>
+                            </div>
                         </section>
 
                         <section class="space-y-4">

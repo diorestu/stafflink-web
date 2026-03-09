@@ -7,8 +7,17 @@ use Illuminate\Support\Str;
 
 class NannyInquiryWeddingCsv
 {
-    public static function groupKey(string $coupleNames, string $weddingDate): string
+    public static function groupKey(string $coupleNames, string $weddingDate, ?string $uniqueCode = null): string
     {
+        $normalizedCode = Str::of((string) $uniqueCode)
+            ->upper()
+            ->replaceMatches('/[^A-Z0-9]+/', '')
+            ->value();
+
+        if ($normalizedCode !== '') {
+            return md5('code|'.$normalizedCode);
+        }
+
         $normalizedNames = Str::of($coupleNames)
             ->lower()
             ->replaceMatches('/[^\pL\pN]+/u', ' ')
@@ -36,10 +45,20 @@ class NannyInquiryWeddingCsv
         $first = $inquiries->first();
         $weddingDate = (string) optional($first->wedding_date)->format('Y-m-d');
         $slugBase = Str::slug((string) ($first->wedding_couple_names ?: 'wedding'));
-        $filename = trim(($weddingDate !== '' ? $weddingDate.'_' : '').$slugBase, '_').'_nanny_bookings.csv';
+        $codeSuffix = Str::of((string) ($first->unique_code ?? ''))
+            ->lower()
+            ->replaceMatches('/[^a-z0-9]+/', '-')
+            ->trim('-')
+            ->value();
+        $filenameBase = trim(($weddingDate !== '' ? $weddingDate.'_' : '').$slugBase, '_');
+        if ($codeSuffix !== '') {
+            $filenameBase .= '_'.$codeSuffix;
+        }
+        $filename = trim($filenameBase, '_').'_nanny_bookings.csv';
 
         $rows = [[
             'Wedding Of',
+            'Unique Code',
             'Wedding Date',
             'Wedding Start Time',
             'Wedding Location Address',
@@ -77,6 +96,7 @@ class NannyInquiryWeddingCsv
 
             $rows[] = [
                 (string) ($inquiry->wedding_couple_names ?? ''),
+                (string) ($inquiry->unique_code ?? ''),
                 (string) optional($inquiry->wedding_date)->format('Y-m-d'),
                 (string) ($inquiry->wedding_start_time ?? ''),
                 (string) ($inquiry->wedding_location_address ?? ''),

@@ -22,6 +22,12 @@
 </head>
 <body class="bg-[#e9e9e9] text-[#708868]">
     @include('partials.gtm-noscript')
+    @php
+        $heroVideos = [
+            'https://atelierhouseofevents.com/wp-content/uploads/2025/06/Website-Video_19.06.25.mp4',
+            'http://stafflink_web.test/images/wedding_hero.mp4',
+        ];
+    @endphp
     <div class="min-h-screen">
         <x-site-header />
 
@@ -34,9 +40,16 @@
                     </div>
                     <div class="hero-video-wrap rounded-tr-[22px] rounded-br-[140px] rounded-tl-[22px] rounded-bl-[22px]">
                         <div class="h-[360px] w-full sm:h-[520px] lg:h-[620px]">
-                            <video class="hero-video-bg" autoplay muted loop playsinline preload="metadata">
-                                <source src="https://atelierhouseofevents.com/wp-content/uploads/2025/06/Website-Video_19.06.25.mp4" type="video/mp4">
-                            </video>
+                            <div class="relative h-full w-full" data-hero-carousel data-videos='@json($heroVideos)'>
+                                <video class="hero-video-bg" data-hero-video autoplay muted loop playsinline preload="metadata">
+                                    <source src="{{ $heroVideos[0] ?? '' }}" type="video/mp4">
+                                </video>
+                                @if (count($heroVideos) > 1)
+                                    <div class="absolute inset-x-0 bottom-4 z-10 flex items-center justify-center gap-2">
+                                        <div class="flex items-center gap-2" data-hero-dots></div>
+                                    </div>
+                                @endif
+                            </div>
                         </div>
                     </div>
                 </header>
@@ -56,19 +69,19 @@
                     <div class="grid gap-5 self-start border-l-0 border-[#708868]/15 pl-0 lg:border-l lg:pl-8">
                         <article>
                             <h3 class="font-parisienne script-accent text-center text-[2.05rem] leading-tight">Concept &amp; Timeline</h3>
-                            <p class="mt-1 text-center text-sm text-[#3c3f44]">Structured milestone planning from pre-event prep to final wrap-up.</p>
+                            <p class="mt-1 text-center text-sm text-[#3c3f44]">A clear roadmap aligned to your vision, budget, and event milestones.</p>
                         </article>
                         <article>
                             <h3 class="font-parisienne script-accent text-center text-[2.05rem] leading-tight">Vendor Coordination</h3>
-                            <p class="mt-1 text-center text-sm text-[#3c3f44]">Clear contracts, payment schedules, and quality delivery controls.</p>
+                            <p class="mt-1 text-center text-sm text-[#3c3f44]">Disciplined vendor delivery with transparent contracts and timelines.</p>
                         </article>
                         <article>
                             <h3 class="font-parisienne script-accent text-center text-[2.05rem] leading-tight">Guest Logistics</h3>
-                            <p class="mt-1 text-center text-sm text-[#3c3f44]">Comfort-first guest flow, hospitality, and on-site coordination.</p>
+                            <p class="mt-1 text-center text-sm text-[#3c3f44]">Smooth guest flow, hospitality support, and event-day coordination.</p>
                         </article>
                         <article>
                             <h3 class="font-parisienne script-accent text-center text-[2.05rem] leading-tight">On-Day Control</h3>
-                            <p class="mt-1 text-center text-sm text-[#3c3f44]">Seamless behind-the-scenes execution while you enjoy every moment.</p>
+                            <p class="mt-1 text-center text-sm text-[#3c3f44]">Behind-the-scenes command so you can stay fully present and enjoy the day.</p>
                         </article>
                     </div>
                 </section>
@@ -81,22 +94,22 @@
                     </p>
                     <div class="grid gap-4 md:grid-cols-2">
                         <article class="border border-[#708868]/20 bg-[#fafafa] p-5">
-                            <h3 class="text-xl font-semibold">Concept and Timeline Planning</h3>
+                            <h3 class="text-xl font-semibold">Wedding Organizers &amp; Wedding Planners in Bali - Concept and Timeline Planning</h3>
                             <p class="mt-2 text-sm leading-relaxed text-[#4b4f55]">At Staff Link, our Wedding Organizers &amp; Wedding Planners in Bali define your event flow, guest journey, and milestone timeline to ensure disciplined planning from preparation through post-event wrap-up.</p>
                             <p class="mt-2 text-sm leading-relaxed text-[#4b4f55]">We shape your vision into a seamless sequence of moments that unfold naturally and beautifully.</p>
                         </article>
                         <article class="border border-[#708868]/20 bg-[#fafafa] p-5">
-                            <h3 class="text-xl font-semibold">Vendor and Contract Coordination</h3>
+                            <h3 class="text-xl font-semibold">Wedding Organizers &amp; Wedding Planners in Bali - Vendor and Contract Coordination</h3>
                             <p class="mt-2 text-sm leading-relaxed text-[#4b4f55]">At Staff Link, our Wedding Organizers &amp; Wedding Planners in Bali manage vendor negotiations, contracts, and payment schedules to protect your budget and maintain operational clarity.</p>
                             <p class="mt-2 text-sm leading-relaxed text-[#4b4f55]">Let us take care of the details and ensure everything is handled properly so you can relax, enjoy, and celebrate every moment stress-free, full of smiles and love.</p>
                         </article>
                         <article class="border border-[#708868]/20 bg-[#fafafa] p-5">
-                            <h3 class="text-xl font-semibold">Guest and Logistics Management</h3>
+                            <h3 class="text-xl font-semibold">Wedding Organizers &amp; Wedding Planners in Bali - Guest and Logistics Management</h3>
                             <p class="mt-2 text-sm leading-relaxed text-[#4b4f55]">At Staff Link, our Wedding Organizers &amp; Wedding Planners in Bali curate guest flow, comfort, and hospitality so every attendee feels part of an unforgettable celebration.</p>
                             <p class="mt-2 text-sm leading-relaxed text-[#4b4f55]">We create an atmosphere where your family and friends feel welcomed, supported, and fully present on your special day.</p>
                         </article>
                         <article class="border border-[#708868]/20 bg-[#fafafa] p-5">
-                            <h3 class="text-xl font-semibold">On-Day Execution Control</h3>
+                            <h3 class="text-xl font-semibold">Wedding Organizers &amp; Wedding Planners in Bali - On-Day Execution Control</h3>
                             <p class="mt-2 text-sm leading-relaxed text-[#4b4f55]">At Staff Link, our Wedding Organizers &amp; Wedding Planners in Bali manage every moving part behind the scenes, allowing you to stay present, confident, and fully immersed in your special day.</p>
                             <p class="mt-2 text-sm leading-relaxed text-[#4b4f55]">While we oversee the coordination, you simply embrace the joy of the moment.</p>
                         </article>
@@ -105,18 +118,17 @@
 
                 <section class="grid gap-6">
                     <article class="rounded-[20px] bg-white p-7 shadow-[0_12px_30px_rgba(0,0,0,0.06)] lg:p-9">
-                        <h2 class="text-2xl font-semibold leading-tight">Destination Wedding Coordination</h2>
+                        <h2 class="text-2xl font-semibold leading-tight">Wedding Organizers &amp; Wedding Planners in Bali - Destination Wedding Coordination</h2>
                         <p class="mt-3 text-sm leading-relaxed text-[#4b4f55]">At Staff Link, our Wedding Organizers &amp; Wedding Planners in Bali manage cross-border planning, structured communication, and remote coordination for international couples choosing Bali.</p>
                         <p class="mt-3 text-sm leading-relaxed text-[#4b4f55]">We guide you with clarity and reassurance throughout the process, ensuring distance never limits the wedding experience you envision.</p>
                     </article>
                     <article class="rounded-[20px] bg-white p-7 shadow-[0_12px_30px_rgba(0,0,0,0.06)] lg:p-9">
-                        <h2 class="text-2xl font-semibold leading-tight">Child-Friendly Guest Experience Coordination</h2>
-                        <p class="mt-3 text-sm leading-relaxed text-[#4b4f55]">At Staff Link, our Wedding Organizers &amp; Wedding Planners in Bali design structured child-friendly experiences as an optional add-on to support families attending your celebration.</p>
-                        <p class="mt-3 text-sm leading-relaxed text-[#4b4f55]">We prepare a dedicated guest list for attendees requiring nanny assistance, coordinate supervised children’s activity areas, and arrange elegant white bouncy castles with professionally managed face-painting sessions.</p>
-                        <h3 class="mt-4 text-lg font-semibold">Professional Nanny Support</h3>
-                        <p class="mt-2 text-sm leading-relaxed text-[#4b4f55]">Experienced and vetted nanny professionals matched by guest count, age groups, and venue requirements.</p>
-                        <h3 class="mt-4 text-lg font-semibold">Children’s Activity Coordination</h3>
-                        <p class="mt-2 text-sm leading-relaxed text-[#4b4f55]">Supervised entertainment areas designed so children are safely engaged in a dedicated environment throughout the celebration.</p>
+                        <h2 class="text-2xl font-semibold leading-tight">Wedding Organizers &amp; Wedding Planners in Bali - Child-Friendly Guest Experience Coordination</h2>
+                        <p class="mt-3 text-sm leading-relaxed text-[#4b4f55]">At Staff Link, our Wedding Organizers &amp; Wedding Planners in Bali design structured child-friendly experiences as an optional add-on to support families attending your celebration. We prepare a dedicated guest list for attendees requiring nanny assistance, coordinate supervised children’s activity areas, and arrange refined entertainment elements such as elegant white bouncy castles and professionally managed face-painting sessions, ensuring young guests are engaged while adults celebrate with complete peace of mind.</p>
+                        <h3 class="mt-4 text-lg font-semibold">Wedding Organizers &amp; Wedding Planners in Bali - Professional Nanny Support</h3>
+                        <p class="mt-2 text-sm leading-relaxed text-[#4b4f55]">At Staff Link, our Wedding Organizers &amp; Wedding Planners in Bali match experienced and vetted nanny professionals based on guest count, age groups, and venue requirements to provide reliable supervision and structured childcare coverage throughout the event.</p>
+                        <h3 class="mt-4 text-lg font-semibold">Wedding Organizers &amp; Wedding Planners in Bali - Children’s Activity Coordination</h3>
+                        <p class="mt-2 text-sm leading-relaxed text-[#4b4f55]">At Staff Link, our Wedding Organizers &amp; Wedding Planners in Bali coordinate supervised entertainment areas, including elegant white bouncy castles and professionally managed face-painting sessions, to ensure young guests are safely engaged in a dedicated environment during the celebration.</p>
                         <div class="mt-6 flex flex-wrap gap-3">
                             <a href="{{ route('forms.nannies-inquiry') }}" class="inline-flex rounded-none border-2 border-[#708868] bg-[#708868] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-transparent hover:text-[#708868]">Open Nanny Inquiry Form</a>
                             <a href="{{ route('contact') }}" class="inline-flex rounded-none border-2 border-[#708868] px-5 py-2.5 text-sm font-semibold text-[#708868] transition hover:bg-[#708868] hover:text-white">Ask Our Team First</a>
@@ -139,5 +151,65 @@
 
         <x-site-footer />
     </div>
+    @once
+        <script>
+            (() => {
+                const carousels = document.querySelectorAll('[data-hero-carousel]');
+                carousels.forEach((carousel) => {
+                    const video = carousel.querySelector('[data-hero-video]');
+                    if (!video) return;
+
+                    let videos = [];
+                    try {
+                        videos = JSON.parse(carousel.getAttribute('data-videos') || '[]');
+                    } catch (_e) {
+                        videos = [];
+                    }
+                    videos = videos.filter(Boolean);
+                    if (videos.length <= 1) return;
+
+                    const dotsWrap = carousel.querySelector('[data-hero-dots]');
+                    let index = 0;
+                    let timer = null;
+
+                    const renderDots = () => {
+                        if (!dotsWrap) return;
+                        dotsWrap.innerHTML = '';
+                        videos.forEach((_, i) => {
+                            const dot = document.createElement('button');
+                            dot.type = 'button';
+                            dot.className = i === index
+                                ? 'h-2.5 w-2.5 rounded-full bg-white'
+                                : 'h-2.5 w-2.5 rounded-full bg-white/45';
+                            dot.addEventListener('click', () => {
+                                setIndex(i);
+                                restartTimer();
+                            });
+                            dotsWrap.appendChild(dot);
+                        });
+                    };
+
+                    const setIndex = (nextIndex) => {
+                        index = (nextIndex + videos.length) % videos.length;
+                        video.src = videos[index];
+                        video.load();
+                        const playPromise = video.play();
+                        if (playPromise && typeof playPromise.catch === 'function') {
+                            playPromise.catch(() => {});
+                        }
+                        renderDots();
+                    };
+
+                    const restartTimer = () => {
+                        if (timer) clearInterval(timer);
+                        timer = setInterval(() => setIndex(index + 1), 8000);
+                    };
+
+                    renderDots();
+                    restartTimer();
+                });
+            })();
+        </script>
+    @endonce
 </body>
 </html>

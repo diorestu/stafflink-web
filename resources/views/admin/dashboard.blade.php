@@ -7,7 +7,7 @@
         $dashboardTimezone = 'Asia/Singapore'; // UTC+8
     @endphp
 
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-8">
+    <div class="grid grid-cols-1 gap-4 mb-8 md:grid-cols-2 xl:grid-cols-5">
         <div class="rounded-xl border border-[#d7e8df] bg-[#f6faf8] p-5">
             <div class="flex items-start justify-between gap-3">
                 <div>
@@ -69,6 +69,25 @@
                 </div>
             </div>
         </div>
+
+        <div class="rounded-xl border border-[#d7e8df] bg-[#f6faf8] p-5">
+            <div class="flex items-start justify-between gap-3">
+                <div>
+                    <p class="text-[11px] uppercase tracking-wide text-[#5b6d63]">Contact Inquiries</p>
+                    <p class="mt-2 text-3xl font-semibold leading-none text-[#1f5f46]">
+                        {{ $metrics['contact_inquiries'] ?? 0 }}
+                    </p>
+                </div>
+                <div class="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-[#e6f1ec] text-[#1f5f46]">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6h16v12H4z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 7l8 6 8-6" />
+                    </svg>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="bg-white rounded-lg shadow">
@@ -107,6 +126,16 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                 </svg>
                 <span>Add Service</span>
+            </a>
+            <a href="{{ route('admin.contact-inquiries.index') }}"
+                class="inline-flex items-center gap-2 rounded-full border border-[#c7dfd4] bg-[#f6faf8] px-4 py-2 text-sm font-semibold text-[#1f5f46] transition hover:bg-[#eaf5ef]">
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M4 6h16v12H4z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M4 7l8 6 8-6" />
+                </svg>
+                <span>View Contact Inquiries</span>
             </a>
         </div>
     </div>

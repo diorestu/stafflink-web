@@ -88,63 +88,86 @@
                         </div>
 
                         <div class="rounded-[28px] bg-white p-8 shadow-[0_20px_50px_rgba(31,95,70,0.12)]" data-aos="fade-up" data-aos-delay="150">
-                            <form class="grid gap-5 sm:grid-cols-2">
+                            @if (session('success'))
+                                <div class="mb-5 rounded-2xl border border-green-200 bg-green-50 px-5 py-4 text-sm text-green-800">
+                                    {{ session('success') }}
+                                </div>
+                            @endif
+
+                            @if ($errors->any())
+                                <div class="mb-5 rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-700">
+                                    <ul class="list-disc pl-5">
+                                        @foreach ($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            @endif
+
+                            <form action="{{ route('contact.store') }}" method="POST" class="grid gap-5 sm:grid-cols-2">
+                                @csrf
+                                <div class="hidden" aria-hidden="true">
+                                    <label for="website">Website</label>
+                                    <input id="website" name="website" type="text" tabindex="-1" autocomplete="off">
+                                </div>
                                 <div class="sm:col-span-2">
                                     <label class="text-sm font-semibold">Name <span class="text-red-500">*</span></label>
-                                    <input type="text" placeholder="Your Name"
+                                    <input type="text" name="name" value="{{ old('name') }}" placeholder="Your Name"
                                         class="mt-2 w-full rounded-xl border border-[#d1d5db] px-4 py-3 text-sm focus:border-[#287854] focus:outline-none"
                                         required />
                                 </div>
                                 <div class="sm:col-span-1">
                                     <label class="text-sm font-semibold">Business Email <span class="text-red-500">*</span></label>
-                                    <input type="email" placeholder="your@company.com"
+                                    <input type="email" name="email" value="{{ old('email') }}" placeholder="your@company.com"
                                         class="mt-2 w-full rounded-xl border border-[#d1d5db] px-4 py-3 text-sm focus:border-[#287854] focus:outline-none"
                                         required />
                                 </div>
                                 <div class="sm:col-span-1">
                                     <label class="text-sm font-semibold">Contact Number <span class="text-red-500">*</span></label>
-                                    <input type="tel" placeholder="(000) 000-0000"
+                                    <input type="tel" name="phone" value="{{ old('phone') }}" placeholder="(000) 000-0000"
                                         class="mt-2 w-full rounded-xl border border-[#d1d5db] px-4 py-3 text-sm focus:border-[#287854] focus:outline-none"
                                         required />
                                 </div>
                                 <div class="sm:col-span-1">
                                     <label class="text-sm font-semibold">Company Name <span class="text-red-500">*</span></label>
-                                    <input type="text" placeholder="Your Company"
+                                    <input type="text" name="company_name" value="{{ old('company_name') }}" placeholder="Your Company"
                                         class="mt-2 w-full rounded-xl border border-[#d1d5db] px-4 py-3 text-sm focus:border-[#287854] focus:outline-none"
                                         required />
                                 </div>
                                 <div class="sm:col-span-1">
                                     <label class="text-sm font-semibold">Company Size <span class="text-red-500">*</span></label>
-                                    <select
+                                    <select name="company_size"
                                         class="mt-2 w-full rounded-xl border border-[#d1d5db] px-4 py-3 text-sm focus:border-[#287854] focus:outline-none"
                                         required>
-                                        <option>1-10 Employees</option>
-                                        <option>11-50 Employees</option>
-                                        <option>51-200 Employees</option>
-                                        <option>201-500 Employees</option>
-                                        <option>500+ Employees</option>
+                                        <option value="">Select company size</option>
+                                        <option value="1-10 Employees" @selected(old('company_size') === '1-10 Employees')>1-10 Employees</option>
+                                        <option value="11-50 Employees" @selected(old('company_size') === '11-50 Employees')>11-50 Employees</option>
+                                        <option value="51-200 Employees" @selected(old('company_size') === '51-200 Employees')>51-200 Employees</option>
+                                        <option value="201-500 Employees" @selected(old('company_size') === '201-500 Employees')>201-500 Employees</option>
+                                        <option value="500+ Employees" @selected(old('company_size') === '500+ Employees')>500+ Employees</option>
                                     </select>
                                 </div>
                                 <div class="sm:col-span-1">
                                     <label class="text-sm font-semibold">Preferred Time To Call</label>
-                                    <select
+                                    <select name="preferred_call_time"
                                         class="mt-2 w-full rounded-xl border border-[#d1d5db] px-4 py-3 text-sm focus:border-[#287854] focus:outline-none">
-                                        <option>9:00 AM</option>
-                                        <option>10:00 AM</option>
-                                        <option>11:00 AM</option>
-                                        <option>1:00 PM</option>
-                                        <option>3:00 PM</option>
+                                        <option value="">No preference</option>
+                                        <option value="9:00 AM" @selected(old('preferred_call_time') === '9:00 AM')>9:00 AM</option>
+                                        <option value="10:00 AM" @selected(old('preferred_call_time') === '10:00 AM')>10:00 AM</option>
+                                        <option value="11:00 AM" @selected(old('preferred_call_time') === '11:00 AM')>11:00 AM</option>
+                                        <option value="1:00 PM" @selected(old('preferred_call_time') === '1:00 PM')>1:00 PM</option>
+                                        <option value="3:00 PM" @selected(old('preferred_call_time') === '3:00 PM')>3:00 PM</option>
                                     </select>
                                 </div>
                                 <div class="sm:col-span-1">
                                     <label class="text-sm font-semibold">Best Day &amp; Time to Call You</label>
-                                    <input type="date"
+                                    <input type="date" name="preferred_call_date" value="{{ old('preferred_call_date') }}"
                                         class="mt-2 w-full rounded-xl border border-[#d1d5db] px-4 py-3 text-sm focus:border-[#287854] focus:outline-none" />
                                 </div>
                                 <div class="sm:col-span-2">
                                     <label class="text-sm font-semibold">Message</label>
-                                    <textarea placeholder="Message" rows="4"
-                                        class="mt-2 w-full rounded-xl border border-[#d1d5db] px-4 py-3 text-sm focus:border-[#287854] focus:outline-none"></textarea>
+                                    <textarea name="message" placeholder="Message" rows="4"
+                                        class="mt-2 w-full rounded-xl border border-[#d1d5db] px-4 py-3 text-sm focus:border-[#287854] focus:outline-none">{{ old('message') }}</textarea>
                                 </div>
                                 <div class="sm:col-span-2">
                                     <button type="submit"

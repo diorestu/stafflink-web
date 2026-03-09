@@ -15,17 +15,47 @@
         $isGardenerLanding = ($pageType ?? '') === 'Role'
             && in_array(($baseSlug ?? ''), ['gardener', 'gardeners'], true)
             && empty($currentArea);
+        $customRoleCopyData = $rolePageCopy ?? [];
+        $customRoleMode = $rolePageMode ?? 'template';
+        $customRoleHasContent = collect($customRoleCopyData)
+            ->except(['mode'])
+            ->filter(function ($value) {
+                if (is_array($value)) {
+                    return !empty($value);
+                }
 
-        $heroBadge = $isGardenerLanding ? 'Gardeners in Bali' : $pageType;
-        $heroTitle = $isGardenerLanding ? 'Professional Gardeners in Bali' : $pageTitle;
+                return trim((string) $value) !== '';
+            })
+            ->isNotEmpty();
+        $hasCustomRoleCopy = ($pageType ?? '') === 'Role'
+            && empty($currentArea)
+            && $customRoleMode === 'custom'
+            && $customRoleHasContent;
+
+        $heroBadge = $isGardenerLanding
+            ? 'Gardeners in Bali'
+            : ($hasCustomRoleCopy ? ($rolePageCopy['hero_badge'] ?? $pageType) : $pageType);
+        $heroTitle = $isGardenerLanding
+            ? 'Professional Gardeners in Bali'
+            : ($hasCustomRoleCopy ? ($rolePageCopy['hero_title'] ?? $pageTitle) : $pageTitle);
         $heroSubtitle = $isGardenerLanding
             ? 'A beautiful garden is not created in a day, it is maintained with consistency and care. Our professional gardeners in Bali offer reliable and structured garden maintenance services for private villas and residences throughout the island. Each placement is carefully matched to your property\'s specific needs to ensure your outdoor space remains healthy, balanced, and beautifully maintained.'
-            : $subtitle;
+            : ($hasCustomRoleCopy
+                ? ($rolePageCopy['hero_subtitle'] ?? $subtitle)
+                : $subtitle);
 
-        $primaryCtaLabel = $isGardenerLanding ? 'Book a Consultation with Us' : 'Contact specialist';
-        $primaryCtaUrl = $isGardenerLanding ? route('appointments.create') : route('contact');
-        $secondaryCtaLabel = $isGardenerLanding ? 'Contact Us' : 'Book consultation';
-        $secondaryCtaUrl = $isGardenerLanding ? route('contact') : route('appointments.create');
+        $primaryCtaLabel = $isGardenerLanding
+            ? 'Book a Consultation with Us'
+            : ($hasCustomRoleCopy ? ($rolePageCopy['primary_cta_label'] ?? 'Contact specialist') : 'Contact specialist');
+        $primaryCtaUrl = $isGardenerLanding
+            ? route('appointments.create')
+            : ($hasCustomRoleCopy ? ($rolePageCopy['primary_cta_url'] ?? route('contact')) : route('contact'));
+        $secondaryCtaLabel = $isGardenerLanding
+            ? 'Contact Us'
+            : ($hasCustomRoleCopy ? ($rolePageCopy['secondary_cta_label'] ?? 'Book consultation') : 'Book consultation');
+        $secondaryCtaUrl = $isGardenerLanding
+            ? route('contact')
+            : ($hasCustomRoleCopy ? ($rolePageCopy['secondary_cta_url'] ?? route('appointments.create')) : route('appointments.create'));
 
         $serviceSchema = [
             '@type' => 'Service',
@@ -172,6 +202,83 @@
                                 </article>
                             </div>
                         </section>
+                    @elseif ($hasCustomRoleCopy)
+                        @foreach (($rolePageCopy['sections'] ?? []) as $section)
+                            @if (($section['layout'] ?? 'text') === 'cards')
+                                @php
+                                    $columns = (string) ($section['columns'] ?? '3');
+                                    $gridClass = match ($columns) {
+                                        '2' => 'grid gap-4 md:grid-cols-2',
+                                        '4' => 'grid gap-4 md:grid-cols-2 xl:grid-cols-4',
+                                        default => 'grid gap-4 lg:grid-cols-3',
+                                    };
+                                @endphp
+                                <section class="space-y-6 rounded-[28px] bg-white p-8 shadow-[0_20px_50px_rgba(31,95,70,0.12)]" data-aos="fade-up">
+                                    @if (!empty($section['title']))
+                                        <h2 class="text-3xl font-semibold text-[#1b1b18]">{{ $section['title'] }}</h2>
+                                    @endif
+                                    <div class="{{ $gridClass }}">
+                                        @foreach (($section['items'] ?? []) as $item)
+                                            <article class="rounded-2xl border border-[#dfe8e3] bg-[#f7faf8] p-6">
+                                                @if (!empty($item['title']))
+                                                    <h3 class="text-xl font-semibold text-[#1f5f46]">{{ $item['title'] }}</h3>
+                                                @endif
+                                                @if (!empty($item['body']))
+                                                    <p class="mt-3 text-sm leading-relaxed text-[#5a5a55]">
+                                                        {{ $item['body'] }}
+                                                    </p>
+                                                @endif
+                                            </article>
+                                        @endforeach
+                                    </div>
+                                </section>
+                            @elseif (($section['layout'] ?? 'text') === 'split_image')
+                                @php
+                                    $imagePosition = (string) ($section['image_position'] ?? 'right');
+                                    $imageFirstClass = $imagePosition === 'left' ? 'lg:order-1' : 'lg:order-2';
+                                    $textFirstClass = $imagePosition === 'left' ? 'lg:order-2' : 'lg:order-1';
+                                    $imageAlt = trim((string) ($section['image_alt'] ?? '')) !== ''
+                                        ? trim((string) $section['image_alt'])
+                                        : (!empty($section['title']) ? $section['title'] : 'Role section image');
+                                    $imageFitClass = (string) ($section['image_fit'] ?? 'cover') === 'contain' ? 'object-contain' : 'object-cover';
+                                    $imageHeightClass = match ((string) ($section['image_height'] ?? 'md')) {
+                                        'sm' => 'h-64',
+                                        'lg' => 'h-[28rem]',
+                                        default => 'h-80',
+                                    };
+                                @endphp
+                                <section class="rounded-[28px] bg-white p-8 shadow-[0_20px_50px_rgba(31,95,70,0.12)]" data-aos="fade-up">
+                                    <div class="grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
+                                        <div class="space-y-4 {{ $textFirstClass }}">
+                                            @if (!empty($section['title']))
+                                                <h2 class="text-3xl font-semibold text-[#1b1b18]">{{ $section['title'] }}</h2>
+                                            @endif
+                                            @foreach (($section['paragraphs'] ?? []) as $paragraph)
+                                                <p class="text-sm leading-relaxed text-[#5a5a55]">
+                                                    {{ $paragraph }}
+                                                </p>
+                                            @endforeach
+                                        </div>
+                                        <div class="overflow-hidden rounded-2xl border border-[#dfe8e3] bg-[#f7faf8] {{ $imageFirstClass }}">
+                                            <img src="{{ !empty($section['image_path']) ? \Illuminate\Support\Facades\Storage::url($section['image_path']) : asset('images/img_hero.webp') }}"
+                                                alt="{{ $imageAlt }}"
+                                                class="{{ $imageHeightClass }} w-full {{ $imageFitClass }}" loading="lazy" draggable="false" />
+                                        </div>
+                                    </div>
+                                </section>
+                            @else
+                                <section class="space-y-4 rounded-[28px] bg-white p-8 shadow-[0_20px_50px_rgba(31,95,70,0.12)]" data-aos="fade-up">
+                                    @if (!empty($section['title']))
+                                        <h2 class="text-3xl font-semibold text-[#1b1b18]">{{ $section['title'] }}</h2>
+                                    @endif
+                                    @foreach (($section['paragraphs'] ?? []) as $paragraph)
+                                        <p class="text-sm leading-relaxed text-[#5a5a55]">
+                                            {{ $paragraph }}
+                                        </p>
+                                    @endforeach
+                                </section>
+                            @endif
+                        @endforeach
                     @else
                         @include('partials.role-services')
 

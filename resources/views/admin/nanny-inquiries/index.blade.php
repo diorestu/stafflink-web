@@ -11,12 +11,16 @@
                 <div class="grid gap-3 sm:grid-cols-2">
                     <input name="couple_names" type="text" required placeholder="Wedding of (Bride & Groom full names)"
                         class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-[#1f5f46] focus:outline-none">
-                    <input name="wedding_date" type="date" required
-                        class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-[#1f5f46] focus:outline-none">
+                    <input name="unique_code" type="text" required placeholder="Unique code (e.g. WED-BALI-001)"
+                        class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm uppercase focus:border-[#1f5f46] focus:outline-none">
                 </div>
                 <div class="grid gap-3 sm:grid-cols-2">
+                    <input name="wedding_date" type="date" required
+                        class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-[#1f5f46] focus:outline-none">
                     <input name="wedding_start_time" type="time" required
                         class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-[#1f5f46] focus:outline-none">
+                </div>
+                <div class="grid gap-3 sm:grid-cols-1">
                     <input name="wedding_venue_name" type="text" placeholder="Hotel/Villa Name (optional)"
                         class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-[#1f5f46] focus:outline-none">
                 </div>
@@ -45,6 +49,7 @@
                                     <td class="px-3 py-2 text-sm text-gray-800">{{ $event->couple_names }}</td>
                                     <td class="px-3 py-2 text-sm text-gray-700">{{ $event->wedding_date?->format('d M Y') }}</td>
                                     <td class="px-3 py-2 text-xs text-[#1f5f46]">
+                                        <div class="mb-1 font-semibold text-[#173f31]">Code: {{ $event->unique_code ?: \Illuminate\Support\Str::upper($event->share_token) }}</div>
                                         {{ route('forms.nannies-inquiry', ['event' => $event->share_token]) }}
                                     </td>
                                     <td class="px-3 py-2 text-xs">
@@ -83,6 +88,7 @@
                                 <tr>
                                     <td class="px-3 py-2 text-sm text-gray-800">
                                         <p class="font-semibold">{{ $group->wedding_couple_names }}</p>
+                                        <p class="text-xs text-gray-500">Code: {{ $group->unique_code ?: '-' }}</p>
                                         <p class="text-xs text-gray-500">{{ \Illuminate\Support\Carbon::parse($group->wedding_date)->format('d M Y') }}</p>
                                     </td>
                                     <td class="px-3 py-2 text-sm text-gray-700">{{ (int) $group->total_families }}</td>
@@ -103,7 +109,7 @@
         @endif
         <form method="GET" action="{{ route('admin.nanny-inquiries.index') }}" class="mt-4 flex flex-wrap gap-2">
             <input type="text" name="search" value="{{ $search }}"
-                placeholder="Search wedding, name, email, phone, or date"
+                placeholder="Search wedding, code, name, email, phone, or date"
                 class="w-full max-w-md rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-[#1f5f46] focus:outline-none">
             <button type="submit"
                 class="rounded-md bg-[#1f5f46] px-4 py-2 text-sm font-semibold text-white hover:bg-[#287854]">
@@ -134,6 +140,7 @@
                         <tr>
                             <td class="px-4 py-4 align-top text-sm text-gray-700">
                                 <p class="font-semibold text-gray-900">{{ $inquiry->wedding_couple_names ?: '-' }}</p>
+                                <p class="mt-1 text-xs text-gray-500">Code: {{ $inquiry->unique_code ?: '-' }}</p>
                                 <p class="mt-1 text-xs text-gray-500">
                                     Date:
                                     {{ $inquiry->wedding_date?->format('d M Y') ?: '-' }}

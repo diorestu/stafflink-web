@@ -25,7 +25,7 @@
                 'title' => $category->name,
                 'description' => \Illuminate\Support\Str::limit(
                     $category->description ?: count($careers) . ' service(s) available',
-                    100,
+                    300,
                 ),
                 'jobs' => $careers,
                 'image_path' => $category->image_path,
@@ -37,7 +37,7 @@
         $categoryCards = collect($content['cards'] ?? [])->map(function ($card) {
             return [
                 'title' => $card['title'] ?? '',
-                'description' => $card['description'] ?? '',
+                'description' => \Illuminate\Support\Str::limit((string) ($card['description'] ?? ''), 300),
                 'jobs' => $card['jobs'] ?? [],
                 'image_path' => $card['image_path'] ?? null,
             ];
@@ -77,10 +77,10 @@
                         @endif
                     </div>
                     <div class="flex flex-1 flex-col p-5">
-                        <h3 class="min-h-[3.5rem] text-base font-semibold leading-snug text-[#2e2e2e]">
+                        <h3 class="min-h-[3rem] text-base font-semibold leading-snug text-[#2e2e2e]">
                             {{ $category['title'] ?? '' }}
                         </h3>
-                        <p class="mt-2 line-clamp-4 text-sm text-[#6b6b66]">{{ $category['description'] ?? '' }}</p>
+                        <p class="mt-1 line-clamp-4 text-xs text-[#6b6b66]">{{ $category['description'] ?? '' }}</p>
                     </div>
                 </button>
             @endforeach

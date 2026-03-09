@@ -4,20 +4,45 @@ namespace App\Http\Controllers;
 
 use App\Models\Career;
 use App\Models\CareerCategory;
+use App\Support\RolePageWording;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class AdminCareerController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $search = trim((string) $request->query('search', ''));
+        $sortBy = (string) $request->query('sort_by', 'sort_order');
+        $sortDir = strtolower((string) $request->query('sort_dir', 'asc')) === 'desc' ? 'desc' : 'asc';
+
+        $allowedSorts = ['title', 'sort_order', 'created_at'];
+        if (!in_array($sortBy, $allowedSorts, true)) {
+            $sortBy = 'sort_order';
+        }
+
         $careers = Career::query()
             ->with('category')
-            ->orderBy('sort_order')
-            ->latest()
+            ->when($search !== '', function ($query) use ($search): void {
+                $query->where(function ($sub) use ($search): void {
+                    $sub->where('title', 'like', "%{$search}%")
+                        ->orWhere('description', 'like', "%{$search}%")
+                        ->orWhereHas('category', function ($categoryQuery) use ($search): void {
+                            $categoryQuery->where('name', 'like', "%{$search}%");
+                        });
+                });
+            })
+            ->orderBy($sortBy, $sortDir)
+            ->orderByDesc('created_at')
             ->paginate(10);
 
-        return view('admin.careers.index', compact('careers'));
+        return view('admin.careers.index', [
+            'careers' => $careers,
+            'search' => $search,
+            'sortBy' => $sortBy,
+            'sortDir' => $sortDir,
+        ]);
     }
 
     public function create()
@@ -28,7 +53,11 @@ class AdminCareerController extends Controller
             ->orderBy('name')
             ->get();
 
-        return view('admin.careers.create', compact('categories'));
+        return view('admin.careers.create', [
+            'categories' => $categories,
+            'rolePageMode' => old('role_page_mode', 'template'),
+            'rolePageCopyUrl' => null,
+        ]);
     }
 
     public function store(Request $request)
@@ -45,6 +74,7 @@ class AdminCareerController extends Controller
             'minimum_salary' => 'nullable|integer|min:0|required_with:maximum_salary',
             'maximum_salary' => 'nullable|integer|min:0|gte:minimum_salary|required_with:minimum_salary',
             'status' => 'nullable|in:draft,published',
+            'role_page_mode' => 'nullable|in:template,custom',
         ]);
 
         $validated['country'] = $validated['country'] ?? null;
@@ -71,7 +101,12 @@ class AdminCareerController extends Controller
             $validated['published_at'] = now();
         }
 
+        $rolePageMode = (string) ($validated['role_page_mode'] ?? 'template');
+        $roleSlug = Str::slug((string) $validated['title']);
+        unset($validated['role_page_mode']);
+
         Career::create($validated);
+        RolePageWording::setMode($roleSlug, $rolePageMode);
 
         return redirect()->route('admin.careers.index')
             ->with('success', 'Career created successfully.');
@@ -85,7 +120,14 @@ class AdminCareerController extends Controller
             ->orderBy('name')
             ->get();
 
-        return view('admin.careers.edit', compact('career', 'categories'));
+        $roleSlug = Str::slug((string) $career->title);
+
+        return view('admin.careers.edit', [
+            'career' => $career,
+            'categories' => $categories,
+            'rolePageMode' => old('role_page_mode', RolePageWording::mode($roleSlug)),
+            'rolePageCopyUrl' => route('admin.role-page-wording.edit', $roleSlug),
+        ]);
     }
 
     public function update(Request $request, Career $career)
@@ -102,6 +144,7 @@ class AdminCareerController extends Controller
             'minimum_salary' => 'nullable|integer|min:0|required_with:maximum_salary',
             'maximum_salary' => 'nullable|integer|min:0|gte:minimum_salary|required_with:minimum_salary',
             'status' => 'nullable|in:draft,published',
+            'role_page_mode' => 'nullable|in:template,custom',
         ]);
 
         $validated['country'] = array_key_exists('country', $validated) ? ($validated['country'] ?: null) : $career->country;
@@ -135,7 +178,14 @@ class AdminCareerController extends Controller
             $validated['published_at'] = now();
         }
 
+        $oldRoleSlug = Str::slug((string) $career->title);
+        $newRoleSlug = Str::slug((string) $validated['title']);
+        $rolePageMode = (string) ($validated['role_page_mode'] ?? RolePageWording::mode($oldRoleSlug));
+        unset($validated['role_page_mode']);
+
         $career->update($validated);
+        RolePageWording::renameSlug($oldRoleSlug, $newRoleSlug);
+        RolePageWording::setMode($newRoleSlug, $rolePageMode);
 
         return redirect()->route('admin.careers.index')
             ->with('success', 'Career updated successfully.');
