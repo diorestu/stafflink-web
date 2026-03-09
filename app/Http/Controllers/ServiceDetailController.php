@@ -69,14 +69,8 @@ class ServiceDetailController extends Controller
             ->orderBy('title')
             ->get();
 
-        $categories = $areaCareers
-            ->pluck('category')
-            ->filter()
-            ->unique('id')
-            ->sortBy('name', SORT_NATURAL | SORT_FLAG_CASE)
-            ->values();
-
-        $roles = $areaCareers
+        $services = Career::query()
+            ->where('status', 'published')
             ->pluck('title')
             ->filter()
             ->unique()
@@ -85,11 +79,10 @@ class ServiceDetailController extends Controller
 
         return view('service-area', [
             'area' => $area,
-            'categories' => $categories,
-            'roles' => $roles,
+            'services' => $services,
             'relatedCareers' => $areaCareers->take(9)->values(),
             'serviceAreas' => $this->serviceAreaService->topAreas(18),
-            'metaDescription' => "Explore childcare and staffing services in {$area['seo_label']} across sectors and roles.",
+            'metaDescription' => "Explore all staffing services available in {$area['seo_label']}.",
         ]);
     }
 

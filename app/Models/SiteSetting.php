@@ -62,6 +62,13 @@ class SiteSetting extends Model
                 ['label' => 'Our Purpose & Business Principles', 'url' => route('our-purpose-business-principles')],
                 ['label' => 'Blog', 'url' => route('blog')],
             ],
+            'services_links' => [
+                ['label' => 'Nanny Services', 'url' => route('airport-services.nanny-concierge')],
+                ['label' => 'Baggage Drop Off', 'url' => route('airport-services.baggage-drop-off')],
+                ['label' => 'Wedding Organizer', 'url' => route('services.wedding-organizer')],
+                ['label' => 'Destination Weddings (Australians in Bali)', 'url' => route('services.destination-weddings-australians-bali')],
+                ['label' => 'Bali Relocation Support', 'url' => route('services.bali-relocation-support')],
+            ],
             'main_links' => [
                 ['label' => 'Contact Us', 'url' => route('contact')],
                 ['label' => 'Jobs', 'url' => route('jobs.index')],

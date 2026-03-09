@@ -14,6 +14,7 @@ use App\Http\Controllers\AdminLeadController;
 use App\Http\Controllers\AdminNannyInquiryController;
 use App\Http\Controllers\AdminPageController;
 use App\Http\Controllers\AdminPageWordingController;
+use App\Http\Controllers\AdminPasswordController;
 use App\Http\Controllers\AdminRolePageWordingController;
 use App\Http\Controllers\AdminServiceAreaController;
 use App\Http\Controllers\AdminUserController;
@@ -54,6 +55,7 @@ Route::get('/airport-services/nanny-concierge/areas/{areaSlug}', [ServiceDetailC
 Route::redirect('/airport-services', '/airport-services/nanny-concierge');
 Route::view('/services/wedding-organizer', 'wedding-organizer')->name('services.wedding-organizer');
 Route::view('/services/destination-weddings-australians-bali', 'destination-weddings-australians-bali')->name('services.destination-weddings-australians-bali');
+Route::view('/services/bali-relocation-support', 'bali-relocation-support')->name('services.bali-relocation-support');
 Route::view('/services/sectors/remote-worker', 'roles.remote-worker')->name('services.sectors.remote-worker');
 Route::get('/services/sectors/{slug}', [ServiceDetailController::class, 'sector'])->name('services.sectors.show');
 Route::get('/services/sectors/{slug}/areas/{areaSlug}', [ServiceDetailController::class, 'sectorArea'])->name('services.sectors.areas.show');
@@ -85,6 +87,8 @@ Route::post('/admin/logout', [AdminAuthController::class, 'logout'])->name('admi
 // Admin (protected)
 Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', [AdminController::class, 'dashboard'])->name('dashboard');
+    Route::get('/password', [AdminPasswordController::class, 'edit'])->name('password.edit');
+    Route::put('/password', [AdminPasswordController::class, 'update'])->name('password.update');
 
     // Shared for super admin and admin
     Route::middleware(EnsureUserRole::class.':super_admin,admin')->group(function () {

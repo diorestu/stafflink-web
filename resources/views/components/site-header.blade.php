@@ -70,6 +70,7 @@
     $serviceRoles = collect($headerData['service_roles'] ?? []);
     $traditionalRecruitmentCards = collect($headerData['traditional_recruitment_cards'] ?? []);
     $serviceAreas = collect($headerData['service_areas'] ?? []);
+    $featuredServices = collect($hf['services_links'] ?? []);
 @endphp
 
 <header class="sticky top-0 z-50 w-full border-b border-[#dfe8e3] bg-white/95 backdrop-blur" data-aos="fade-down" data-site-header>
@@ -155,33 +156,16 @@
                         <div class="p-5">
                             <section id="services-panel-airport-services" data-services-panel="airport-services">
                                 <div class="rounded-2xl border border-[#e3ebe6] bg-[#f9fbfa] p-6">
-                                    <div class="grid gap-5 lg:grid-cols-2">
-                                        <div>
-                                            <p class="text-xs uppercase tracking-[0.2em] text-[#287854]">Airport Services</p>
-                                            <div class="mt-4 grid gap-3">
-                                                <a href="{{ route('airport-services.nanny-concierge') }}"
-                                                    class="inline-flex rounded-xl border border-[#dfe8e3] bg-white px-4 py-3 text-sm font-semibold text-[#2e2e2e] transition hover:border-[#bcd7c8] hover:bg-[#f4faf7] hover:text-[#1f5f46]">
-                                                    Nanny - Concierge Services
-                                                </a>
-                                                <a href="{{ route('airport-services.baggage-drop-off') }}"
-                                                    class="inline-flex rounded-xl border border-[#dfe8e3] bg-white px-4 py-3 text-sm font-semibold text-[#2e2e2e] transition hover:border-[#bcd7c8] hover:bg-[#f4faf7] hover:text-[#1f5f46]">
-                                                    Baggage Drop Off
-                                                </a>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <p class="text-xs uppercase tracking-[0.2em] text-[#287854]">Wedding Planner</p>
-                                            <div class="mt-4 grid gap-3">
-                                                <a href="{{ route('services.wedding-organizer') }}"
-                                                    class="inline-flex rounded-xl border border-[#dfe8e3] bg-white px-4 py-3 text-sm font-semibold text-[#2e2e2e] transition hover:border-[#bcd7c8] hover:bg-[#f4faf7] hover:text-[#1f5f46]">
-                                                    Wedding Organizer
-                                                </a>
-                                                <a href="{{ route('services.destination-weddings-australians-bali') }}"
-                                                    class="inline-flex rounded-xl border border-[#dfe8e3] bg-white px-4 py-3 text-sm font-semibold text-[#2e2e2e] transition hover:border-[#bcd7c8] hover:bg-[#f4faf7] hover:text-[#1f5f46]">
-                                                    Destination Weddings (Australians in Bali)
-                                                </a>
-                                            </div>
-                                        </div>
+                                    <p class="text-xs uppercase tracking-[0.2em] text-[#287854]">Featured Services</p>
+                                    <div class="mt-4 grid gap-3 sm:grid-cols-2">
+                                        @forelse ($featuredServices as $link)
+                                            <a href="{{ $link['url'] ?? '#' }}"
+                                                class="inline-flex rounded-xl border border-[#dfe8e3] bg-white px-4 py-3 text-sm font-semibold text-[#2e2e2e] transition hover:border-[#bcd7c8] hover:bg-[#f4faf7] hover:text-[#1f5f46]">
+                                                {{ $link['label'] ?? '' }}
+                                            </a>
+                                        @empty
+                                            <p class="text-sm text-[#6b6b66]">No featured services configured yet.</p>
+                                        @endforelse
                                     </div>
                                 </div>
                             </section>
@@ -295,20 +279,14 @@
             <details class="rounded-xl border border-[#e3ebe6] p-2">
                 <summary class="cursor-pointer list-none px-2 py-2 text-[#1f5f46]">Services</summary>
                 <div class="space-y-3 px-2 pb-1 pt-2 text-sm">
-                    <p class="px-2 pt-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#287854]">Airport Services</p>
-                    <a href="{{ route('airport-services.nanny-concierge') }}" class="block rounded-lg px-2 py-2 transition hover:bg-[#f3f8f5]">
-                        Nanny Concierge Services
-                    </a>
-                    <a href="{{ route('airport-services.baggage-drop-off') }}" class="block rounded-lg px-2 py-2 transition hover:bg-[#f3f8f5]">
-                        Baggage Drop Off
-                    </a>
-                    <p class="px-2 pt-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#287854]">Wedding Planner</p>
-                    <a href="{{ route('services.wedding-organizer') }}" class="block rounded-lg px-2 py-2 transition hover:bg-[#f3f8f5]">
-                        Wedding Organizer
-                    </a>
-                    <a href="{{ route('services.destination-weddings-australians-bali') }}" class="block rounded-lg px-2 py-2 transition hover:bg-[#f3f8f5]">
-                        Destination Weddings (Australians in Bali)
-                    </a>
+                    @if ($featuredServices->isNotEmpty())
+                        <p class="px-2 pt-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#287854]">Featured Services</p>
+                        @foreach ($featuredServices as $link)
+                            <a href="{{ $link['url'] ?? '#' }}" class="block rounded-lg px-2 py-2 transition hover:bg-[#f3f8f5]">
+                                {{ $link['label'] ?? '' }}
+                            </a>
+                        @endforeach
+                    @endif
                     @foreach ($serviceCategories->take(6) as $category)
                         <a href="{{ route('services.sectors.show', $category['slug']) }}" class="block rounded-lg px-2 py-2 transition hover:bg-[#f3f8f5]">
                             {{ $category['name'] }}

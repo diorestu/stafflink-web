@@ -15,7 +15,7 @@
             '@id' => request()->url().'#service',
             'name' => 'Staffing Services in '.$area['seo_label'],
             'serviceType' => 'Recruitment and Staffing',
-            'description' => $metaDescription ?? ('Explore sectors and roles with active opportunities in '.$area['seo_label'].'.'),
+            'description' => $metaDescription ?? ('Explore all staffing services available in '.$area['seo_label'].'.'),
             'provider' => ['@id' => url('/').'#organization'],
             'url' => request()->url(),
             'areaServed' => [
@@ -26,7 +26,7 @@
     @endphp
     @include('partials.seo-meta', [
         'seoTitle' => \App\Models\SiteSetting::siteName().' | Services in '.$area['seo_label'],
-        'seoDescription' => $metaDescription ?? ('Explore sectors and roles with active opportunities in '.$area['seo_label'].'.'),
+        'seoDescription' => $metaDescription ?? ('Explore all staffing services available in '.$area['seo_label'].'.'),
         'seoKeywords' => 'staffing by area, bali service areas, recruitment in '.$area['label'],
         'seoBreadcrumbItems' => $breadcrumbItems,
         'seoStructuredDataNodes' => [$serviceSchema],
@@ -45,7 +45,7 @@
                     <p class="text-xs uppercase tracking-[0.3em] text-[#e9d29d]">Service Area</p>
                     <h1 class="mt-4 text-3xl font-semibold sm:text-4xl">Services in {{ $area['seo_label'] }}</h1>
                     <p class="mt-4 max-w-3xl text-sm leading-relaxed text-white/90">
-                        Explore sectors and roles with active opportunities in {{ $area['seo_label'] }}.
+                        Explore all active services available in {{ $area['seo_label'] }}.
                     </p>
                     <div class="mt-6 flex flex-wrap gap-3">
                         <a href="{{ route('appointments.create') }}" class="inline-flex rounded-full bg-white px-6 py-3 text-sm font-semibold text-[#1f5f46] transition hover:bg-[#e7f2ec]">Book consultation</a>
@@ -66,42 +66,18 @@
                     </section>
                 @endif
 
-                <section class="grid gap-8 lg:grid-cols-2" data-aos="fade-up">
-                    <div class="rounded-[24px] bg-white p-6 shadow-[0_18px_44px_rgba(31,95,70,0.12)]">
-                        <p class="text-xs uppercase tracking-[0.25em] text-[#287854]">Sectors in {{ $area['seo_label'] }}</p>
-                        <div class="mt-4 grid gap-3 sm:grid-cols-2">
-                            @forelse ($categories as $category)
-                                <a href="{{ route('services.sectors.areas.show', ['slug' => $category->slug, 'areaSlug' => $area['slug']]) }}"
-                                    class="rounded-xl border border-[#dfe8e3] bg-[#f9fbfa] px-4 py-3 text-sm font-semibold text-[#2e2e2e] transition hover:border-[#bcd7c8] hover:bg-[#f4faf7] hover:text-[#1f5f46]">
-                                    {{ $category->name }}
-                                </a>
-                            @empty
-                                <p class="text-sm text-[#6b6b66]">No sector data available in this area yet.</p>
-                            @endforelse
-                        </div>
-                    </div>
-
-                    <div class="rounded-[24px] bg-white p-6 shadow-[0_18px_44px_rgba(31,95,70,0.12)]">
-                        <p class="text-xs uppercase tracking-[0.25em] text-[#287854]">Roles in {{ $area['seo_label'] }}</p>
-                        <div class="mt-4 grid gap-3 sm:grid-cols-2">
-                            @forelse ($roles as $role)
-                                <a href="{{ route('services.roles.areas.show', ['slug' => \Illuminate\Support\Str::slug($role), 'areaSlug' => $area['slug']]) }}"
-                                    class="rounded-xl border border-[#dfe8e3] bg-[#f9fbfa] px-4 py-3 text-sm font-semibold text-[#2e2e2e] transition hover:border-[#bcd7c8] hover:bg-[#f4faf7] hover:text-[#1f5f46]">
-                                    {{ $role }}
-                                </a>
-                            @empty
-                                <p class="text-sm text-[#6b6b66]">No role data available in this area yet.</p>
-                            @endforelse
-                        </div>
-                    </div>
-                </section>
-
                 <section class="rounded-[24px] bg-white p-6 shadow-[0_18px_44px_rgba(31,95,70,0.12)]" data-aos="fade-up">
-                    <p class="text-xs uppercase tracking-[0.25em] text-[#287854]">Airport services</p>
-                    <a href="{{ route('airport-services.nanny-concierge.area', $area['slug']) }}"
-                        class="mt-4 inline-flex rounded-xl border border-[#dfe8e3] bg-[#f9fbfa] px-4 py-3 text-sm font-semibold text-[#2e2e2e] transition hover:border-[#bcd7c8] hover:bg-[#f4faf7] hover:text-[#1f5f46]">
-                        Nanny - Concierge Services in {{ $area['seo_label'] }}
-                    </a>
+                    <p class="text-xs uppercase tracking-[0.25em] text-[#287854]">All services in {{ $area['seo_label'] }}</p>
+                    <div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                        @forelse ($services as $service)
+                            <a href="{{ route('services.roles.areas.show', ['slug' => \Illuminate\Support\Str::slug($service), 'areaSlug' => $area['slug']]) }}"
+                                class="rounded-xl border border-[#dfe8e3] bg-[#f9fbfa] px-4 py-3 text-sm font-semibold text-[#2e2e2e] transition hover:border-[#bcd7c8] hover:bg-[#f4faf7] hover:text-[#1f5f46]">
+                                {{ $service }}
+                            </a>
+                        @empty
+                            <p class="text-sm text-[#6b6b66]">No services available in this area yet.</p>
+                        @endforelse
+                    </div>
                 </section>
 
                 <section class="space-y-5" data-aos="fade-up">

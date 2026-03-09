@@ -268,5 +268,6 @@
                 Click here to chat
             </span>
         </a>
-    </div></body>
+    </div>
+</body>
 </html>

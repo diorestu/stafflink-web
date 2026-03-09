@@ -9,7 +9,7 @@
             $sections = [];
         }
     @endphp
-    <div class="space-y-6">
+    <div class="space-y-6 pb-28">
         <div class="rounded-lg border border-[#d7e8df] bg-[#f6faf8] p-5">
             <div class="flex items-center justify-between gap-4">
                 <div>
@@ -37,13 +37,38 @@
             </div>
         </div>
 
+        <div class="grid gap-6 xl:grid-cols-[18rem_minmax(0,1fr)]">
+        <aside class="h-fit rounded-2xl border border-[#dfe8e3] bg-white p-4 shadow-sm xl:sticky xl:top-24">
+            <div class="flex items-start justify-between gap-3">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-[0.22em] text-[#287854]">Builder Navigator</p>
+                    <h3 class="mt-2 text-lg font-semibold text-[#1b1b18]">Sections</h3>
+                    <p class="mt-1 text-sm text-[#5a5a55]">Lompat cepat antar section dan minimize bagian yang tidak sedang diedit.</p>
+                </div>
+                <span class="rounded-full bg-[#ecf7f1] px-3 py-1 text-xs font-semibold text-[#287854]" data-section-count>
+                    {{ count($sections) }} sections
+                </span>
+            </div>
+            <div class="mt-4 flex gap-2">
+                <button type="button" data-expand-all-sections
+                    class="flex-1 rounded-lg border border-[#287854] px-3 py-2 text-xs font-semibold text-[#287854] hover:bg-[#ecf7f1]">
+                    Expand All
+                </button>
+                <button type="button" data-collapse-all-sections
+                    class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-50">
+                    Collapse All
+                </button>
+            </div>
+            <div id="section-outline" class="mt-4 space-y-2"></div>
+        </aside>
+
         <div class="max-w-5xl rounded-lg bg-white shadow">
         <div class="border-b p-6">
             <h3 class="text-lg font-semibold">{{ $roleTitle }}</h3>
             <p class="mt-1 text-sm text-gray-500">Edit copy untuk halaman role `/services/roles/{{ $roleSlug }}`.</p>
         </div>
 
-        <form action="{{ route('admin.role-page-wording.update', $roleSlug) }}" method="POST" enctype="multipart/form-data" class="space-y-6 p-6">
+        <form id="role-page-wording-form" action="{{ route('admin.role-page-wording.update', $roleSlug) }}" method="POST" enctype="multipart/form-data" class="space-y-6 p-6">
             @csrf
             @method('PUT')
 
@@ -122,6 +147,18 @@
                     </div>
                 </div>
 
+                <div class="mb-4 rounded-2xl border border-[#dfe8e3] bg-[#f8fbf9] p-4">
+                    <div class="flex flex-wrap items-center justify-between gap-3">
+                        <div>
+                            <p class="text-sm font-semibold text-[#1f5f46]">Editing flow yang lebih ringkas</p>
+                            <p class="mt-1 text-xs text-[#5a5a55]">Setiap section sekarang bisa di-minimize. Gunakan navigator di kiri untuk lompat cepat ke section yang ingin diedit.</p>
+                        </div>
+                        <div class="rounded-full bg-white px-4 py-2 text-xs font-semibold text-gray-600 shadow-sm" data-builder-status>
+                            Changes update live preview automatically
+                        </div>
+                    </div>
+                </div>
+
                 <div id="sections-builder" class="space-y-4">
                     @foreach ($sections as $sectionIndex => $section)
                         @php
@@ -140,17 +177,17 @@
                             $imageHeightValue = (string) ($section['image_height'] ?? 'md');
                             $imageHeight = in_array($imageHeightValue, ['sm', 'md', 'lg'], true) ? $imageHeightValue : 'md';
                         @endphp
-                        <div class="rounded-xl border border-gray-200 bg-gray-50 p-4" data-section data-layout="{{ $layout }}"
+                        <div class="rounded-2xl border border-[#dfe8e3] bg-[linear-gradient(180deg,#ffffff_0%,#f8faf9_100%)] p-4 shadow-sm" data-section data-layout="{{ $layout }}"
                             draggable="true"
                             data-section-index="{{ $sectionIndex }}"
                             data-next-paragraph-index="{{ count($paragraphs) }}"
                             data-next-card-index="{{ count($items) }}">
-                            <div class="flex items-center justify-between gap-3">
-                                <div class="flex items-center gap-3">
+                            <div class="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#e6eeea] bg-white px-4 py-3">
+                                <div class="flex flex-wrap items-center gap-3">
                                     <button type="button" class="cursor-grab rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-semibold text-gray-500 hover:bg-gray-50" data-drag-section-handle>
                                         Drag
                                     </button>
-                                    <span class="rounded-full bg-white px-3 py-1 text-xs font-semibold text-gray-600" data-section-label>
+                                    <span class="rounded-full bg-[#f3f7f5] px-3 py-1 text-xs font-semibold text-gray-600" data-section-label>
                                         {{ $layout === 'cards' ? 'Cards Section' : ($layout === 'split_image' ? 'Image Section' : 'Text Section') }}
                                     </span>
                                     <select name="sections[{{ $sectionIndex }}][layout]" class="rounded-lg border border-gray-300 px-3 py-2 text-sm" data-section-layout>
@@ -158,8 +195,14 @@
                                         <option value="cards" @selected($layout === 'cards')>Cards</option>
                                         <option value="split_image" @selected($layout === 'split_image')>Image Split</option>
                                     </select>
+                                    <span class="text-sm font-medium text-[#1b1b18]" data-section-summary>
+                                        {{ $title !== '' ? $title : 'Untitled section' }}
+                                    </span>
                                 </div>
-                                <div class="flex gap-2">
+                                <div class="flex flex-wrap gap-2">
+                                    <button type="button" class="rounded-lg border border-gray-300 px-3 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50" data-toggle-section>
+                                        Minimize
+                                    </button>
                                     <button type="button" class="rounded-lg border border-[#287854] px-3 py-2 text-sm font-semibold text-[#287854] hover:bg-white" data-duplicate-section>
                                         Duplicate Section
                                     </button>
@@ -169,9 +212,10 @@
                                 </div>
                             </div>
 
-                            <div class="mt-4">
+                            <div class="mt-4 space-y-4" data-section-body>
+                            <div>
                                 <label class="mb-2 block text-sm font-semibold text-gray-700">Section Title</label>
-                                <input type="text" name="sections[{{ $sectionIndex }}][title]" value="{{ $title }}"
+                                <input type="text" name="sections[{{ $sectionIndex }}][title]" value="{{ $title }}" data-section-title-input
                                     class="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm" placeholder="Section heading">
                             </div>
 
@@ -295,6 +339,7 @@
                                         data-default-src="{{ asset('images/img_hero.webp') }}">
                                 </div>
                             </div>
+                            </div>
                         </div>
                     @endforeach
                 </div>
@@ -316,24 +361,41 @@
         </form>
     </div>
     </div>
+    </div>
+
+    <div class="pointer-events-none fixed bottom-6 right-6 z-40">
+        <div class="pointer-events-auto flex items-center gap-3 rounded-full border border-[#1f5f46] bg-[#1f5f46] px-4 py-3 text-white shadow-[0_16px_40px_rgba(31,95,70,0.28)]">
+            <div class="hidden sm:block">
+                <p class="text-[11px] uppercase tracking-[0.18em] text-white/65">Role Builder</p>
+                <p class="text-sm font-semibold" data-floating-save-label>Save changes</p>
+            </div>
+            <button type="submit" form="role-page-wording-form" class="rounded-full bg-white px-5 py-2 text-sm font-semibold text-[#1f5f46] transition hover:bg-[#ecf7f1]">
+                Save Role Copy
+            </button>
+        </div>
+    </div>
 
     <template id="section-template">
-        <div class="rounded-xl border border-gray-200 bg-gray-50 p-4" data-section data-layout="__LAYOUT__"
+        <div class="rounded-2xl border border-[#dfe8e3] bg-[linear-gradient(180deg,#ffffff_0%,#f8faf9_100%)] p-4 shadow-sm" data-section data-layout="__LAYOUT__"
             draggable="true"
             data-section-index="__SECTION_INDEX__" data-next-paragraph-index="0" data-next-card-index="0">
-            <div class="flex items-center justify-between gap-3">
-                <div class="flex items-center gap-3">
+            <div class="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#e6eeea] bg-white px-4 py-3">
+                <div class="flex flex-wrap items-center gap-3">
                     <button type="button" class="cursor-grab rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-semibold text-gray-500 hover:bg-gray-50" data-drag-section-handle>
                         Drag
                     </button>
-                    <span class="rounded-full bg-white px-3 py-1 text-xs font-semibold text-gray-600" data-section-label>__LABEL__</span>
+                    <span class="rounded-full bg-[#f3f7f5] px-3 py-1 text-xs font-semibold text-gray-600" data-section-label>__LABEL__</span>
                     <select name="sections[__SECTION_INDEX__][layout]" class="rounded-lg border border-gray-300 px-3 py-2 text-sm" data-section-layout>
                         <option value="text" __TEXT_SELECTED__>Text</option>
                         <option value="cards" __CARDS_SELECTED__>Cards</option>
                         <option value="split_image" __IMAGE_SELECTED__>Image Split</option>
                     </select>
+                    <span class="text-sm font-medium text-[#1b1b18]" data-section-summary>Untitled section</span>
                 </div>
-                <div class="flex gap-2">
+                <div class="flex flex-wrap gap-2">
+                    <button type="button" class="rounded-lg border border-gray-300 px-3 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50" data-toggle-section>
+                        Minimize
+                    </button>
                     <button type="button" class="rounded-lg border border-[#287854] px-3 py-2 text-sm font-semibold text-[#287854] hover:bg-white" data-duplicate-section>
                         Duplicate Section
                     </button>
@@ -343,9 +405,10 @@
                 </div>
             </div>
 
-            <div class="mt-4">
+            <div class="mt-4 space-y-4" data-section-body>
+            <div>
                 <label class="mb-2 block text-sm font-semibold text-gray-700">Section Title</label>
-                <input type="text" name="sections[__SECTION_INDEX__][title]" class="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm" placeholder="Section heading">
+                <input type="text" name="sections[__SECTION_INDEX__][title]" class="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm" placeholder="Section heading" data-section-title-input>
             </div>
 
             <div class="mt-4 space-y-3" data-text-fields __TEXT_STYLE__>
@@ -426,6 +489,7 @@
                         data-default-src="{{ asset('images/img_hero.webp') }}">
                 </div>
             </div>
+            </div>
         </div>
     </template>
 
@@ -487,6 +551,11 @@
             const previewPrimaryCta = document.querySelector('[data-preview-primary-cta]');
             const previewSecondaryCta = document.querySelector('[data-preview-secondary-cta]');
             const previewSections = document.getElementById('role-preview-sections');
+            const sectionOutline = document.getElementById('section-outline');
+            const sectionCount = document.querySelector('[data-section-count]');
+            const builderStatus = document.querySelector('[data-builder-status]');
+            const floatingSaveLabel = document.querySelector('[data-floating-save-label]');
+            const form = document.getElementById('role-page-wording-form');
             const heroBadgeInput = document.getElementById('hero_badge');
             const heroTitleInput = document.getElementById('hero_title');
             const heroSubtitleInput = document.getElementById('hero_subtitle');
@@ -494,10 +563,31 @@
             const secondaryCtaLabelInput = document.getElementById('secondary_cta_label');
             let draggedSection = null;
             let draggedCard = null;
+            let isDirty = false;
 
             let sectionCounter = Array.from(builder.querySelectorAll('[data-section]'))
                 .map((section) => Number(section.getAttribute('data-section-index') || '0'))
                 .reduce((max, value) => Math.max(max, value), -1) + 1;
+
+            const markDirty = (message = 'Unsaved changes') => {
+                isDirty = true;
+                if (builderStatus) {
+                    builderStatus.textContent = message;
+                }
+                if (floatingSaveLabel) {
+                    floatingSaveLabel.textContent = 'Unsaved changes';
+                }
+            };
+
+            const markSaved = () => {
+                isDirty = false;
+                if (builderStatus) {
+                    builderStatus.textContent = 'All changes saved';
+                }
+                if (floatingSaveLabel) {
+                    floatingSaveLabel.textContent = 'Saved';
+                }
+            };
 
             const nextSectionIndex = () => {
                 const next = sectionCounter;
@@ -534,6 +624,8 @@
                     addCard(section);
                 }
 
+                reindexSections();
+                markDirty('Section added');
                 renderPreview();
             };
 
@@ -548,6 +640,7 @@
                 const wrapper = document.createElement('div');
                 wrapper.innerHTML = html.trim();
                 list.appendChild(wrapper.firstElementChild);
+                markDirty('Paragraph added');
                 renderPreview();
             };
 
@@ -562,7 +655,49 @@
                 const wrapper = document.createElement('div');
                 wrapper.innerHTML = html.trim();
                 list.appendChild(wrapper.firstElementChild);
+                reindexCards(section);
+                markDirty('Card added');
                 renderPreview();
+            };
+
+            const syncSectionSummary = (section) => {
+                const titleInput = section.querySelector('[data-section-title-input]');
+                const summary = section.querySelector('[data-section-summary]');
+                if (!(summary instanceof HTMLElement)) return;
+                const value = titleInput instanceof HTMLInputElement ? titleInput.value.trim() : '';
+                summary.textContent = value || 'Untitled section';
+            };
+
+            const setSectionCollapsed = (section, collapsed) => {
+                const body = section.querySelector('[data-section-body]');
+                const button = section.querySelector('[data-toggle-section]');
+                if (!(body instanceof HTMLElement) || !(button instanceof HTMLButtonElement)) return;
+                body.style.display = collapsed ? 'none' : '';
+                section.dataset.collapsed = collapsed ? '1' : '0';
+                button.textContent = collapsed ? 'Expand' : 'Minimize';
+            };
+
+            const renderSectionOutline = () => {
+                if (!sectionOutline) return;
+                const sections = Array.from(builder.querySelectorAll('[data-section]'));
+                sectionOutline.innerHTML = sections.map((section, index) => {
+                    const summary = section.querySelector('[data-section-summary]')?.textContent?.trim() || 'Untitled section';
+                    const label = section.querySelector('[data-section-label]')?.textContent?.trim() || 'Section';
+                    const collapsed = section.dataset.collapsed === '1';
+                    return `
+                        <button type="button" class="flex w-full items-center justify-between rounded-xl border border-[#e3ebe6] bg-[#f8fbf9] px-3 py-3 text-left transition hover:border-[#bcd7c8] hover:bg-white" data-outline-target="${index}">
+                            <span>
+                                <span class="block text-[11px] font-semibold uppercase tracking-[0.18em] text-[#287854]">${escapeHtml(label)}</span>
+                                <span class="mt-1 block text-sm font-medium text-[#1b1b18]">${escapeHtml(summary)}</span>
+                            </span>
+                            <span class="text-xs font-semibold ${collapsed ? 'text-gray-500' : 'text-[#287854]'}">${collapsed ? 'Hidden' : 'Open'}</span>
+                        </button>
+                    `;
+                }).join('');
+
+                if (sectionCount) {
+                    sectionCount.textContent = `${sections.length} section${sections.length === 1 ? '' : 's'}`;
+                }
             };
 
             const updateSectionVisibility = (section, layout) => {
@@ -571,6 +706,7 @@
                 section.querySelector('[data-text-fields]').style.display = layout === 'cards' ? 'none' : '';
                 section.querySelector('[data-cards-fields]').style.display = layout === 'cards' ? '' : 'none';
                 section.querySelector('[data-image-fields]').style.display = layout === 'split_image' ? '' : 'none';
+                renderSectionOutline();
 
                 if ((layout === 'text' || layout === 'split_image') && section.querySelectorAll('[data-paragraph-row]').length === 0) {
                     addParagraph(section);
@@ -582,6 +718,7 @@
                     return;
                 }
 
+                markDirty('Section layout updated');
                 renderPreview();
             };
 
@@ -624,8 +761,11 @@
                         reindexParagraphs(section);
                         reindexCards(section);
                     }
+
+                    syncSectionSummary(section);
                 });
 
+                renderSectionOutline();
                 renderPreview();
             };
 
@@ -723,6 +863,8 @@
                     }
                 }
 
+                reindexSections();
+                markDirty('Section duplicated');
                 renderPreview();
             };
 
@@ -732,6 +874,8 @@
                 const latest = cards[cards.length - 1];
                 latest.querySelector('input').value = cardRow.querySelector('input')?.value ?? '';
                 latest.querySelector('textarea').value = cardRow.querySelector('textarea')?.value ?? '';
+                reindexCards(section);
+                markDirty('Card duplicated');
                 renderPreview();
             };
 
@@ -830,6 +974,28 @@
                 togglePreviewButton.textContent = isHidden ? 'Hide Preview' : 'Show Preview';
             });
 
+            sectionOutline?.addEventListener('click', (event) => {
+                const target = event.target;
+                if (!(target instanceof HTMLElement)) return;
+                const button = target.closest('[data-outline-target]');
+                if (!(button instanceof HTMLButtonElement)) return;
+                const sectionIndex = Number(button.dataset.outlineTarget || '-1');
+                const section = builder.querySelectorAll('[data-section]')[sectionIndex];
+                if (!(section instanceof HTMLElement)) return;
+                setSectionCollapsed(section, false);
+                section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+
+            document.querySelector('[data-expand-all-sections]')?.addEventListener('click', () => {
+                builder.querySelectorAll('[data-section]').forEach((section) => setSectionCollapsed(section, false));
+                renderSectionOutline();
+            });
+
+            document.querySelector('[data-collapse-all-sections]')?.addEventListener('click', () => {
+                builder.querySelectorAll('[data-section]').forEach((section) => setSectionCollapsed(section, true));
+                renderSectionOutline();
+            });
+
             builder.addEventListener('click', (event) => {
                 const target = event.target;
                 if (!(target instanceof HTMLElement)) return;
@@ -838,12 +1004,19 @@
 
                 if (target.matches('[data-remove-section]')) {
                     section?.remove();
-                    renderPreview();
+                    reindexSections();
+                    markDirty('Section removed');
                     return;
                 }
 
                 if (target.matches('[data-duplicate-section]') && section) {
                     cloneSection(section);
+                    return;
+                }
+
+                if (target.matches('[data-toggle-section]') && section) {
+                    setSectionCollapsed(section, section.dataset.collapsed !== '1');
+                    renderSectionOutline();
                     return;
                 }
 
@@ -853,7 +1026,13 @@
                 }
 
                 if (target.matches('[data-remove-paragraph]')) {
-                    target.closest('[data-paragraph-row]')?.remove();
+                    const row = target.closest('[data-paragraph-row]');
+                    const parentSection = target.closest('[data-section]');
+                    row?.remove();
+                    if (parentSection) {
+                        reindexParagraphs(parentSection);
+                    }
+                    markDirty('Paragraph removed');
                     renderPreview();
                     return;
                 }
@@ -872,7 +1051,13 @@
                 }
 
                 if (target.matches('[data-remove-card]')) {
-                    target.closest('[data-card-row]')?.remove();
+                    const row = target.closest('[data-card-row]');
+                    const parentSection = target.closest('[data-section]');
+                    row?.remove();
+                    if (parentSection) {
+                        reindexCards(parentSection);
+                    }
+                    markDirty('Card removed');
                     renderPreview();
                     return;
                 }
@@ -896,6 +1081,7 @@
                     if (fileInput instanceof HTMLInputElement) {
                         fileInput.value = '';
                     }
+                    markDirty('Image removed');
                     renderPreview();
                 }
             });
@@ -915,6 +1101,12 @@
                 if (!(target instanceof HTMLElement)) return;
 
                 if (target.closest('form')) {
+                    const section = target.closest('[data-section]');
+                    if (section instanceof HTMLElement) {
+                        syncSectionSummary(section);
+                        renderSectionOutline();
+                    }
+                    markDirty();
                     renderPreview();
                 }
             });
@@ -946,6 +1138,7 @@
                 const reader = new FileReader();
                 reader.onload = () => {
                     previewImage.src = typeof reader.result === 'string' ? reader.result : (previewImage.dataset.defaultSrc || '{{ asset('images/img_hero.webp') }}');
+                    markDirty('Image updated');
                     renderPreview();
                 };
                 reader.readAsDataURL(file);
@@ -997,6 +1190,7 @@
                         const section = targetCard.closest('[data-section]');
                         if (section) {
                             reindexCards(section);
+                            markDirty('Card order updated');
                             renderPreview();
                         }
                     }
@@ -1009,11 +1203,30 @@
                         const rect = targetSection.getBoundingClientRect();
                         const before = event.clientY < rect.top + rect.height / 2;
                         builder.insertBefore(draggedSection, before ? targetSection : targetSection.nextSibling);
+                        markDirty('Section order updated');
                         reindexSections();
                     }
                 }
             });
 
+            form?.addEventListener('submit', () => {
+                reindexSections();
+                if (builderStatus) {
+                    builderStatus.textContent = 'Saving changes...';
+                }
+                if (floatingSaveLabel) {
+                    floatingSaveLabel.textContent = 'Saving...';
+                }
+            });
+
+            builder.querySelectorAll('[data-section]').forEach((section) => {
+                syncSectionSummary(section);
+                setSectionCollapsed(section, false);
+            });
+            renderSectionOutline();
+            if (@json(session('success')) !== null) {
+                markSaved();
+            }
             renderPreview();
         })();
     </script>

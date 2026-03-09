@@ -9,6 +9,84 @@ class RolePageWording
     public static function defaults(): array
     {
         return [
+            'nannies' => [
+                'mode' => 'custom',
+                'hero_badge' => 'Nanny Services',
+                'hero_title' => 'Nanny Services in Bali',
+                'hero_subtitle' => 'Our experienced nannies provide safe, structured, development-focused care in private homes throughout Bali. Each placement is thoughtfully matched to your household values, creating continuity, trust, and emotional stability for your children so you can focus on life with complete peace of mind.',
+                'primary_cta_label' => 'Book a Free Discovery Call',
+                'primary_cta_url' => route('appointments.create'),
+                'secondary_cta_label' => 'Contact Us',
+                'secondary_cta_url' => route('contact'),
+                'sections' => [
+                    [
+                        'layout' => 'cards',
+                        'title' => 'Our Nanny Services',
+                        'columns' => '3',
+                        'items' => [
+                            [
+                                'title' => 'Permanent Nanny',
+                                'body' => '',
+                            ],
+                            [
+                                'title' => 'Male Nanny (Mannies)',
+                                'body' => '',
+                            ],
+                            [
+                                'title' => 'Holiday Nanny',
+                                'body' => '',
+                            ],
+                            [
+                                'title' => 'Teacher Nanny',
+                                'body' => '',
+                            ],
+                            [
+                                'title' => 'Nurse Nanny',
+                                'body' => 'Best suited for new borns and toddlers.',
+                            ],
+                            [
+                                'title' => 'Buddies',
+                                'body' => 'For older kids/teenagers.',
+                            ],
+                        ],
+                    ],
+                    [
+                        'layout' => 'text',
+                        'title' => 'Choose Your Nanny Service',
+                        'paragraphs' => [
+                            'Contact us directly to discuss your needs and schedule services. Every family is unique, and we tailor each placement to match your lifestyle, expectations, and parenting approach.',
+                            'Simply call us today via WhatsApp, or message us to arrange a time that suits you. You will always speak with a real person who understands your priorities, not an automated AI system.',
+                        ],
+                    ],
+                    [
+                        'layout' => 'text',
+                        'title' => 'Effortless Nanny Management',
+                        'paragraphs' => [
+                            'Need to reschedule or request something specific? We are always available to assist you personally.',
+                            'From schedule adjustments to special routines, we ensure smooth coordination with discretion and care. Our team handles every detail so your household runs seamlessly.',
+                        ],
+                    ],
+                    [
+                        'layout' => 'cards',
+                        'title' => 'More Than a Nanny - A Trusted Partner in Your Family\'s Journey',
+                        'columns' => '3',
+                        'items' => [
+                            [
+                                'title' => 'Emotional Stability & Secure Attachment',
+                                'body' => 'A nurturing Nanny presence your child can trust every day.',
+                            ],
+                            [
+                                'title' => 'Development-Focused Care',
+                                'body' => 'Staff Link Nannies conduct age-appropriate activities that encourage confidence, curiosity, and independence.',
+                            ],
+                            [
+                                'title' => 'Discreet & Professional Conduct',
+                                'body' => 'Staff Link Nannies respect your privacy, home environment, and family dynamics at all times.',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
             'real-estate-sales-support-assistants' => [
                 'mode' => 'custom',
                 'hero_badge' => 'Real Estate Sales Support Assistants in Bali',

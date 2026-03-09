@@ -3,4 +3,4 @@ Allow: /
 Disallow: /admin/
 Disallow: /login
 
-Sitemap: https://web.stafflink.pro/sitemap.xml
+Sitemap: https://stafflink.pro/sitemap.xml

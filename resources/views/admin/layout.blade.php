@@ -171,15 +171,7 @@
                 </div>
 
                 <div class="mt-4">
-                    <p class="px-6 text-[10px] uppercase text-white/60 font-semibold mb-2">Analytics</p>
-                    <a href="{{ route('admin.analytics.index') }}"
-                        class="flex items-center px-6 py-3 hover:bg-[#287854] {{ request()->routeIs('admin.analytics.*') ? 'bg-[#287854] border-l-4 border-[#b28b2e]' : '' }}">
-                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M11 3v18m-6-6v6m12-12v12m6-9v9" />
-                        </svg>
-                        Analytics
-                    </a>
+                    <p class="px-6 text-[10px] uppercase text-white/60 font-semibold mb-2">Tracking</p>
                     <a href="{{ route('request.analytics') }}"
                         class="flex items-center px-6 py-3 hover:bg-[#287854] {{ request()->routeIs('request.analytics') ? 'bg-[#287854] border-l-4 border-[#b28b2e]' : '' }}">
                         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -192,6 +184,16 @@
 
                 <div class="mt-4">
                     <p class="px-6 text-[10px] uppercase text-white/60 font-semibold mb-2">Settings</p>
+                    <a href="{{ route('admin.password.edit') }}"
+                        class="flex items-center px-6 py-3 hover:bg-[#287854] {{ request()->routeIs('admin.password.*') ? 'bg-[#287854] border-l-4 border-[#b28b2e]' : '' }}">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 11c1.657 0 3-1.343 3-3S13.657 5 12 5 9 6.343 9 8s1.343 3 3 3z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M17 11V9a5 5 0 00-10 0v2a2 2 0 00-2 2v5a2 2 0 002 2h10a2 2 0 002-2v-5a2 2 0 00-2-2z" />
+                        </svg>
+                        Change Password
+                    </a>
                     @if ($isSuperAdmin)
                         <a href="{{ route('admin.users.index') }}"
                             class="flex items-center px-6 py-3 hover:bg-[#287854] {{ request()->routeIs('admin.users.*') ? 'bg-[#287854] border-l-4 border-[#b28b2e]' : '' }}">

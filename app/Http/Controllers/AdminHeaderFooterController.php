@@ -26,7 +26,12 @@ class AdminHeaderFooterController extends Controller
             'consultation_label' => ['nullable', 'string', 'max:100'],
             'consultation_url' => ['nullable', 'string', 'max:255'],
             'copyright_text' => ['nullable', 'string', 'max:255'],
-            'about_links' => ['nullable', 'string'],
+            'about_links' => ['nullable', 'array'],
+            'about_links.*.label' => ['nullable', 'string', 'max:100'],
+            'about_links.*.url' => ['nullable', 'string', 'max:255'],
+            'services_links' => ['nullable', 'array'],
+            'services_links.*.label' => ['nullable', 'string', 'max:100'],
+            'services_links.*.url' => ['nullable', 'string', 'max:255'],
             'main_links' => ['nullable', 'string'],
             'user_links' => ['nullable', 'string'],
             'footer_links' => ['nullable', 'string'],
@@ -38,7 +43,8 @@ class AdminHeaderFooterController extends Controller
             'consultation_label' => $validated['consultation_label'] ?? 'Free Consultation',
             'consultation_url' => $validated['consultation_url'] ?? route('appointments.create'),
             'copyright_text' => $validated['copyright_text'] ?? '',
-            'about_links' => $this->parseJsonLinks($validated['about_links'] ?? '[]'),
+            'about_links' => $this->normalizeLinks($validated['about_links'] ?? []),
+            'services_links' => $this->normalizeLinks($validated['services_links'] ?? []),
             'main_links' => $this->parseJsonLinks($validated['main_links'] ?? '[]'),
             'user_links' => $this->parseJsonLinks($validated['user_links'] ?? '[]'),
             'footer_links' => $this->parseJsonLinks($validated['footer_links'] ?? '[]'),
@@ -50,6 +56,21 @@ class AdminHeaderFooterController extends Controller
         ]);
 
         return redirect()->route('admin.header-footer.edit')->with('success', 'Header and footer updated successfully.');
+    }
+
+    private function normalizeLinks(array $items): array
+    {
+        return collect($items)
+            ->filter(fn ($item) => is_array($item))
+            ->map(function ($item) {
+                return [
+                    'label' => trim((string) ($item['label'] ?? '')),
+                    'url' => trim((string) ($item['url'] ?? '#')),
+                ];
+            })
+            ->filter(fn ($item) => $item['label'] !== '')
+            ->values()
+            ->all();
     }
 
     private function parseJsonLinks(string $json): array
