@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://atelierhouseofevents.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Parisienne&display=swap" rel="stylesheet">
     @include('partials.seo-meta', [
         'seoTitle' => \App\Models\SiteSetting::siteName().' | Wedding Organizer Services',
@@ -25,7 +26,7 @@
     @php
         $heroVideos = [
             'https://atelierhouseofevents.com/wp-content/uploads/2025/06/Website-Video_19.06.25.mp4',
-            'http://stafflink_web.test/images/wedding_hero.mp4',
+            asset('images/wedding_hero.mp4'),
         ];
     @endphp
     <div class="min-h-screen">
@@ -41,9 +42,27 @@
                     <div class="hero-video-wrap rounded-tr-[22px] rounded-br-[140px] rounded-tl-[22px] rounded-bl-[22px]">
                         <div class="h-[360px] w-full sm:h-[520px] lg:h-[620px]">
                             <div class="relative h-full w-full" data-hero-carousel data-videos='@json($heroVideos)'>
-                                <video class="hero-video-bg" data-hero-video autoplay muted loop playsinline preload="metadata">
+                                <video
+                                    class="hero-video-bg"
+                                    data-hero-video
+                                    autoplay
+                                    muted
+                                    loop
+                                    playsinline
+                                    preload="metadata"
+                                    poster="{{ asset('images/hero-bg.webp') }}">
                                     <source src="{{ $heroVideos[0] ?? '' }}" type="video/mp4">
                                 </video>
+                                <div class="absolute right-4 top-4 z-10">
+                                    <button
+                                        type="button"
+                                        data-video-sound-toggle
+                                        aria-pressed="false"
+                                        class="inline-flex items-center gap-2 rounded-full border border-white/40 bg-black/35 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur-sm transition hover:bg-black/50">
+                                        <x-ui-icon name="headset" class="h-4 w-4" />
+                                        <span data-video-sound-label>Sound off</span>
+                                    </button>
+                                </div>
                                 @if (count($heroVideos) > 1)
                                     <div class="absolute inset-x-0 bottom-4 z-10 flex items-center justify-center gap-2">
                                         <div class="flex items-center gap-2" data-hero-dots></div>
@@ -154,10 +173,14 @@
     @once
         <script>
             (() => {
+                const SOUND_PREFERENCE_KEY = 'stafflink:hero-video-sound';
                 const carousels = document.querySelectorAll('[data-hero-carousel]');
+
                 carousels.forEach((carousel) => {
                     const video = carousel.querySelector('[data-hero-video]');
                     if (!video) return;
+
+                    video.playsInline = true;
 
                     let videos = [];
                     try {
@@ -166,11 +189,48 @@
                         videos = [];
                     }
                     videos = videos.filter(Boolean);
-                    if (videos.length <= 1) return;
 
                     const dotsWrap = carousel.querySelector('[data-hero-dots]');
+                    const soundToggle = carousel.querySelector('[data-video-sound-toggle]');
+                    const soundLabel = carousel.querySelector('[data-video-sound-label]');
                     let index = 0;
                     let timer = null;
+                    let isVisible = true;
+
+                    const playSafely = async () => {
+                        try {
+                            await video.play();
+                            return true;
+                        } catch (_e) {
+                            return false;
+                        }
+                    };
+
+                    const updateSoundUi = () => {
+                        if (!soundToggle || !soundLabel) return;
+                        const soundOn = !video.muted;
+                        soundToggle.setAttribute('aria-pressed', soundOn ? 'true' : 'false');
+                        soundLabel.textContent = soundOn ? 'Sound on' : 'Sound off';
+                    };
+
+                    const playUsingPreference = async () => {
+                        const preference = localStorage.getItem(SOUND_PREFERENCE_KEY);
+                        const shouldTrySound = preference === 'on' || preference === null;
+
+                        if (shouldTrySound) {
+                            video.muted = false;
+                            video.volume = 1;
+                            const startedWithSound = await playSafely();
+                            if (startedWithSound) {
+                                updateSoundUi();
+                                return;
+                            }
+                        }
+
+                        video.muted = true;
+                        await playSafely();
+                        updateSoundUi();
+                    };
 
                     const renderDots = () => {
                         if (!dotsWrap) return;
@@ -189,24 +249,73 @@
                         });
                     };
 
-                    const setIndex = (nextIndex) => {
+                    const setIndex = async (nextIndex) => {
                         index = (nextIndex + videos.length) % videos.length;
-                        video.src = videos[index];
-                        video.load();
-                        const playPromise = video.play();
-                        if (playPromise && typeof playPromise.catch === 'function') {
-                            playPromise.catch(() => {});
+                        const nextSrc = videos[index];
+                        if (nextSrc && video.currentSrc !== nextSrc) {
+                            video.src = nextSrc;
+                            video.load();
                         }
+                        await playUsingPreference();
                         renderDots();
                     };
 
                     const restartTimer = () => {
                         if (timer) clearInterval(timer);
-                        timer = setInterval(() => setIndex(index + 1), 8000);
+                        if (videos.length <= 1 || !isVisible) return;
+                        timer = setInterval(() => setIndex(index + 1), 10000);
                     };
 
+                    const stopTimer = () => {
+                        if (!timer) return;
+                        clearInterval(timer);
+                        timer = null;
+                    };
+
+                    if (soundToggle) {
+                        soundToggle.addEventListener('click', async () => {
+                            const shouldEnableSound = video.muted;
+                            video.muted = !shouldEnableSound;
+                            if (shouldEnableSound) {
+                                video.volume = 1;
+                            }
+                            localStorage.setItem(SOUND_PREFERENCE_KEY, shouldEnableSound ? 'on' : 'off');
+                            await playSafely();
+                            updateSoundUi();
+                        });
+                    }
+
                     renderDots();
+                    playUsingPreference();
                     restartTimer();
+
+                    if ('IntersectionObserver' in window) {
+                        const observer = new IntersectionObserver((entries) => {
+                            isVisible = !!entries[0]?.isIntersecting;
+                            if (!isVisible) {
+                                video.pause();
+                                stopTimer();
+                                return;
+                            }
+
+                            playUsingPreference();
+                            restartTimer();
+                        }, { threshold: 0.25 });
+                        observer.observe(carousel);
+                    }
+
+                    document.addEventListener('visibilitychange', () => {
+                        if (document.hidden) {
+                            video.pause();
+                            stopTimer();
+                            return;
+                        }
+
+                        if (isVisible) {
+                            playUsingPreference();
+                            restartTimer();
+                        }
+                    });
                 });
             })();
         </script>

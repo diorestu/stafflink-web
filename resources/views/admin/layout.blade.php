@@ -36,6 +36,8 @@
     @php
         $adminUser = auth()->user();
         $isSuperAdmin = $adminUser?->role === 'super_admin';
+        $isAdminManager = in_array($adminUser?->role, ['super_admin', 'admin'], true);
+        $canAccessAppointments = in_array($adminUser?->role, ['super_admin', 'admin', 'booking_checker'], true);
     @endphp
     <div class="flex h-screen">
         <!-- WordPress-style Sidebar -->
@@ -53,7 +55,8 @@
                     Dashboard
                 </a>
 
-                <div class="mt-4">
+                @if ($isAdminManager)
+                    <div class="mt-4">
                     <p class="px-6 text-[10px] uppercase text-white/60 font-semibold mb-2">Content</p>
                     @if ($isSuperAdmin)
                         <a href="{{ route('admin.pages.index') }}"
@@ -108,9 +111,9 @@
                         </svg>
                         FAQs
                     </a>
-                </div>
+                    </div>
 
-                <div class="mt-4">
+                    <div class="mt-4">
                     <p class="px-6 text-[10px] uppercase text-white/60 font-semibold mb-2">Recruitment</p>
                     @if ($isSuperAdmin)
                         <a href="{{ route('admin.jobs.index') }}"
@@ -156,31 +159,52 @@
                         </svg>
                         Nanny Inquiries
                     </a>
-                </div>
-
-                <div class="mt-4">
-                    <p class="px-6 text-[10px] uppercase text-white/60 font-semibold mb-2">Operations</p>
-                    <a href="{{ route('admin.appointments.index') }}"
-                        class="flex items-center px-6 py-3 hover:bg-[#287854] {{ request()->routeIs('admin.appointments.*') ? 'bg-[#287854] border-l-4 border-[#b28b2e]' : '' }}">
+                    <a href="{{ route('admin.contracts.index') }}"
+                        class="flex items-center px-6 py-3 hover:bg-[#287854] {{ request()->routeIs('admin.contracts.*') ? 'bg-[#287854] border-l-4 border-[#b28b2e]' : '' }}">
                         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M8 7V3m8 4V3m-9 8h10m-11 9h12a2 2 0 002-2V7a2 2 0 00-2-2H6a2 2 0 00-2 2v11a2 2 0 002 2z" />
+                                d="M9 12h6m-6 4h6M7 4h10a2 2 0 012 2v12a2 2 0 01-2 2H7a2 2 0 01-2-2V6a2 2 0 012-2z" />
                         </svg>
-                        Appointments
+                        Contracts
                     </a>
-                </div>
-
-                <div class="mt-4">
-                    <p class="px-6 text-[10px] uppercase text-white/60 font-semibold mb-2">Tracking</p>
-                    <a href="{{ route('request.analytics') }}"
-                        class="flex items-center px-6 py-3 hover:bg-[#287854] {{ request()->routeIs('request.analytics') ? 'bg-[#287854] border-l-4 border-[#b28b2e]' : '' }}">
+                    <a href="{{ route('admin.division-position.index') }}"
+                        class="flex items-center px-6 py-3 hover:bg-[#287854] {{ request()->routeIs('admin.division-position.*') ? 'bg-[#287854] border-l-4 border-[#b28b2e]' : '' }}">
                         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M4 6h16M4 12h16M4 18h16" />
+                                d="M3 7h18M3 12h18M3 17h18" />
                         </svg>
-                        Request Analytics
+                        Division & Position
                     </a>
-                </div>
+                    </div>
+                @endif
+
+                @if ($canAccessAppointments)
+                    <div class="mt-4">
+                        <p class="px-6 text-[10px] uppercase text-white/60 font-semibold mb-2">Operations</p>
+                        <a href="{{ route('admin.appointments.index') }}"
+                            class="flex items-center px-6 py-3 hover:bg-[#287854] {{ request()->routeIs('admin.appointments.*') ? 'bg-[#287854] border-l-4 border-[#b28b2e]' : '' }}">
+                            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8 7V3m8 4V3m-9 8h10m-11 9h12a2 2 0 002-2V7a2 2 0 00-2-2H6a2 2 0 00-2 2v11a2 2 0 002 2z" />
+                            </svg>
+                            Appointments
+                        </a>
+                    </div>
+                @endif
+
+                @if ($isAdminManager)
+                    <div class="mt-4">
+                        <p class="px-6 text-[10px] uppercase text-white/60 font-semibold mb-2">Tracking</p>
+                        <a href="{{ route('request.analytics') }}"
+                            class="flex items-center px-6 py-3 hover:bg-[#287854] {{ request()->routeIs('request.analytics') ? 'bg-[#287854] border-l-4 border-[#b28b2e]' : '' }}">
+                            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 6h16M4 12h16M4 18h16" />
+                            </svg>
+                            Request Analytics
+                        </a>
+                    </div>
+                @endif
 
                 <div class="mt-4">
                     <p class="px-6 text-[10px] uppercase text-white/60 font-semibold mb-2">Settings</p>
@@ -272,18 +296,6 @@
 
             <!-- Content Area -->
             <main class="flex-1 overflow-y-auto p-8">
-                @if (session('success'))
-                    <div class="mb-6 bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg">
-                        {{ session('success') }}
-                    </div>
-                @endif
-
-                @if (session('error'))
-                    <div class="mb-6 bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg">
-                        {{ session('error') }}
-                    </div>
-                @endif
-
                 @yield('content')
             </main>
         </div>

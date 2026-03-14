@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -15,15 +14,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Create admin user
-        User::updateOrCreate(
-            ['email' => 'admin@stafflink.pro'],
-            [
-                'name' => 'Admin',
-                'password' => bcrypt('password'),
-                'role' => 'super_admin',
-            ]
-        );
+        $this->call(RoleUserSeeder::class);
 
         // Seed page sections
         $this->call(PageSectionSeeder::class);

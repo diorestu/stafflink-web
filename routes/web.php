@@ -6,7 +6,9 @@ use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\AdminBlogPostController;
 use App\Http\Controllers\AdminCareerController;
 use App\Http\Controllers\AdminContactInquiryController;
+use App\Http\Controllers\AdminContractController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AdminDivisionPositionController;
 use App\Http\Controllers\AdminFaqController;
 use App\Http\Controllers\AdminHeaderFooterController;
 use App\Http\Controllers\AdminJobApplicationController;
@@ -56,6 +58,10 @@ Route::redirect('/airport-services', '/airport-services/nanny-concierge');
 Route::view('/services/wedding-organizer', 'wedding-organizer')->name('services.wedding-organizer');
 Route::view('/services/destination-weddings-australians-bali', 'destination-weddings-australians-bali')->name('services.destination-weddings-australians-bali');
 Route::view('/services/bali-relocation-support', 'bali-relocation-support')->name('services.bali-relocation-support');
+Route::view('/services/retire-in-bali', 'retire-in-bali')->name('services.retire-in-bali');
+Route::view('/services/schoolies-australia-bali', 'schoolies-australia-bali')->name('services.schoolies-australia-bali');
+Route::view('/services/schoolies-parents', 'schoolies-parents')->name('services.schoolies-parents');
+Route::view('/services/schoolies-bali-packages', 'schoolies-bali-packages')->name('services.schoolies-bali-packages');
 Route::view('/services/sectors/remote-worker', 'roles.remote-worker')->name('services.sectors.remote-worker');
 Route::get('/services/sectors/{slug}', [ServiceDetailController::class, 'sector'])->name('services.sectors.show');
 Route::get('/services/sectors/{slug}/areas/{areaSlug}', [ServiceDetailController::class, 'sectorArea'])->name('services.sectors.areas.show');
@@ -99,20 +105,38 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
         Route::patch('/applicants/{application}/status', [AdminJobApplicationController::class, 'updateStatus'])->name('applicants.status');
         Route::get('/applicants/{application}/resume', [AdminJobApplicationController::class, 'resume'])->name('applicants.resume');
         Route::get('/applicants/{application}/documents/{type}', [AdminJobApplicationController::class, 'document'])->name('applicants.document');
-        Route::get('/appointments', [AdminAppointmentController::class, 'index'])->name('appointments.index');
-        Route::patch('/appointments/{appointment}/approve', [AdminAppointmentController::class, 'approve'])->name('appointments.approve');
-        Route::patch('/appointments/{appointment}/cancel', [AdminAppointmentController::class, 'cancel'])->name('appointments.cancel');
-        Route::delete('/appointments/{appointment}', [AdminAppointmentController::class, 'destroy'])->name('appointments.destroy');
         Route::get('/analytics', [AdminAnalyticsController::class, 'index'])->name('analytics.index');
         Route::get('/leads', [AdminLeadController::class, 'index'])->name('leads.index');
         Route::patch('/leads/{appointment}', [AdminLeadController::class, 'update'])->name('leads.update');
         Route::get('/contact-inquiries', [AdminContactInquiryController::class, 'index'])->name('contact-inquiries.index');
         Route::delete('/contact-inquiries/{contactInquiry}', [AdminContactInquiryController::class, 'destroy'])->name('contact-inquiries.destroy');
+        Route::get('/contracts', [AdminContractController::class, 'index'])->name('contracts.index');
+        Route::get('/contracts/create', [AdminContractController::class, 'create'])->name('contracts.create');
+        Route::get('/contracts/preview', [AdminContractController::class, 'preview'])->name('contracts.preview');
+        Route::post('/contracts/generate', [AdminContractController::class, 'generate'])->name('contracts.generate');
+        Route::post('/contracts/responsibilities', [AdminContractController::class, 'storeResponsibility'])->name('contracts.responsibilities.store');
+        Route::get('/contracts/{contract}/regenerate', [AdminContractController::class, 'regenerate'])->name('contracts.regenerate');
+        Route::delete('/contracts/{contract}', [AdminContractController::class, 'destroy'])->name('contracts.destroy');
+        Route::get('/division-position', [AdminDivisionPositionController::class, 'index'])->name('division-position.index');
+        Route::post('/division-position/divisions', [AdminDivisionPositionController::class, 'storeDivision'])->name('division-position.divisions.store');
+        Route::delete('/division-position/divisions/{division}', [AdminDivisionPositionController::class, 'destroyDivision'])->name('division-position.divisions.destroy');
+        Route::post('/division-position/positions', [AdminDivisionPositionController::class, 'storePosition'])->name('division-position.positions.store');
+        Route::delete('/division-position/positions/{position}', [AdminDivisionPositionController::class, 'destroyPosition'])->name('division-position.positions.destroy');
         Route::get('/nanny-inquiries', [AdminNannyInquiryController::class, 'index'])->name('nanny-inquiries.index');
         Route::post('/nanny-inquiries/wedding-events', [AdminNannyInquiryController::class, 'storeWeddingEvent'])->name('nanny-inquiries.wedding-events.store');
         Route::delete('/nanny-inquiries/wedding-events/{weddingEvent}', [AdminNannyInquiryController::class, 'destroyWeddingEvent'])->name('nanny-inquiries.wedding-events.destroy');
         Route::get('/nanny-inquiries/export-wedding', [AdminNannyInquiryController::class, 'exportWedding'])->name('nanny-inquiries.export-wedding');
         Route::delete('/nanny-inquiries/{nannyInquiry}', [AdminNannyInquiryController::class, 'destroy'])->name('nanny-inquiries.destroy');
+    });
+
+    // Appointment access: booking checker can only view, cannot mutate
+    Route::middleware(EnsureUserRole::class.':super_admin,admin,booking_checker')->group(function () {
+        Route::get('/appointments', [AdminAppointmentController::class, 'index'])->name('appointments.index');
+    });
+    Route::middleware(EnsureUserRole::class.':super_admin,admin')->group(function () {
+        Route::patch('/appointments/{appointment}/approve', [AdminAppointmentController::class, 'approve'])->name('appointments.approve');
+        Route::patch('/appointments/{appointment}/cancel', [AdminAppointmentController::class, 'cancel'])->name('appointments.cancel');
+        Route::delete('/appointments/{appointment}', [AdminAppointmentController::class, 'destroy'])->name('appointments.destroy');
     });
 
     // Super admin only

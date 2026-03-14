@@ -13,6 +13,8 @@ class AdminAppointmentController extends Controller
 {
     public function index()
     {
+        $canManageActions = in_array(request()->user()?->role, ['super_admin', 'admin'], true);
+
         $appointments = Appointment::query()
             ->orderBy('starts_at')
             ->limit(500)
@@ -33,6 +35,7 @@ class AdminAppointmentController extends Controller
         return view('admin.appointments.index', [
             'appointments' => $appointments,
             'appointmentsForJs' => $appointmentsForJs,
+            'canManageActions' => $canManageActions,
         ]);
     }
 

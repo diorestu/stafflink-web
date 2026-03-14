@@ -71,22 +71,24 @@
                                         <p class="text-xs font-semibold text-gray-800">{{ $appointment->name }}</p>
                                         <p class="mt-1 text-[11px] text-gray-600">{{ $appointment->starts_at->format('H:i') }} - {{ $appointment->ends_at->format('H:i') }}</p>
                                         <div class="mt-1.5 flex flex-wrap gap-1.5">
-                                            @if($appointment->status === 'pending')
+                                            @if($canManageActions && $appointment->status === 'pending')
                                                 <button type="button" data-approve-id="{{ $appointment->id }}"
                                                     class="rounded border border-[#1f5f46]/20 bg-white px-2 py-0.5 text-[10px] font-semibold text-[#1f5f46] hover:bg-[#ecf6f1]">
                                                     Approve
                                                 </button>
                                             @endif
-                                            @if($appointment->status !== 'cancelled')
+                                            @if($canManageActions && $appointment->status !== 'cancelled')
                                                 <button type="button" data-cancel-id="{{ $appointment->id }}"
                                                     class="rounded border border-[#b42318]/20 bg-white px-2 py-0.5 text-[10px] font-semibold text-[#b42318] hover:bg-[#fdf3f2]">
                                                     Cancel
                                                 </button>
                                             @endif
-                                            <button type="button" data-delete-id="{{ $appointment->id }}"
-                                                class="rounded border border-gray-300 bg-white px-2 py-0.5 text-[10px] font-semibold text-gray-700 hover:bg-gray-100">
-                                                Delete
-                                            </button>
+                                            @if($canManageActions)
+                                                <button type="button" data-delete-id="{{ $appointment->id }}"
+                                                    class="rounded border border-gray-300 bg-white px-2 py-0.5 text-[10px] font-semibold text-gray-700 hover:bg-gray-100">
+                                                    Delete
+                                                </button>
+                                            @endif
                                         </div>
                                     </article>
                                 @empty
@@ -125,6 +127,7 @@
     <script>
         (() => {
             const appointments = @json($appointmentsForJs);
+            const canManageActions = @json($canManageActions);
             const appointmentTimeZone = 'Asia/Makassar';
             const csrfToken = @json(csrf_token());
             let currentOpenDayKey = null;
@@ -400,25 +403,27 @@
                         const badgeClass = item.status === 'confirmed'
                             ? 'bg-[#dff3e9] text-[#1f5f46]'
                             : (item.status === 'cancelled' ? 'bg-[#fcebea] text-[#b42318]' : 'bg-[#fff7e0] text-[#8a6d1f]');
-                        const approveButton = item.status === 'pending'
+                        const approveButton = canManageActions && item.status === 'pending'
                             ? `
                                 <button type="button" data-approve-id="${item.id}" class="mt-3 rounded-md border border-[#1f5f46]/20 bg-white px-2.5 py-1 text-[11px] font-semibold text-[#1f5f46] hover:bg-[#ecf6f1]">
                                     Approve
                                 </button>
                             `
                             : '';
-                        const cancelButton = item.status !== 'cancelled'
+                        const cancelButton = canManageActions && item.status !== 'cancelled'
                             ? `
                                 <button type="button" data-cancel-id="${item.id}" class="mt-3 rounded-md border border-[#b42318]/20 bg-white px-2.5 py-1 text-[11px] font-semibold text-[#b42318] hover:bg-[#fdf3f2]">
                                     Cancel
                                 </button>
                             `
                             : '';
-                        const deleteButton = `
-                            <button type="button" data-delete-id="${item.id}" class="mt-3 rounded-md border border-gray-300 bg-white px-2.5 py-1 text-[11px] font-semibold text-gray-700 hover:bg-gray-100">
-                                Delete
-                            </button>
-                        `;
+                        const deleteButton = canManageActions
+                            ? `
+                                <button type="button" data-delete-id="${item.id}" class="mt-3 rounded-md border border-gray-300 bg-white px-2.5 py-1 text-[11px] font-semibold text-gray-700 hover:bg-gray-100">
+                                    Delete
+                                </button>
+                            `
+                            : '';
                         return `
                             <article class="rounded-md bg-[#f6faf8] px-4 py-3">
                                 <div class="flex items-center justify-between gap-2">
@@ -455,6 +460,8 @@
             });
 
             document.addEventListener('click', (event) => {
+                if (!canManageActions) return;
+
                 const approveButton = event.target.closest('[data-approve-id]');
                 if (approveButton) {
                     const appointmentId = approveButton.getAttribute('data-approve-id');

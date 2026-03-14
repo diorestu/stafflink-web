@@ -27,6 +27,7 @@
             class="w-full rounded-lg border border-gray-200 px-4 py-2.5 focus:border-[#287854] focus:ring-2 focus:ring-[#287854] bg-white">
             <option value="super_admin" {{ old('role', $user?->role) === 'super_admin' ? 'selected' : '' }}>Super Admin</option>
             <option value="admin" {{ old('role', $user?->role ?? 'admin') === 'admin' ? 'selected' : '' }}>Admin</option>
+            <option value="booking_checker" {{ old('role', $user?->role) === 'booking_checker' ? 'selected' : '' }}>Booking Checker</option>
         </select>
         @error('role')
             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>

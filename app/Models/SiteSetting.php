@@ -68,6 +68,7 @@ class SiteSetting extends Model
                 ['label' => 'Wedding Organizer', 'url' => route('services.wedding-organizer')],
                 ['label' => 'Destination Weddings (Australians in Bali)', 'url' => route('services.destination-weddings-australians-bali')],
                 ['label' => 'Bali Relocation Support', 'url' => route('services.bali-relocation-support')],
+                ['label' => 'Retire in Bali', 'url' => route('services.retire-in-bali')],
             ],
             'main_links' => [
                 ['label' => 'Contact Us', 'url' => route('contact')],

@@ -30,8 +30,20 @@
                                 <td class="px-6 py-4 font-medium text-gray-900">{{ $user->name }}</td>
                                 <td class="px-6 py-4 text-sm text-gray-600">{{ $user->email }}</td>
                                 <td class="px-6 py-4">
-                                    <span class="rounded-full px-2 py-1 text-xs font-medium {{ $user->role === 'super_admin' ? 'bg-amber-100 text-amber-800' : 'bg-blue-100 text-blue-800' }}">
-                                        {{ $user->role === 'super_admin' ? 'Super Admin' : 'Admin' }}
+                                    @php
+                                        $roleLabel = match ($user->role) {
+                                            'super_admin' => 'Super Admin',
+                                            'booking_checker' => 'Booking Checker',
+                                            default => 'Admin',
+                                        };
+                                        $roleClass = match ($user->role) {
+                                            'super_admin' => 'bg-amber-100 text-amber-800',
+                                            'booking_checker' => 'bg-emerald-100 text-emerald-800',
+                                            default => 'bg-blue-100 text-blue-800',
+                                        };
+                                    @endphp
+                                    <span class="rounded-full px-2 py-1 text-xs font-medium {{ $roleClass }}">
+                                        {{ $roleLabel }}
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 text-sm text-gray-600">{{ $user->created_at->format('M d, Y') }}</td>

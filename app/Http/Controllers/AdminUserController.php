@@ -27,7 +27,7 @@ class AdminUserController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
-            'role' => ['required', Rule::in(['super_admin', 'admin'])],
+            'role' => ['required', Rule::in(['super_admin', 'admin', 'booking_checker'])],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
 
@@ -48,7 +48,7 @@ class AdminUserController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
-            'role' => ['required', Rule::in(['super_admin', 'admin'])],
+            'role' => ['required', Rule::in(['super_admin', 'admin', 'booking_checker'])],
             'password' => ['nullable', 'string', 'min:8', 'confirmed'],
         ]);
 

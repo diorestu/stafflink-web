@@ -58,6 +58,11 @@ class User extends Authenticatable implements CanAccessAnalyticsDashboard
         return in_array($this->role, ['super_admin', 'admin'], true);
     }
 
+    public function isBookingChecker(): bool
+    {
+        return $this->role === 'booking_checker';
+    }
+
     public function canAccessAnalyticsDashboard(): bool
     {
         return $this->isAdmin();
