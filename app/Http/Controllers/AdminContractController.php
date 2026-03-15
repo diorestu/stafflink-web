@@ -5,11 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\Contract;
 use App\Models\Division;
 use App\Models\Position;
+use App\Models\Responsibility;
+use App\Models\SubDivision;
 use App\Services\ContractNumberService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\File;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,14 +26,54 @@ class AdminContractController extends Controller
 
     public function create()
     {
+        $divisions = Division::query()
+            ->where('is_active', true)
+            ->with(['positions' => fn ($q) => $q->where('is_active', true)->orderBy('name')])
+            ->orderBy('name')
+            ->get();
+
+        $subDivisionsByDivision = SubDivision::query()
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get()
+            ->groupBy('division_id')
+            ->map(fn ($items) => $items->map(fn ($item) => [
+                'id' => (int) $item->id,
+                'name' => (string) $item->name,
+            ])->values())
+            ->toArray();
+
+        $positionIds = $divisions
+            ->flatMap(fn ($division) => $division->positions->pluck('id'))
+            ->map(fn ($id) => (int) $id)
+            ->values();
+
+        $responsibilitiesByPosition = Responsibility::query()
+            ->whereIn('position_id', $positionIds)
+            ->orderBy('title_id')
+            ->orderBy('title_en')
+            ->get()
+            ->groupBy('position_id')
+            ->map(fn ($items) => $items->map(fn ($item) => [
+                'id' => (int) $item->id,
+                'position_id' => (int) $item->position_id,
+                'title_id' => (string) $item->title_id,
+                'description_id' => (string) ($item->description_id ?? ''),
+                'title_en' => (string) $item->title_en,
+                'description_en' => (string) ($item->description_en ?? ''),
+            ])->values())
+            ->toArray();
+
+        $userRole = request()->user()?->role;
+
         return view('admin.contracts.create', [
             'templates' => $this->templates(),
-            'divisions' => Division::query()
-                ->where('is_active', true)
-                ->with(['positions' => fn ($q) => $q->where('is_active', true)->orderBy('name')])
-                ->orderBy('name')
-                ->get(),
-            'responsibilityLibrary' => $this->getResponsibilityLibrary(),
+            'divisions' => $divisions,
+            'subDivisionsByDivision' => $subDivisionsByDivision,
+            'responsibilitiesByPosition' => $responsibilitiesByPosition,
+            'canCreateResponsibilities' => in_array($userRole, ['super_admin', 'admin'], true),
+            'canEditResponsibilities' => $userRole === 'super_admin',
+            'canSelectResponsibilities' => $userRole === 'super_admin',
         ]);
     }
 
@@ -65,6 +106,7 @@ class AdminContractController extends Controller
             'company_name' => ['required', 'string', 'max:190'],
             'company_address' => ['required', 'string', 'max:255'],
             'division_id' => ['required', 'integer', 'exists:divisions,id'],
+            'sub_division_id' => ['nullable', 'integer', 'exists:sub_divisions,id'],
             'employee_title' => ['required', 'string', 'in:Mr.,Mrs.,Miss'],
             'employee_name' => ['required', 'string', 'max:190'],
             'employee_birth_info' => ['nullable', 'string', 'max:190'],
@@ -106,12 +148,19 @@ class AdminContractController extends Controller
             'sign_employee_name' => ['required', 'string', 'max:190'],
         ]);
 
-        $this->persistResponsibilitiesFromInput((string) ($validated['responsibilities'] ?? ''));
         $selectedDivision = Division::query()->findOrFail((int) $validated['division_id']);
         $selectedPosition = Position::query()->findOrFail((int) $validated['position_id']);
+        $selectedSubDivision = null;
 
         if ((int) $selectedPosition->division_id !== (int) $selectedDivision->id) {
             abort(422, 'Selected position does not belong to the selected division.');
+        }
+
+        if (! empty($validated['sub_division_id'])) {
+            $selectedSubDivision = SubDivision::query()->findOrFail((int) $validated['sub_division_id']);
+            if ((int) $selectedSubDivision->division_id !== (int) $selectedDivision->id) {
+                abort(422, 'Selected sub-division does not belong to the selected division.');
+            }
         }
 
         $data = [
@@ -125,6 +174,7 @@ class AdminContractController extends Controller
             'company_name' => trim((string) $validated['company_name']),
             'company_address' => trim((string) $validated['company_address']),
             'division' => trim((string) $selectedDivision->name),
+            'sub_division' => trim((string) ($selectedSubDivision?->name ?? '')),
             'first_party_name' => trim((string) $validated['sign_employer_name']),
             'first_party_position' => 'Director',
             'first_party_address' => trim((string) $validated['company_address']),
@@ -178,6 +228,7 @@ class AdminContractController extends Controller
         $formData = array_merge($validated, [
             'contract_number' => $data['contract_number'],
             'division' => $selectedDivision->name,
+            'sub_division' => $selectedSubDivision?->name,
             'position_title' => $selectedPosition->name,
         ]);
 
@@ -242,6 +293,7 @@ class AdminContractController extends Controller
             'employee_id_number' => '1234567890123456',
             'employee_phone' => '+62 812 0000 0000',
             'employment_basis' => $isFixedTerm ? 'Full Time' : 'Full Time',
+            'sub_division' => 'Operations',
             'position_title' => 'HR & Finance Manager',
             'start_date' => $today->copy()->addDays(7)->format('F j, Y'),
             'start_date_id' => $today->copy()->addDays(7)->locale('id')->translatedFormat('j F Y'),
@@ -298,9 +350,7 @@ class AdminContractController extends Controller
             'footer_image' => $this->imageDataUri(public_path('images/contracts/letterhead-footer.png')),
         ];
 
-        $pdf = Pdf::loadView('admin.contracts.pdf.employment-contract', [
-            'data' => $data,
-        ])->setPaper('a4');
+        $pdf = $this->buildContractPdf($data);
 
         return $pdf->stream('contract-template-preview.pdf');
     }
@@ -357,6 +407,7 @@ class AdminContractController extends Controller
             'bpjs_jp_enabled' => (bool) ($formData['bpjs_jp_enabled'] ?? true),
             'bpjs_jkp_enabled' => (bool) ($formData['bpjs_jkp_enabled'] ?? true),
             'division' => $formData['division'] ?? optional($contract->division)->name ?? '',
+            'sub_division' => $formData['sub_division'] ?? '',
             'pay_day' => (int) ($formData['pay_day'] ?? 1),
             'role_brief_points' => $formData['role_brief_points'] ?? '',
             'responsibilities' => $formData['responsibilities'] ?? '',
@@ -371,32 +422,103 @@ class AdminContractController extends Controller
             'footer_image' => $this->imageDataUri(public_path('images/contracts/letterhead-footer.png')),
         ];
 
-        $pdf = Pdf::loadView('admin.contracts.pdf.employment-contract', [
-            'data' => $data,
-        ])->setPaper('a4');
+        $pdf = $this->buildContractPdf($data);
 
         return $pdf->download(Str::slug($contract->contract_number).'.pdf');
     }
 
     public function storeResponsibility(Request $request): JsonResponse
     {
+        $this->ensureCanCreateResponsibilities($request);
+
         $validated = $request->validate([
+            'position_id' => ['required', 'integer', 'exists:positions,id'],
             'title_id' => ['required', 'string', 'max:255'],
             'description_id' => ['nullable', 'string', 'max:2000'],
             'title_en' => ['required', 'string', 'max:255'],
             'description_en' => ['nullable', 'string', 'max:2000'],
         ]);
 
-        $payload = json_encode([[
+        $responsibility = Responsibility::create([
+            'position_id' => (int) $validated['position_id'],
             'title_id' => trim((string) $validated['title_id']),
             'description_id' => trim((string) ($validated['description_id'] ?? '')),
             'title_en' => trim((string) $validated['title_en']),
             'description_en' => trim((string) ($validated['description_en'] ?? '')),
-        ]], JSON_UNESCAPED_UNICODE);
+        ]);
 
-        $this->persistResponsibilitiesFromInput((string) $payload);
+        return response()->json([
+            'ok' => true,
+            'item' => [
+                'id' => (int) $responsibility->id,
+                'position_id' => (int) $responsibility->position_id,
+                'title_id' => (string) $responsibility->title_id,
+                'description_id' => (string) ($responsibility->description_id ?? ''),
+                'title_en' => (string) $responsibility->title_en,
+                'description_en' => (string) ($responsibility->description_en ?? ''),
+            ],
+        ]);
+    }
+
+    public function destroyResponsibility(Responsibility $responsibility): JsonResponse
+    {
+        $this->ensureSuperAdminCanManageResponsibilities(request());
+
+        $responsibility->delete();
 
         return response()->json(['ok' => true]);
+    }
+
+    public function updateResponsibility(Request $request, Responsibility $responsibility): JsonResponse
+    {
+        $this->ensureSuperAdminCanManageResponsibilities($request);
+
+        $validated = $request->validate([
+            'position_id' => ['required', 'integer', 'exists:positions,id'],
+            'title_id' => ['required', 'string', 'max:255'],
+            'description_id' => ['nullable', 'string', 'max:2000'],
+            'title_en' => ['required', 'string', 'max:255'],
+            'description_en' => ['nullable', 'string', 'max:2000'],
+        ]);
+
+        $responsibility->update([
+            'position_id' => (int) $validated['position_id'],
+            'title_id' => trim((string) $validated['title_id']),
+            'description_id' => trim((string) ($validated['description_id'] ?? '')),
+            'title_en' => trim((string) $validated['title_en']),
+            'description_en' => trim((string) ($validated['description_en'] ?? '')),
+        ]);
+
+        return response()->json([
+            'ok' => true,
+            'item' => [
+                'id' => (int) $responsibility->id,
+                'position_id' => (int) $responsibility->position_id,
+                'title_id' => (string) $responsibility->title_id,
+                'description_id' => (string) ($responsibility->description_id ?? ''),
+                'title_en' => (string) $responsibility->title_en,
+                'description_en' => (string) ($responsibility->description_en ?? ''),
+            ],
+        ]);
+    }
+
+    public function bulkDestroyResponsibilities(Request $request): JsonResponse
+    {
+        $this->ensureSuperAdminCanManageResponsibilities($request);
+
+        $validated = $request->validate([
+            'ids' => ['required', 'array', 'min:1'],
+            'ids.*' => ['integer', 'exists:responsibilities,id'],
+        ]);
+
+        $deletedCount = Responsibility::query()
+            ->whereIn('id', $validated['ids'])
+            ->delete();
+
+        return response()->json([
+            'ok' => true,
+            'deleted_count' => $deletedCount,
+        ]);
     }
 
     public function destroy(Contract $contract)
@@ -413,6 +535,16 @@ class AdminContractController extends Controller
             'fixed_term_pkwt' => 'Fixed Term / PKWT',
             'permanent_pkwtt' => 'Permanent / PKWTT',
         ];
+    }
+
+    private function ensureCanCreateResponsibilities(Request $request): void
+    {
+        abort_unless(in_array($request->user()?->role, ['super_admin', 'admin'], true), 403, 'Only admins can create responsibilities.');
+    }
+
+    private function ensureSuperAdminCanManageResponsibilities(Request $request): void
+    {
+        abort_unless($request->user()?->role === 'super_admin', 403, 'Only super admins can manage responsibilities.');
     }
 
     private function formatIdr(float $amount): string
@@ -434,6 +566,15 @@ class AdminContractController extends Controller
         $mime = mime_content_type($path) ?: 'image/png';
 
         return 'data:'.$mime.';base64,'.base64_encode($contents);
+    }
+
+    private function buildContractPdf(array $data)
+    {
+        return Pdf::loadView('admin.contracts.pdf.employment-contract', [
+            'data' => $data,
+        ])->setPaper('a4')->setOptions([
+            'defaultFont' => 'bookantiquapdf',
+        ]);
     }
 
     private function normalizeCurrencyInput(mixed $value): mixed
@@ -463,199 +604,4 @@ class AdminContractController extends Controller
         return (string) $total;
     }
 
-    private function getResponsibilityLibrary(): array
-    {
-        $path = $this->responsibilityLibraryPath();
-
-        if (! File::exists($path)) {
-            $defaults = $this->defaultResponsibilities();
-            File::ensureDirectoryExists(dirname($path));
-            File::put($path, json_encode($defaults, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
-
-            return $defaults;
-        }
-
-        $decoded = json_decode((string) File::get($path), true);
-        if (! is_array($decoded)) {
-            return $this->defaultResponsibilities();
-        }
-
-        $sanitized = [];
-        foreach ($decoded as $item) {
-            if (! is_array($item)) {
-                continue;
-            }
-
-            // Backward compatible with old schema: title/description.
-            $titleId = trim((string) ($item['title_id'] ?? ''));
-            $descId = trim((string) ($item['description_id'] ?? ''));
-            $titleEn = trim((string) ($item['title_en'] ?? ($item['title'] ?? '')));
-            $descEn = trim((string) ($item['description_en'] ?? ($item['description'] ?? '')));
-
-            if ($titleId === '' && $titleEn === '') {
-                continue;
-            }
-
-            if ($titleId === '') {
-                $titleId = $titleEn;
-            }
-
-            if ($titleEn === '') {
-                $titleEn = $titleId;
-            }
-
-            $sanitized[] = [
-                'title_id' => $titleId,
-                'description_id' => $descId,
-                'title_en' => $titleEn,
-                'description_en' => $descEn,
-            ];
-        }
-
-        return $sanitized === [] ? $this->defaultResponsibilities() : $sanitized;
-    }
-
-    private function persistResponsibilitiesFromInput(string $raw): void
-    {
-        $newItems = $this->parseResponsibilitiesInput($raw);
-        if ($newItems === []) {
-            return;
-        }
-
-        $existingItems = $this->getResponsibilityLibrary();
-        $seen = [];
-
-        foreach ($existingItems as $item) {
-            $seen[$this->responsibilityKey(
-                (string) ($item['title_id'] ?? ''),
-                (string) ($item['description_id'] ?? ''),
-                (string) ($item['title_en'] ?? ''),
-                (string) ($item['description_en'] ?? '')
-            )] = true;
-        }
-
-        foreach ($newItems as $item) {
-            $key = $this->responsibilityKey(
-                (string) ($item['title_id'] ?? ''),
-                (string) ($item['description_id'] ?? ''),
-                (string) ($item['title_en'] ?? ''),
-                (string) ($item['description_en'] ?? '')
-            );
-            if (isset($seen[$key])) {
-                continue;
-            }
-
-            $existingItems[] = $item;
-            $seen[$key] = true;
-        }
-
-        $path = $this->responsibilityLibraryPath();
-        File::ensureDirectoryExists(dirname($path));
-        File::put($path, json_encode($existingItems, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
-    }
-
-    private function parseResponsibilitiesInput(string $raw): array
-    {
-        $decoded = json_decode($raw, true);
-        if (is_array($decoded)) {
-            $items = [];
-            foreach ($decoded as $row) {
-                if (! is_array($row)) {
-                    continue;
-                }
-
-                $titleId = trim((string) ($row['title_id'] ?? ''));
-                $descId = trim((string) ($row['description_id'] ?? ''));
-                $titleEn = trim((string) ($row['title_en'] ?? ''));
-                $descEn = trim((string) ($row['description_en'] ?? ''));
-
-                if ($titleId === '' && $titleEn === '') {
-                    continue;
-                }
-
-                if ($titleId === '') {
-                    $titleId = $titleEn;
-                }
-
-                if ($titleEn === '') {
-                    $titleEn = $titleId;
-                }
-
-                $items[] = [
-                    'title_id' => $titleId,
-                    'description_id' => $descId,
-                    'title_en' => $titleEn,
-                    'description_en' => $descEn,
-                ];
-            }
-
-            return $items;
-        }
-
-        $lines = preg_split('/\r\n|\r|\n/', $raw) ?: [];
-        $items = [];
-
-        foreach ($lines as $line) {
-            $line = trim((string) $line);
-            if ($line === '') {
-                continue;
-            }
-
-            $parts = explode(':', $line, 2);
-            $title = trim((string) ($parts[0] ?? ''));
-            $description = trim((string) ($parts[1] ?? ''));
-            if ($title === '') {
-                continue;
-            }
-
-            $items[] = [
-                'title_id' => $title,
-                'description_id' => $description,
-                'title_en' => $title,
-                'description_en' => $description,
-            ];
-        }
-
-        return $items;
-    }
-
-    private function responsibilityLibraryPath(): string
-    {
-        return storage_path('app/contracts/responsibilities.json');
-    }
-
-    private function responsibilityKey(string $titleId, string $descriptionId, string $titleEn, string $descriptionEn): string
-    {
-        return mb_strtolower(trim($titleId).'|'.trim($descriptionId).'|'.trim($titleEn).'|'.trim($descriptionEn));
-    }
-
-    private function defaultResponsibilities(): array
-    {
-        return [
-            [
-                'title_id' => 'Interaksi dengan Klien',
-                'description_id' => 'Berinteraksi dengan keluarga terkait pembayaran, pemesanan, dan koordinasi layanan.',
-                'title_en' => 'Client Engagement',
-                'description_en' => 'Engage with families regarding payments, bookings, and service coordination.',
-            ],
-            [
-                'title_id' => 'Onboarding Staf',
-                'description_id' => 'Menangani proses onboarding staf baru untuk Perusahaan serta klien dan mitra bisnis.',
-                'title_en' => 'Staff Onboarding',
-                'description_en' => 'Handle onboarding of new staff for the Company and for its clients and business partners.',
-            ],
-            [
-                'title_id' => 'Integritas & Kepatuhan Keuangan',
-                'description_id' => 'Mengelola keuangan dan penagihan secara akurat serta melaporkan aktivitas mencurigakan.',
-                'title_en' => 'Financial Integrity & Compliance',
-                'description_en' => 'Maintain company finances and invoicing accurately and report suspicious activity.',
-            ],
-            [
-                'title_id' => 'Penagihan & Pelacakan Pembayaran',
-                'description_id' => 'Membuat invoice, memantau pembayaran masuk, dan menjaga akun tetap mutakhir.',
-                'title_en' => 'Invoicing & Payment Tracking',
-                'description_en' => 'Generate invoices, monitor incoming payments, and keep accounts updated.',
-            ],
-        ];
-    }
 }

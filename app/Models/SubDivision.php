@@ -4,9 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Division extends Model
+class SubDivision extends Model
 {
     protected $fillable = [
+        'division_id',
         'name',
         'is_active',
     ];
@@ -15,13 +16,13 @@ class Division extends Model
         'is_active' => 'boolean',
     ];
 
+    public function division()
+    {
+        return $this->belongsTo(Division::class);
+    }
+
     public function positions()
     {
         return $this->hasMany(Position::class);
-    }
-
-    public function subDivisions()
-    {
-        return $this->hasMany(SubDivision::class);
     }
 }

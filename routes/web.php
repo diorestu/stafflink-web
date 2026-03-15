@@ -10,6 +10,7 @@ use App\Http\Controllers\AdminContractController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AdminDivisionPositionController;
 use App\Http\Controllers\AdminFaqController;
+use App\Http\Controllers\AdminForgotPasswordController;
 use App\Http\Controllers\AdminHeaderFooterController;
 use App\Http\Controllers\AdminJobApplicationController;
 use App\Http\Controllers\AdminLeadController;
@@ -89,6 +90,12 @@ Route::get('/{country}', [GlobalStaffingController::class, 'show'])
 Route::get('/admin/login', [AdminAuthController::class, 'showLogin'])->name('admin.login');
 Route::post('/admin/login', [AdminAuthController::class, 'login']);
 Route::post('/admin/logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
+Route::middleware('guest')->group(function () {
+    Route::get('/admin/forgot-password', [AdminForgotPasswordController::class, 'showLinkRequestForm'])->name('admin.password.request');
+    Route::post('/admin/forgot-password', [AdminForgotPasswordController::class, 'sendResetLinkEmail'])->name('admin.password.email');
+    Route::get('/admin/reset-password/{token}', [AdminForgotPasswordController::class, 'showResetForm'])->name('admin.password.reset');
+    Route::post('/admin/reset-password', [AdminForgotPasswordController::class, 'reset'])->name('admin.password.reset.submit');
+});
 
 // Admin (protected)
 Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
@@ -115,13 +122,11 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
         Route::get('/contracts/preview', [AdminContractController::class, 'preview'])->name('contracts.preview');
         Route::post('/contracts/generate', [AdminContractController::class, 'generate'])->name('contracts.generate');
         Route::post('/contracts/responsibilities', [AdminContractController::class, 'storeResponsibility'])->name('contracts.responsibilities.store');
+        Route::delete('/contracts/responsibilities', [AdminContractController::class, 'bulkDestroyResponsibilities'])->name('contracts.responsibilities.bulk-destroy');
+        Route::patch('/contracts/responsibilities/{responsibility}', [AdminContractController::class, 'updateResponsibility'])->name('contracts.responsibilities.update');
+        Route::delete('/contracts/responsibilities/{responsibility}', [AdminContractController::class, 'destroyResponsibility'])->name('contracts.responsibilities.destroy');
         Route::get('/contracts/{contract}/regenerate', [AdminContractController::class, 'regenerate'])->name('contracts.regenerate');
         Route::delete('/contracts/{contract}', [AdminContractController::class, 'destroy'])->name('contracts.destroy');
-        Route::get('/division-position', [AdminDivisionPositionController::class, 'index'])->name('division-position.index');
-        Route::post('/division-position/divisions', [AdminDivisionPositionController::class, 'storeDivision'])->name('division-position.divisions.store');
-        Route::delete('/division-position/divisions/{division}', [AdminDivisionPositionController::class, 'destroyDivision'])->name('division-position.divisions.destroy');
-        Route::post('/division-position/positions', [AdminDivisionPositionController::class, 'storePosition'])->name('division-position.positions.store');
-        Route::delete('/division-position/positions/{position}', [AdminDivisionPositionController::class, 'destroyPosition'])->name('division-position.positions.destroy');
         Route::get('/nanny-inquiries', [AdminNannyInquiryController::class, 'index'])->name('nanny-inquiries.index');
         Route::post('/nanny-inquiries/wedding-events', [AdminNannyInquiryController::class, 'storeWeddingEvent'])->name('nanny-inquiries.wedding-events.store');
         Route::delete('/nanny-inquiries/wedding-events/{weddingEvent}', [AdminNannyInquiryController::class, 'destroyWeddingEvent'])->name('nanny-inquiries.wedding-events.destroy');
@@ -143,6 +148,18 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::middleware(EnsureUserRole::class.':super_admin')->group(function () {
         // User management
         Route::resource('users', AdminUserController::class)->except(['show']);
+
+        Route::get('/division-position', [AdminDivisionPositionController::class, 'index'])->name('division-position.index');
+        Route::get('/divisions', [AdminDivisionPositionController::class, 'divisionsIndex'])->name('divisions.index');
+        Route::post('/divisions', [AdminDivisionPositionController::class, 'storeDivision'])->name('divisions.store');
+        Route::delete('/divisions/{division}', [AdminDivisionPositionController::class, 'destroyDivision'])->name('divisions.destroy');
+        Route::post('/divisions/sub-divisions', [AdminDivisionPositionController::class, 'storeSubDivision'])->name('divisions.sub-divisions.store');
+        Route::delete('/divisions/sub-divisions/{subDivision}', [AdminDivisionPositionController::class, 'destroySubDivision'])->name('divisions.sub-divisions.destroy');
+        Route::get('/roles-responsibilities', [AdminDivisionPositionController::class, 'rolesResponsibilitiesIndex'])->name('roles-responsibilities.index');
+        Route::post('/roles-responsibilities/positions', [AdminDivisionPositionController::class, 'storePosition'])->name('roles-responsibilities.positions.store');
+        Route::delete('/roles-responsibilities/positions/{position}', [AdminDivisionPositionController::class, 'destroyPosition'])->name('roles-responsibilities.positions.destroy');
+        Route::post('/roles-responsibilities/responsibilities', [AdminDivisionPositionController::class, 'storeResponsibility'])->name('roles-responsibilities.responsibilities.store');
+        Route::delete('/roles-responsibilities/responsibilities/{responsibility}', [AdminDivisionPositionController::class, 'destroyResponsibility'])->name('roles-responsibilities.responsibilities.destroy');
 
         // Page Sections
         Route::get('/sections', [AdminController::class, 'index'])->name('sections.index');

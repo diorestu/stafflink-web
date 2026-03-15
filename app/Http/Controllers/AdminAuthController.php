@@ -25,7 +25,7 @@ class AdminAuthController extends Controller
 
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $user = Auth::user();
-            if (!$user || !in_array($user->role, ['super_admin', 'admin'], true)) {
+            if (!$user || !in_array($user->role, ['super_admin', 'admin', 'booking_checker'], true)) {
                 Auth::logout();
 
                 return back()->withErrors([

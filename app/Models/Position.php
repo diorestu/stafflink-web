@@ -8,6 +8,7 @@ class Position extends Model
 {
     protected $fillable = [
         'division_id',
+        'sub_division_id',
         'name',
         'is_active',
     ];
@@ -19,5 +20,15 @@ class Position extends Model
     public function division()
     {
         return $this->belongsTo(Division::class);
+    }
+
+    public function subDivision()
+    {
+        return $this->belongsTo(SubDivision::class);
+    }
+
+    public function responsibilities()
+    {
+        return $this->hasMany(Responsibility::class);
     }
 }

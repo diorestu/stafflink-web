@@ -7,6 +7,7 @@ use App\Events\AppointmentApproved;
 use App\Listeners\CreateTeamsEventOnAppointmentApproved;
 use App\Listeners\SendApplicantStatusNotification;
 use App\Listeners\SendAppointmentApprovedNotification;
+use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
@@ -30,6 +31,13 @@ class AppServiceProvider extends ServiceProvider
         // Support older MySQL/MariaDB index byte limits with utf8mb4.
         Schema::defaultStringLength(191);
         Model::preventLazyLoading(!app()->isProduction());
+
+        ResetPassword::createUrlUsing(function ($user, string $token): string {
+            return url(route('admin.password.reset', [
+                'token' => $token,
+                'email' => $user->getEmailForPasswordReset(),
+            ], false));
+        });
 
         Event::listen(AppointmentApproved::class, SendAppointmentApprovedNotification::class);
         Event::listen(AppointmentApproved::class, CreateTeamsEventOnAppointmentApproved::class);

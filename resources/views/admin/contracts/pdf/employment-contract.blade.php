@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>PKWTT Contract</title>
+    <title>{{ ($data['selected_template'] ?? 'fixed_term_pkwt') === 'fixed_term_pkwt' ? 'PKWT Contract' : 'PKWTT Contract' }}</title>
     @php
         $bookAntiquaAvailable =
             is_file(public_path('fonts/BookAntiqua.ttf')) &&
@@ -42,14 +42,14 @@
         body {
             margin: 0;
             padding: 178px 0.5in 82px 1.15in;
-            font-family: {{ $bookAntiquaAvailable ? "'BookAntiquaPdf', 'Book Antiqua', 'Palatino Linotype', Palatino, serif" : "'DejaVu Serif', serif" }};
+            font-family: {{ $bookAntiquaAvailable ? "'bookantiquapdf', 'Book Antiqua', 'Palatino Linotype', Palatino, serif" : "'DejaVu Serif', serif" }};
             font-size: 12px;
             color: #1f2937;
             line-height: 1.45;
             text-align: justify;
         }
         body, p, li, td, h1, h2, h3, h4, h5, h6, span, div {
-            font-family: {{ $bookAntiquaAvailable ? "'BookAntiquaPdf', 'Book Antiqua', 'Palatino Linotype', Palatino, serif" : "'DejaVu Serif', serif" }};
+            font-family: {{ $bookAntiquaAvailable ? "'bookantiquapdf', 'Book Antiqua', 'Palatino Linotype', Palatino, serif" : "'DejaVu Serif', serif" }};
         }
         header { position: fixed; top: 0; left: 0; right: 0; height: 138px; }
         footer { position: fixed; bottom: 0; left: 0; right: 0; height: 42px; }
@@ -156,18 +156,28 @@
         }
         .role-highlights {
             margin: 6px 0 10px;
+            line-height: 1.15;
         }
         .role-highlights p {
             margin: 0 0 6px;
         }
-        .role-highlights ul,
-        .role-highlights ol {
-            margin: 6px 0 8px 24px;
+        .role-highlights-columns {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .role-highlights-columns td {
+            width: 50%;
+            vertical-align: top;
+            padding-right: 16px;
+        }
+        .role-highlights-columns ul {
+            margin: 0 0 0 20px;
             padding: 0;
         }
-        .role-highlights li {
+        .role-highlights-columns li {
             margin-bottom: 4px;
-            margin-left: 18px;
+            margin-left: 10px;
+            line-height: 1.15;
         }
         ol.alpha-list { margin: 0 0 7px 26px; padding: 0; list-style-type: lower-alpha; }
         ol.alpha-list li { margin-bottom: 4px; }
@@ -204,7 +214,7 @@
                 @endif
             </td>
             <td>
-                <h1 class="text-center">SURAT PERJANJIAN KERJA KONTRAK {{ strtoupper($data['contract_type_en'] == 'fixed_term' ? 'PKWT' : 'PKWTT') }}/ <em>CONTRACT {{ strtoupper($data['contract_type_en']) }} EMPLOYMENT AGREEMENT</em></h1>
+                <h1 class="text-center">SURAT PERJANJIAN KERJA KONTRAK {{ ($data['selected_template'] ?? 'fixed_term_pkwt') === 'fixed_term_pkwt' ? 'PKWT' : 'PKWTT' }}/ <em>CONTRACT {{ strtoupper($data['contract_type_en']) }} EMPLOYMENT AGREEMENT</em></h1>
             </td>
         </tr>
     </table>
@@ -289,12 +299,50 @@
     <p><em>For clarity the role covers but not limited to:</em></p>
     @php
         $roleBriefRaw = trim((string) ($data['role_brief_points'] ?? ''));
+        $roleHighlightItems = [];
+
+        if ($roleBriefRaw !== '' && preg_match_all('/<li[^>]*>(.*?)<\/li>/is', $roleBriefRaw, $matches)) {
+            foreach ($matches[1] as $match) {
+                $item = trim(html_entity_decode(strip_tags($match), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+                if ($item !== '') {
+                    $roleHighlightItems[] = $item;
+                }
+            }
+        }
+
+        $roleHighlightLeft = array_slice($roleHighlightItems, 0, 4);
+        $roleHighlightRight = array_slice($roleHighlightItems, 4);
     @endphp
     @if ($roleBriefRaw !== '' && $roleBriefRaw !== '<p><br></p>')
-        <div class="role-highlights">{!! $roleBriefRaw !!}</div>
+        <div class="role-highlights">
+            @if (count($roleHighlightItems) > 0)
+                <table class="role-highlights-columns">
+                    <tr>
+                        <td>
+                            <ul>
+                                @foreach ($roleHighlightLeft as $item)
+                                    <li><em>{{ $item }}</em></li>
+                                @endforeach
+                            </ul>
+                        </td>
+                        <td>
+                            @if (count($roleHighlightRight) > 0)
+                                <ul>
+                                    @foreach ($roleHighlightRight as $item)
+                                        <li><em>{{ $item }}</em></li>
+                                    @endforeach
+                                </ul>
+                            @endif
+                        </td>
+                    </tr>
+                </table>
+            @else
+                {!! $roleBriefRaw !!}
+            @endif
+        </div>
     @endif
 
-    
+    <div class="page-break"></div>
     <div class="article-head">
         <p class="article-number"><em>BACKGROUND</em></p>
         <p><em>A. The Employer has agreed to employ the Employee, and the Employee has agreed to work for the Employer in the position described in this Agreement and the Schedule.</em></p>
@@ -724,10 +772,75 @@
     <p class="para-label">Paragraph 6</p>
     <p><em>The EMPLOYEE shall not make personal calls during working hours, except in the case of an emergency, in which event the EMPLOYEE must notify the EMPLOYER as soon as reasonably practicable.</em></p>
 
+    <p class="ayat-label">Ayat 7</p>
+    <p>Dalam keadaan darurat medis dan pertolongan pertama, PIHAK KEDUA wajib segera memanggil ambulans apabila keadaan darurat bersifat kritis dan Anak mengalami cedera berat. Dalam keadaan yang lebih ringan, PIHAK KEDUA wajib terlebih dahulu menghubungi orang tua Anak dan mengonfirmasi tindakan selanjutnya yang harus dilakukan.</p>
+    <p class="para-label">Paragraph 7</p>
+    <p><em>In the event of a medical emergency or first aid situation, the EMPLOYEE must immediately call an ambulance if the emergency is critical and the Children have been seriously injured. In minor cases, the EMPLOYEE must first call the Children's parents and confirm the next course of action.</em></p>
+
+    <p class="ayat-label">Ayat 8</p>
+    <p>PIHAK KEDUA diharapkan menjaga profesionalisme selama jam kerja berbayar dan memahami bahwa PIHAK KEDUA dibayar untuk bekerja, bukan untuk menggunakan telepon genggam pribadi secara berlebihan atau untuk kepentingan yang tidak berkaitan dengan pekerjaan.</p>
+    <p class="para-label">Paragraph 8</p>
+    <p><em>The EMPLOYEE is expected to maintain professionalism during paid working hours and understands that they are paid to work, not to spend time on a mobile phone for excessive or non-work-related purposes.</em></p>
+
+    <p class="ayat-label">Ayat 9</p>
+    <p>PIHAK KEDUA dengan ini menyetujui hal-hal berikut:</p>
+    <ol class="alpha-list">
+        <li>tidak diperkenankan melakukan panggilan pribadi selama jam kerja kecuali dalam keadaan darurat, dan dalam hal demikian PIHAK KEDUA wajib memberitahukan PIHAK PERTAMA sesegera mungkin; dan</li>
+        <li>apabila membawa Anak keluar rumah atau melakukan kegiatan di luar, PIHAK KEDUA wajib memastikan telepon genggam dalam mode dering (bukan senyap) serta wajib segera menjawab panggilan dari PIHAK PERTAMA apabila aman untuk dilakukan.</li>
+    </ol>
+    <p class="para-label">Paragraph 9</p>
+    <p><em>The EMPLOYEE agrees to the following:</em></p>
+    <ol class="alpha-list">
+        <li><em>no personal calls are allowed during work hours unless there is an emergency, in which case the EMPLOYEE must notify the EMPLOYER as soon as reasonably practicable; and</em></li>
+        <li><em>when taking the Children on outings, the EMPLOYEE must keep their phone on ring mode (not silent) and must answer the EMPLOYER's calls immediately when it is safe to do so.</em></li>
+    </ol>
+
+    <p class="ayat-label">Ayat 10</p>
+    <p>Standar kebersihan dan tata berpakaian yang diharapkan bagi PIHAK KEDUA adalah sebagai berikut:</p>
+    <ol class="alpha-list">
+        <li>PIHAK KEDUA wajib selalu tampil sopan, rapi, bersih, dan profesional;</li>
+        <li>PIHAK KEDUA wajib mengenakan celana panjang atau celana pendek, kaos, dan sepatu anti-slip (bukan sandal) untuk menjaga penampilan yang profesional dan aman, apabila seragam Staff Link belum tersedia;</li>
+        <li>PIHAK KEDUA wajib membawa celana renang dan kacamata renang setiap hari apabila dibutuhkan untuk pelaksanaan tugas;</li>
+        <li>PIHAK KEDUA wajib mengenakan seragam Staff Link selama bekerja setiap saat apabila seragam telah diberikan;</li>
+        <li>deposit sebesar IDR 500.000 akan dipotong dari gaji pertama untuk setiap seragam dan akan dikembalikan pada saat seragam dikembalikan dalam keadaan baik dan tidak rusak;</li>
+        <li>apabila seragam rusak dalam bentuk apa pun, deposit tidak akan dikembalikan dan seragam tetap menjadi milik Staff Link karena seragam tersebut hanya dipinjamkan kepada PIHAK KEDUA selama masa kerja; dan</li>
+        <li>tidak mengembalikan seragam karyawan dapat dianggap sebagai pencurian, dapat memengaruhi pembayaran gaji terakhir PIHAK KEDUA, dan dapat dilaporkan kepada pihak kepolisian sebagai barang yang dicuri.</li>
+    </ol>
+    <p class="para-label">Paragraph 10</p>
+    <p><em>The expected hygiene and dress code standards for the EMPLOYEE are as follows:</em></p>
+    <ol class="alpha-list">
+        <li><em>the EMPLOYEE is expected to present in a modest, neat, clean, and professional manner at all times;</em></li>
+        <li><em>the EMPLOYEE must wear pants or shorts, a t-shirt, and non-slip sneakers (not slippers) to ensure a professional and presentable appearance where the Staff Link uniform is not yet available;</em></li>
+        <li><em>the EMPLOYEE must bring swimming shorts and goggles daily where required for the role;</em></li>
+        <li><em>the EMPLOYEE must wear the Staff Link uniform to work at all times once the uniform has been provided;</em></li>
+        <li><em>a deposit of IDR 500,000 shall be deducted from the first salary for each uniform and shall be refunded upon return of the uniform provided it is not damaged;</em></li>
+        <li><em>if the uniform is damaged in any way, the deposit shall not be refunded and the uniform shall remain the property of Staff Link, as it is only loaned to the staff member or EMPLOYEE during the period of employment; and</em></li>
+        <li><em>failure to return the EMPLOYEE uniform may be treated as theft, may affect the EMPLOYEE's final salary payment, and may be reported to the police as stolen property.</em></li>
+    </ol>
+
+    <p class="ayat-label">Ayat 11</p>
+    <p>Perilaku yang dilarang bagi PIHAK KEDUA meliputi hal-hal berikut:</p>
+    <ol class="alpha-list">
+        <li>dilarang merokok di dalam rumah;</li>
+        <li>dilarang mengonsumsi alkohol atau narkotika/obat-obatan terlarang kapan pun; dan</li>
+        <li>apabila PIHAK KEDUA terbukti melanggar ketentuan ini, khususnya di sekitar anak di bawah umur yang berada dalam pengawasannya, PIHAK KEDUA dapat menghadapi tuntutan hukum dan dengan menandatangani Perjanjian ini PIHAK KEDUA menyetujui adanya sanksi finansial lebih dari USD 50.000, sejauh diperbolehkan oleh hukum yang berlaku.</li>
+    </ol>
+    <p class="para-label">Paragraph 11</p>
+    <p><em>Prohibited behaviour for the EMPLOYEE includes the following:</em></p>
+    <ol class="alpha-list">
+        <li><em>no smoking is allowed inside the house;</em></li>
+        <li><em>no consumption of alcohol or drugs is permitted at any time; and</em></li>
+        <li><em>if the EMPLOYEE is found violating these terms, particularly around underage children entrusted to their care, the EMPLOYEE may face legal claims and, by signing this Agreement, agrees to financial penalties exceeding USD 50,000, to the extent permitted by applicable law.</em></li>
+    </ol>
+
     <div class="article-head">
         <p class="article-number">PASAL 10 / <em>ARTICLE 10</em></p>
         <p class="article-title">NON-SOLISITASI, KERAHASIAAN, DAN PERLINDUNGAN USAHA / <em>NON-SOLICITATION, CONFIDENTIALITY, AND BUSINESS PROTECTION</em></p>
     </div>
+    @php
+        $positionTitleArticle10 = mb_strtolower((string) ($data['position_title'] ?? ''), 'UTF-8');
+        $showFamilyConfidentialityClause = str_contains($positionTitleArticle10, 'nanny') || str_contains($positionTitleArticle10, 'cleaner');
+    @endphp
     <p class="ayat-label">Ayat 1</p>
     <p>Setelah berakhirnya hubungan kerja dengan alasan apa pun, PIHAK KEDUA dilarang, baik secara langsung maupun tidak langsung, melakukan pendekatan, penawaran, permintaan, atau upaya solisitasi terhadap Klien PIHAK PERTAMA untuk memberikan jasa yang bersaing atau sejenis, sepanjang tindakan tersebut didasarkan pada atau memanfaatkan Informasi Rahasia, rahasia dagang, struktur harga, data klien, atau hubungan usaha yang diperoleh selama PIHAK KEDUA bekerja pada PIHAK PERTAMA.</p>
     <p class="para-label">Paragraph 1</p>
@@ -781,8 +894,55 @@
     <p class="para-label">Paragraph 9</p>
     <p><em>The EMPLOYEE acknowledges that any breach of this Article may cause irreparable harm to the EMPLOYER, and that the EMPLOYER shall be entitled to seek damages, injunctive relief, and any other remedies available under the laws of {{ $data['governing_law'] }}.</em></p>
 
+    @if ($showFamilyConfidentialityClause)
+        <p class="ayat-label">Ayat 10</p>
+        <p>Karyawan pekerja setuju untuk menjaga kerahasiaan penuh terkait informasi pribadi, medis, atau sensitif milik keluarga Pemberi Kerja.</p>
+        <p class="para-label">Paragraph 10</p>
+        <p><em>The staff member agrees to maintain strict confidentiality regarding any personal, medical, or sensitive information pertaining to the Employer's family.</em></p>
+
+        <p class="ayat-label">Ayat 11</p>
+        <ol class="alpha-list">
+            <li>Karyawan pekerja tidak diperbolehkan mengambil foto atau video anggota keluarga Pemberi Kerja tanpa persetujuan tertulis dari Pemberi Kerja.</li>
+            <li>Karyawan pekerja juga setuju untuk tidak memposting foto atau informasi terkait keluarga Pemberi Kerja di media sosial atau platform publik dalam keadaan apa pun.</li>
+            <li>Pelanggaran terhadap perjanjian kerahasiaan ini dianggap sebagai pelanggaran kontrak, dan Pemberi Kerja berhak memutuskan hubungan kerja secara langsung tanpa kompensasi.</li>
+            <li>Selain itu, karyawan pekerja memahami bahwa setiap pelanggaran kerahasiaan dapat mengakibatkan konsekuensi hukum, termasuk namun tidak terbatas pada denda finansial atau tindakan hukum.</li>
+            <li>Karyawan pekerja juga dilarang membicarakan urusan keluarga, kondisi anak, atau informasi rumah tangga kepada pihak luar tanpa izin tertulis dari Pemberi Kerja.</li>
+            <li>Pekerja dilarang keras berkomunikasi dengan tamu yang datang ke rumah keluarga dan tidak boleh terlibat dalam percakapan dengan mereka. Fokus utama Pekerja harus selalu tertuju pada anak, memastikan pengasuhan dan pengawasannya. Pekerja setuju untuk bertindak dengan profesionalisme tinggi dan menjaga kerahasiaan penuh setiap saat.</li>
+            <li>Selain itu, Pekerja setuju untuk tidak membagikan informasi kontak, nomor telepon, atau informasi pribadi keluarga kepada siapa pun dalam keadaan apa pun. Setiap pelanggaran ketentuan ini akan dianggap sebagai pelanggaran serius terhadap kerahasiaan dan dapat menyebabkan pemutusan hubungan kerja secara langsung tanpa kompensasi, serta konsekuensi hukum.</li>
+        </ol>
+        <p class="para-label">Paragraph 11</p>
+        <ol class="alpha-list">
+            <li><em>The staff member is not permitted to take photos or videos of the Employer's family members without explicit written consent from the Employer.</em></li>
+            <li><em>Additionally, the staff member agrees not to post any photos or information related to the Employer's family on social media or public platforms under any circumstances.</em></li>
+            <li><em>Failure to adhere to this confidentiality agreement constitutes a breach of contract, and the Employer reserves the right to terminate the staff member's employment immediately without compensation.</em></li>
+            <li><em>Furthermore, the staff member acknowledges that any breach of confidentiality may result in legal consequences, including but not limited to financial penalties or legal action.</em></li>
+            <li><em>The staff member is also prohibited from discussing private family matters, the child's condition, or any household-related information with external parties without explicit written permission from the Employer.</em></li>
+            <li><em>The staff member is strictly prohibited from communicating with visitors to the family home and must not engage in discussions with them. The staff member's primary focus must always remain on the child, ensuring their care and supervision. The staff member agrees to act with the utmost professionalism and maintain strict privacy at all times.</em></li>
+            <li><em>Additionally, the staff member agrees not to share the family's contact details, phone numbers, or any personal information with anyone under any circumstances. Any breach of this provision will be considered a serious violation of confidentiality and may lead to immediate termination without compensation, as well as potential legal consequences.</em></li>
+        </ol>
+    @endif
+
     <div class="article-head">
         <p class="article-number">PASAL 11 / <em>ARTICLE 11</em></p>
+        <p class="article-title">KLAUSUL PERSETUJUAN MEDIA DAN KONTEN / <em>MEDIA AND CONTENT CONSENT CLAUSE</em></p>
+    </div>
+    <p class="ayat-label">Ayat 1</p>
+    <p>Karyawan menyetujui bahwa Staff Link dapat, dari waktu ke waktu, mengambil foto atau video Karyawan untuk keperluan bisnis, pemasaran, atau media sosial. Karyawan dengan ini memberikan persetujuan dan izin penuh kepada Staff Link untuk menggunakan, mempublikasikan, menggandakan, dan mendistribusikan konten tersebut dalam bentuk media apa pun, baik yang telah dikenal saat ini maupun yang akan dikembangkan di kemudian hari, tanpa adanya kompensasi tambahan apa pun.</p>
+    <p class="para-label">Paragraph 1</p>
+    <p><em>The staff member agrees that Staff Link may, from time to time, take photographs or videos of them for business, marketing, or social media purposes. The staff member hereby grants full consent and permission to Staff Link to use, publish, reproduce, and distribute such content in any form of media, whether now known or hereafter developed, without any further compensation.</em></p>
+
+    <p class="ayat-label">Ayat 2</p>
+    <p>Seluruh foto, video, dan konten media lainnya yang dihasilkan merupakan dan akan tetap menjadi milik eksklusif Staff Link, dengan seluruh hak dilindungi. Kepemilikan dan persetujuan ini tetap berlaku meskipun hubungan kerja Karyawan telah berakhir, baik karena pengunduran diri maupun pemutusan hubungan kerja.</p>
+    <p class="para-label">Paragraph 2</p>
+    <p><em>All photographs, videos, and other media content produced shall remain the sole property of Staff Link, with all rights reserved. This ownership and consent shall continue to apply even after the Employee's resignation or termination of employment.</em></p>
+
+    <p class="ayat-label">Ayat 3</p>
+    <p>Dengan menandatangani Kontrak ini, Karyawan menyatakan telah membaca, memahami, dan sepenuhnya menyetujui ketentuan-ketentuan tersebut di atas.</p>
+    <p class="para-label">Paragraph 3</p>
+    <p><em>By signing this contract, you fully consent and agree to these terms.</em></p>
+
+    <div class="article-head">
+        <p class="article-number">PASAL 12 / <em>ARTICLE 12</em></p>
         <p class="article-title">PERUBAHAN KETENTUAN DAN KETERPISAHAN / <em>VARIATION OF TERMS AND SEVERABILITY</em></p>
     </div>
     <p class="ayat-label">Ayat 1</p>
@@ -801,35 +961,35 @@
     <p><em>Such severance shall not affect the validity, enforceability, or legal effect of the remaining provisions of this Contract, which shall continue in full force and effect.</em></p>
 
     <div class="article-head">
-        <p class="article-number">PASAL 12 / <em>ARTICLE 12</em></p>
+        <p class="article-number">PASAL 13 / <em>ARTICLE 13</em></p>
         <p class="article-title">BERAKHIRNYA PERJANJIAN / <em>TERMINATION OF THE AGREEMENT</em></p>
     </div>
     <p>Selain sebagaimana diatur dalam ayat-ayat pada Pasal 8 Perjanjian ini, Perjanjian Kerja ini akan berakhir dengan sendirinya apabila PIHAK KEDUA meninggal dunia.</p>
     <p><em>In addition to the provisions stipulated in the clauses of Article 8 of this Agreement, this Employment Agreement shall automatically terminate if the EMPLOYEE passes away.</em></p>
 
     <div class="article-head">
-        <p class="article-number">PASAL 13 / <em>ARTICLE 13</em></p>
+        <p class="article-number">PASAL 14 / <em>ARTICLE 14</em></p>
         <p class="article-title">KEADAAN DARURAT / <em>FORCE MAJEURE</em></p>
     </div>
     <p>Perjanjian kerja ini batal dengan sendirinya jika karena keadaan atau situasi yang memaksa, seperti: bencana alam, pemberontakan, perang, huru-hara, kerusuhan, Peraturan Pemerintah atau apapun yang mengakibatkan perjanjian kerja ini tidak mungkin lagi untuk diwujudkan.</p>
     <p><em>This Employment Agreement shall be deemed null and void by operation of law in the event of force majeure circumstances, including but not limited to natural disasters, rebellion, war, riots, civil unrest, Government Regulations, or any other events that render the performance of this Employment Agreement impossible.</em></p>
 
     <div class="article-head">
-        <p class="article-number">PASAL 14 / <em>ARTICLE 14</em></p>
+        <p class="article-number">PASAL 15 / <em>ARTICLE 15</em></p>
         <p class="article-title">PENYELESAIAN PERSELISIHAN / <em>DISPUTE RESOLUTION</em></p>
     </div>
     <p>Setiap perselisihan yang terkait dengan kontrak ini akan diselesaikan melalui mediasi internal. Jika tidak terselesaikan, proses hukum dapat dilakukan berdasarkan hukum ketenagakerjaan Indonesia melalui lembaga hubungan industrial yang berwenang di Bali.</p>
     <p><em>Any dispute relating to this contract shall be resolved through internal mediation. If unresolved, legal proceedings may be brought under Indonesian labor law through the appropriate industrial relations authority in Bali.</em></p>
 
     <div class="article-head">
-        <p class="article-number">PASAL 15 / <em>ARTICLE 15</em></p>
+        <p class="article-number">PASAL 16 / <em>ARTICLE 16</em></p>
         <p class="article-title">BAHASA / <em>LANGUAGE</em></p>
     </div>
     <p>Perjanjian kerja ini dibuat dalam Bahasa Inggris dan Bahasa Indonesia. Jika terjadi perbedaan antara teks Bahasa Inggris dan teks Bahasa Indonesia, maka {{ $data['language_law_id'] ?? 'teks Bahasa Inggris yang berlaku' }} dan mengikat para pihak.</p>
     <p><em>Contract Agreement is made in English and in Bahasa. In the event of any conflict between the English text and the Indonesian text, {{ $data['language_law'] ?? 'English text shall prevail' }} and bind the parties.</em></p>
 
     <div class="article-head">
-        <p class="article-number">PASAL 16 / <em>ARTICLE 16</em></p>
+        <p class="article-number">PASAL 17 / <em>ARTICLE 17</em></p>
         <p class="article-title">PENUTUP / <em>CLOSING</em></p>
     </div>
     <p>Demikianlah perjanjian ini dibuat, disetujui, dan ditandatangani dalam rangkap dua, asli dan tembusan bermaterei cukup dan berkekuatan hukum yang sama. Satu dipegang oleh PIHAK PERTAMA dan lainnya untuk PIHAK KEDUA.</p>

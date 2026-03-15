@@ -75,8 +75,8 @@
                     </div>
                 </div>
 
-                <div class="section-card grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div class="md:col-span-2">
+                <div class="section-card grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div class="md:col-span-3">
                         <p class="text-sm font-semibold text-gray-800">1. Position Category</p>
                     </div>
                     <div>
@@ -89,6 +89,13 @@
                                     {{ $division->name }}
                                 </option>
                             @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label for="sub_division_id" class="block text-sm font-medium text-gray-700 mb-2">Sub-Division</label>
+                        <select id="sub_division_id" name="sub_division_id"
+                            class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#287854] focus:border-transparent bg-white">
+                            <option value="">Select sub-division</option>
                         </select>
                     </div>
                     <div>
@@ -339,56 +346,105 @@
                 <div class="section-card">
                     <div class="flex items-center justify-between gap-3 mb-2">
                         <label class="block text-sm font-medium text-gray-700">Responsibilities</label>
-                        <button type="button" id="open-responsibility-modal"
-                            class="inline-flex items-center justify-center rounded-full bg-[#287854] text-white w-8 h-8 text-lg leading-none hover:bg-[#1f5f46]"
-                            aria-label="Add responsibility">+</button>
+                        @if ($canCreateResponsibilities ?? false)
+                            <button type="button" id="open-responsibility-modal"
+                                class="inline-flex items-center justify-center rounded-full bg-[#287854] text-white w-8 h-8 text-lg leading-none hover:bg-[#1f5f46]"
+                                aria-label="Add responsibility">+</button>
+                        @endif
+                    </div>
+                    <div class="mb-3 grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div>
+                            <label for="responsibility-role-select" class="block text-sm font-medium text-gray-700 mb-2">Select responsibilities for the required role</label>
+                            <select id="responsibility-role-select"
+                                class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#287854] focus:border-transparent bg-white">
+                                <option value="">Select role name</option>
+                                @foreach ($divisions as $division)
+                                    @foreach ($division->positions as $position)
+                                        <option value="{{ $position->id }}" {{ (string) old('position_id') === (string) $position->id ? 'selected' : '' }}>
+                                            {{ $position->name }}
+                                        </option>
+                                    @endforeach
+                                @endforeach
+                            </select>
+                            <p class="mt-1 text-xs text-gray-500">This follows the selected Position Title above.</p>
+                        </div>
+                        <div>
+                            <label for="responsibility-search" class="block text-sm font-medium text-gray-700 mb-2">Search Responsibilities</label>
+                            <input type="search" id="responsibility-search"
+                                class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#287854] focus:border-transparent"
+                                placeholder="Search responsibilities by title or description">
+                        </div>
                     </div>
                     <input type="hidden" id="responsibilities" name="responsibilities" value="{{ old('responsibilities') }}">
+                    <div class="mb-3 space-y-2">
+                        <p id="responsibility-search-status" class="text-xs text-gray-500">Showing all responsibilities.</p>
+                        @if ($canEditResponsibilities ?? false)
+                            <div class="flex items-center justify-end">
+                                <button type="button" id="bulk-delete-responsibilities"
+                                    class="inline-flex items-center rounded-md border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-100">
+                                    Delete Checked
+                                </button>
+                            </div>
+                        @elseif ($canCreateResponsibilities ?? false)
+                            <p class="text-xs text-amber-700">Admin can add new responsibility data, but only super admin can select, edit, or delete existing responsibility data on this page.</p>
+                        @else
+                            <p class="text-xs text-amber-700">Only super admin can manage responsibility master data on this page.</p>
+                        @endif
+                    </div>
                     <div id="responsibility-list" class="space-y-3 rounded-lg border border-gray-200 bg-gray-50 p-4"></div>
-                    <p class="mt-2 text-xs text-gray-500">Tick responsibilities to include in Ayat 2 (Indonesia) and Paragraph 2 (English). Each responsibility stores 4 fields: Judul + Deskripsi (ID), Title + Description (EN).</p>
+                    <p class="mt-2 text-xs text-gray-500">
+                        @if ($canSelectResponsibilities ?? false)
+                            Tick responsibilities to include in Ayat 2 (Indonesia) and Paragraph 2 (English).
+                        @else
+                            All responsibilities for the selected role will be included automatically in Ayat 2 (Indonesia) and Paragraph 2 (English).
+                        @endif
+                        Each responsibility stores 4 fields: Judul + Deskripsi (ID), Title + Description (EN).
+                    </p>
                 </div>
 
-                <div id="responsibility-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40 p-4">
-                    <div class="w-full max-w-lg rounded-xl bg-white shadow-xl border border-gray-200">
-                        <div class="px-6 py-4 border-b">
-                            <h4 class="text-lg font-semibold text-gray-900">Create New Responsibility</h4>
-                        </div>
-                        <div class="p-6 space-y-4">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label for="new_responsibility_title_id" class="block text-sm font-medium text-gray-700 mb-2">Judul (ID)</label>
-                                    <input type="text" id="new_responsibility_title_id"
-                                        class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#287854] focus:border-transparent"
-                                        placeholder="Contoh: Interaksi dengan Klien">
+                @if ($canCreateResponsibilities ?? false)
+                    <div id="responsibility-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40 p-4">
+                        <div class="w-full max-w-lg rounded-xl bg-white shadow-xl border border-gray-200">
+                            <div class="px-6 py-4 border-b">
+                                <h4 class="text-lg font-semibold text-gray-900">Create New Responsibility</h4>
+                            </div>
+                            <div class="p-6 space-y-4">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label for="new_responsibility_title_id" class="block text-sm font-medium text-gray-700 mb-2">Judul (ID)</label>
+                                        <input type="text" id="new_responsibility_title_id"
+                                            class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#287854] focus:border-transparent"
+                                            placeholder="Contoh: Interaksi dengan Klien">
+                                    </div>
+                                    <div>
+                                        <label for="new_responsibility_title_en" class="block text-sm font-medium text-gray-700 mb-2">Title (EN)</label>
+                                        <input type="text" id="new_responsibility_title_en"
+                                            class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#287854] focus:border-transparent"
+                                            placeholder="Example: Client Engagement">
+                                    </div>
                                 </div>
-                                <div>
-                                    <label for="new_responsibility_title_en" class="block text-sm font-medium text-gray-700 mb-2">Title (EN)</label>
-                                    <input type="text" id="new_responsibility_title_en"
-                                        class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#287854] focus:border-transparent"
-                                        placeholder="Example: Client Engagement">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label for="new_responsibility_description_id" class="block text-sm font-medium text-gray-700 mb-2">Deskripsi (ID)</label>
+                                        <textarea id="new_responsibility_description_id" rows="4"
+                                            class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#287854] focus:border-transparent"
+                                            placeholder="Tulis deskripsi tanggung jawab dalam Bahasa Indonesia"></textarea>
+                                    </div>
+                                    <div>
+                                        <label for="new_responsibility_description_en" class="block text-sm font-medium text-gray-700 mb-2">Description (EN)</label>
+                                        <textarea id="new_responsibility_description_en" rows="4"
+                                            class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#287854] focus:border-transparent"
+                                            placeholder="Write responsibility description in English"></textarea>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label for="new_responsibility_description_id" class="block text-sm font-medium text-gray-700 mb-2">Deskripsi (ID)</label>
-                                    <textarea id="new_responsibility_description_id" rows="4"
-                                        class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#287854] focus:border-transparent"
-                                        placeholder="Tulis deskripsi tanggung jawab dalam Bahasa Indonesia"></textarea>
-                                </div>
-                                <div>
-                                    <label for="new_responsibility_description_en" class="block text-sm font-medium text-gray-700 mb-2">Description (EN)</label>
-                                    <textarea id="new_responsibility_description_en" rows="4"
-                                        class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#287854] focus:border-transparent"
-                                        placeholder="Write responsibility description in English"></textarea>
-                                </div>
+                            <div class="px-6 py-4 border-t flex items-center justify-end gap-3">
+                                <button type="button" id="cancel-responsibility-modal" class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50">Cancel</button>
+                                <button type="button" id="save-responsibility-modal" class="px-4 py-2 rounded-lg bg-[#287854] text-white hover:bg-[#1f5f46]">Add Responsibility</button>
                             </div>
-                        </div>
-                        <div class="px-6 py-4 border-t flex items-center justify-end gap-3">
-                            <button type="button" id="cancel-responsibility-modal" class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50">Cancel</button>
-                            <button type="button" id="save-responsibility-modal" class="px-4 py-2 rounded-lg bg-[#287854] text-white hover:bg-[#1f5f46]">Add Responsibility</button>
                         </div>
                     </div>
-                </div>
+                @endif
 
                 <div class="section-card">
                     <label for="additional_terms" class="block text-sm font-medium text-gray-700 mb-2">Additional Terms</label>
@@ -472,12 +528,20 @@
     <script src="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js"></script>
     <script>
         (() => {
+            const canCreateResponsibilities = @json($canCreateResponsibilities ?? false);
+            const canEditResponsibilities = @json($canEditResponsibilities ?? false);
+            const canSelectResponsibilities = @json($canSelectResponsibilities ?? false);
             const listEl = document.getElementById('responsibility-list');
             const hiddenInput = document.getElementById('responsibilities');
+            const responsibilityRoleSelect = document.getElementById('responsibility-role-select');
+            const responsibilitySearchInput = document.getElementById('responsibility-search');
+            const responsibilitySearchStatus = document.getElementById('responsibility-search-status');
+            const bulkDeleteBtn = document.getElementById('bulk-delete-responsibilities');
             const modal = document.getElementById('responsibility-modal');
             const openModalBtn = document.getElementById('open-responsibility-modal');
             const cancelModalBtn = document.getElementById('cancel-responsibility-modal');
             const saveModalBtn = document.getElementById('save-responsibility-modal');
+            const modalTitleEl = modal?.querySelector('h4');
             const newTitleIdInput = document.getElementById('new_responsibility_title_id');
             const newDescIdInput = document.getElementById('new_responsibility_description_id');
             const newTitleEnInput = document.getElementById('new_responsibility_title_en');
@@ -493,6 +557,7 @@
             const roleBriefInput = document.getElementById('role_brief_points');
             const csrfToken = document.querySelector('input[name="_token"]')?.value || '';
             const divisionSelect = document.getElementById('division');
+            const subDivisionSelect = document.getElementById('sub_division_id');
             const positionSelect = document.getElementById('position_id');
             const bpjsEmploymentSelect = document.getElementById('bpjs_employment_status');
             const bpjsComponentsWrap = document.getElementById('bpjs-employment-components');
@@ -502,8 +567,11 @@
             const transportAllowanceInput = document.getElementById('transport_allowance');
             const salaryTotalInput = document.getElementById('salary_total');
             const oldPositionId = @json(old('position_id'));
+            const oldSubDivisionId = @json(old('sub_division_id'));
             let restoredDraftPositionId = null;
+            let restoredDraftSubDivisionId = null;
             const positionsByDivision = @json(($divisions ?? [])->mapWithKeys(fn($d) => [$d->id => ($d->positions ?? [])->map(fn($p) => ['id' => $p->id, 'name' => $p->name])->values()]));
+            const subDivisionsByDivision = @json($subDivisionsByDivision ?? []);
             const draftStorageKey = 'stafflink_contract_create_draft_v1';
             const autosaveIntervalMs = 5 * 60 * 1000;
             const quill = roleBriefEditor
@@ -519,24 +587,18 @@
                 })
                 : null;
 
-            let responsibilities = @json($responsibilityLibrary ?? []);
-            responsibilities = (Array.isArray(responsibilities) ? responsibilities : []).map((item) => {
-                const normalized = {
-                    title_id: String(item?.title_id || item?.title || '').trim(),
-                    description_id: String(item?.description_id || item?.description || '').trim(),
-                    title_en: String(item?.title_en || item?.title || '').trim(),
-                    description_en: String(item?.description_en || item?.description || '').trim(),
-                };
-
-                if (!normalized.title_id) normalized.title_id = normalized.title_en;
-                if (!normalized.title_en) normalized.title_en = normalized.title_id;
-
-                return normalized;
-            }).filter((item) => item.title_id || item.title_en);
+            const responsibilitiesByPosition = @json($responsibilitiesByPosition ?? []);
+            const responsibilityDestroyUrlTemplate = "{{ route('admin.contracts.responsibilities.destroy', ['responsibility' => '__RESPONSIBILITY_ID__']) }}";
+            const responsibilityUpdateUrlTemplate = "{{ route('admin.contracts.responsibilities.update', ['responsibility' => '__RESPONSIBILITY_ID__']) }}";
+            const responsibilityBulkDestroyUrl = "{{ route('admin.contracts.responsibilities.bulk-destroy') }}";
+            let responsibilities = [];
             const oldRaw = @json(old('responsibilities'));
 
             const checkedMap = new Map();
             let draftDirty = false;
+            let responsibilitySearchTerm = '';
+            let oldResponsibilitiesApplied = false;
+            let editingResponsibilityId = null;
 
             const setDraftStatus = (savedAt) => {
                 if (!draftStatusEl) {
@@ -562,6 +624,64 @@
                 }
 
                 draftStatusEl.textContent = 'Unsaved changes detected. Next autosave runs within 5 minutes.';
+            };
+
+            const normalizeResponsibilityItem = (item) => {
+                const normalized = {
+                    id: item?.id ? Number(item.id) : null,
+                    position_id: item?.position_id ? Number(item.position_id) : null,
+                    title_id: String(item?.title_id || item?.title || '').trim(),
+                    description_id: String(item?.description_id || item?.description || '').trim(),
+                    title_en: String(item?.title_en || item?.title || '').trim(),
+                    description_en: String(item?.description_en || item?.description || '').trim(),
+                };
+
+                if (!normalized.title_id) normalized.title_id = normalized.title_en;
+                if (!normalized.title_en) normalized.title_en = normalized.title_id;
+
+                return normalized;
+            };
+
+            const setResponsibilitiesForPosition = (positionId) => {
+                const sourceItems = Array.isArray(responsibilitiesByPosition?.[String(positionId)])
+                    ? responsibilitiesByPosition[String(positionId)]
+                    : [];
+
+                responsibilities = sourceItems
+                    .map((item) => normalizeResponsibilityItem(item))
+                    .filter((item) => item.title_id || item.title_en);
+
+                checkedMap.clear();
+                responsibilities.forEach((_, index) => checkedMap.set(index, true));
+            };
+
+            const removeResponsibilityById = (positionId, responsibilityId) => {
+                const key = String(positionId || '');
+                if (!Array.isArray(responsibilitiesByPosition[key])) {
+                    return;
+                }
+
+                responsibilitiesByPosition[key] = responsibilitiesByPosition[key]
+                    .filter((item) => Number(item?.id || 0) !== Number(responsibilityId));
+            };
+
+            const updateResponsibilityById = (positionId, updatedItem) => {
+                const key = String(positionId || '');
+                if (!Array.isArray(responsibilitiesByPosition[key])) {
+                    return;
+                }
+
+                const targetId = Number(updatedItem?.id || 0);
+                responsibilitiesByPosition[key] = responsibilitiesByPosition[key].map((item) => {
+                    if (Number(item?.id || 0) !== targetId) {
+                        return item;
+                    }
+
+                    return {
+                        ...item,
+                        ...updatedItem,
+                    };
+                });
             };
 
             const applyResponsibilitiesFromRaw = (raw) => {
@@ -634,7 +754,7 @@
 
             const syncHiddenInput = () => {
                 const selected = responsibilities
-                    .filter((_, index) => checkedMap.get(index))
+                    .filter((_, index) => !canSelectResponsibilities || checkedMap.get(index))
                     .map((item) => ({
                         title_id: String(item.title_id || '').trim(),
                         description_id: String(item.description_id || '').trim(),
@@ -644,24 +764,59 @@
                 hiddenInput.value = JSON.stringify(selected);
             };
 
+            const normalizeResponsibilitySearch = (value) => String(value || '').trim().toLowerCase();
+
+            const matchesResponsibilitySearch = (item) => {
+                if (!responsibilitySearchTerm) {
+                    return true;
+                }
+
+                const haystack = [
+                    item.title_id,
+                    item.description_id,
+                    item.title_en,
+                    item.description_en,
+                ].map((value) => normalizeResponsibilitySearch(value)).join(' ');
+
+                return haystack.includes(responsibilitySearchTerm);
+            };
+
+            const updateResponsibilitySearchStatus = (visibleCount, totalCount) => {
+                if (!responsibilitySearchStatus) {
+                    return;
+                }
+
+                if (!responsibilitySearchTerm) {
+                    responsibilitySearchStatus.textContent = `Showing all responsibilities (${totalCount}).`;
+                    return;
+                }
+
+                responsibilitySearchStatus.textContent = `Showing ${visibleCount} of ${totalCount} responsibilities for "${responsibilitySearchTerm}".`;
+            };
+
             const renderList = () => {
                 listEl.innerHTML = '';
-                responsibilities.forEach((item, index) => {
-                    const wrapper = document.createElement('label');
+                const filteredResponsibilities = responsibilities
+                    .map((item, index) => ({ item, index }))
+                    .filter(({ item }) => matchesResponsibilitySearch(item));
+
+                updateResponsibilitySearchStatus(filteredResponsibilities.length, responsibilities.length);
+
+                if (filteredResponsibilities.length === 0) {
+                    const emptyState = document.createElement('div');
+                    emptyState.className = 'rounded-lg border border-dashed border-gray-300 bg-white px-4 py-5 text-sm text-gray-500';
+                    emptyState.textContent = 'No responsibilities match your search.';
+                    listEl.appendChild(emptyState);
+                    syncHiddenInput();
+                    return;
+                }
+
+                filteredResponsibilities.forEach(({ item, index }) => {
+                    const wrapper = document.createElement(canSelectResponsibilities ? 'label' : 'div');
                     wrapper.className = 'flex items-start gap-3 rounded-lg border border-gray-200 bg-white px-4 py-3';
 
-                    const checkbox = document.createElement('input');
-                    checkbox.type = 'checkbox';
-                    checkbox.className = 'mt-1 h-4 w-4 rounded border-gray-300 text-[#287854] focus:ring-[#287854]';
-                    checkbox.checked = Boolean(checkedMap.get(index));
-                    checkbox.addEventListener('change', () => {
-                        checkedMap.set(index, checkbox.checked);
-                        syncHiddenInput();
-                        markDraftDirty();
-                    });
-
                     const textWrap = document.createElement('div');
-                    textWrap.className = 'text-sm';
+                    textWrap.className = 'text-sm flex-1';
                     const titleIdEl = document.createElement('p');
                     titleIdEl.className = 'font-semibold text-gray-900';
                     titleIdEl.textContent = `ID: ${item.title_id || '-'}`;
@@ -681,8 +836,97 @@
                     textWrap.appendChild(titleEnEl);
                     textWrap.appendChild(descEnEl);
 
-                    wrapper.appendChild(checkbox);
+                    let actionWrap = null;
+                    if (canEditResponsibilities && item.id) {
+                        actionWrap = document.createElement('div');
+                        actionWrap.className = 'ml-3 flex flex-col gap-1';
+
+                        const editBtn = document.createElement('button');
+                        editBtn.type = 'button';
+                        editBtn.className = 'inline-flex items-center rounded-md border border-blue-200 bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 hover:bg-blue-100';
+                        editBtn.textContent = 'Edit';
+                        editBtn.addEventListener('click', (event) => {
+                            event.preventDefault();
+                            event.stopPropagation();
+
+                            editingResponsibilityId = Number(item.id);
+                            newTitleIdInput.value = item.title_id || '';
+                            newDescIdInput.value = item.description_id || '';
+                            newTitleEnInput.value = item.title_en || '';
+                            newDescEnInput.value = item.description_en || '';
+
+                            if (modalTitleEl) {
+                                modalTitleEl.textContent = 'Edit Responsibility';
+                            }
+                            saveModalBtn.textContent = 'Update Responsibility';
+
+                            modal.classList.remove('hidden');
+                            modal.classList.add('flex');
+                            newTitleIdInput.focus();
+                        });
+
+                        const deleteBtn = document.createElement('button');
+                        deleteBtn.type = 'button';
+                        deleteBtn.className = 'inline-flex items-center rounded-md border border-red-200 bg-red-50 px-2 py-1 text-xs font-medium text-red-700 hover:bg-red-100';
+                        deleteBtn.textContent = 'Delete';
+                        deleteBtn.addEventListener('click', (event) => {
+                            event.preventDefault();
+                            event.stopPropagation();
+
+                            const confirmed = window.confirm('Delete this responsibility? This action cannot be undone.');
+                            if (!confirmed) {
+                                return;
+                            }
+
+                            const selectedPositionId = String(positionSelect?.value || responsibilityRoleSelect?.value || item.position_id || '');
+                            const targetUrl = responsibilityDestroyUrlTemplate.replace('__RESPONSIBILITY_ID__', String(item.id));
+
+                            fetch(targetUrl, {
+                                method: 'DELETE',
+                                headers: {
+                                    'X-CSRF-TOKEN': csrfToken,
+                                    'Accept': 'application/json',
+                                },
+                            })
+                                .then((response) => {
+                                    if (!response.ok) {
+                                        throw new Error('Unable to delete responsibility.');
+                                    }
+
+                                    return response.json();
+                                })
+                                .then(() => {
+                                    removeResponsibilityById(selectedPositionId, item.id);
+                                    setResponsibilitiesForPosition(selectedPositionId);
+                                    renderList();
+                                    markDraftDirty();
+                                })
+                                .catch(() => {
+                                    alert('Failed to delete responsibility. Please try again.');
+                                });
+                        });
+
+                        actionWrap.appendChild(editBtn);
+                        actionWrap.appendChild(deleteBtn);
+                    }
+
+                    if (canSelectResponsibilities) {
+                        const checkbox = document.createElement('input');
+                        checkbox.type = 'checkbox';
+                        checkbox.className = 'mt-1 h-4 w-4 rounded border-gray-300 text-[#287854] focus:ring-[#287854]';
+                        checkbox.checked = Boolean(checkedMap.get(index));
+                        checkbox.addEventListener('change', () => {
+                            checkedMap.set(index, checkbox.checked);
+                            syncHiddenInput();
+                            markDraftDirty();
+                        });
+
+                        wrapper.appendChild(checkbox);
+                    }
                     wrapper.appendChild(textWrap);
+                    if (canEditResponsibilities && item.id) {
+                        wrapper.appendChild(actionWrap);
+                    }
                     listEl.appendChild(wrapper);
                 });
                 syncHiddenInput();
@@ -697,36 +941,55 @@
             const closeModal = () => {
                 modal.classList.add('hidden');
                 modal.classList.remove('flex');
+                editingResponsibilityId = null;
+                if (modalTitleEl) {
+                    modalTitleEl.textContent = 'Create New Responsibility';
+                }
+                saveModalBtn.textContent = 'Add Responsibility';
                 newTitleIdInput.value = '';
                 newDescIdInput.value = '';
                 newTitleEnInput.value = '';
                 newDescEnInput.value = '';
             };
 
-            openModalBtn.addEventListener('click', openModal);
-            cancelModalBtn.addEventListener('click', closeModal);
-            modal.addEventListener('click', (event) => {
-                if (event.target === modal) closeModal();
-            });
+            if (canCreateResponsibilities && openModalBtn && cancelModalBtn && modal && saveModalBtn) {
+                openModalBtn.addEventListener('click', openModal);
+                cancelModalBtn.addEventListener('click', closeModal);
+                modal.addEventListener('click', (event) => {
+                    if (event.target === modal) closeModal();
+                });
+            }
 
-            saveModalBtn.addEventListener('click', () => {
+            saveModalBtn?.addEventListener('click', () => {
                 const titleId = newTitleIdInput.value.trim();
                 const descId = newDescIdInput.value.trim();
                 const titleEn = newTitleEnInput.value.trim();
                 const descEn = newDescEnInput.value.trim();
+                const selectedPositionId = String(positionSelect?.value || responsibilityRoleSelect?.value || '');
 
                 if (!titleId || !titleEn) return;
+                if (!selectedPositionId) {
+                    alert('Please select a role/position first before adding responsibility.');
+                    return;
+                }
                 saveModalBtn.disabled = true;
                 saveModalBtn.classList.add('opacity-70', 'cursor-not-allowed');
 
-                fetch("{{ route('admin.contracts.responsibilities.store') }}", {
-                    method: 'POST',
+                const isEditing = Number.isInteger(editingResponsibilityId) && editingResponsibilityId > 0;
+                const requestUrl = isEditing
+                    ? responsibilityUpdateUrlTemplate.replace('__RESPONSIBILITY_ID__', String(editingResponsibilityId))
+                    : "{{ route('admin.contracts.responsibilities.store') }}";
+                const requestMethod = isEditing ? 'PATCH' : 'POST';
+
+                fetch(requestUrl, {
+                    method: requestMethod,
                     headers: {
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': csrfToken,
                         'Accept': 'application/json',
                     },
                     body: JSON.stringify({
+                        position_id: selectedPositionId,
                         title_id: titleId,
                         description_id: descId,
                         title_en: titleEn,
@@ -739,14 +1002,29 @@
                         }
                         return response.json();
                     })
-                    .then(() => {
-                        responsibilities.push({
+                    .then((payload) => {
+                        const savedItem = normalizeResponsibilityItem(payload?.item || {
                             title_id: titleId,
                             description_id: descId,
                             title_en: titleEn,
                             description_en: descEn,
                         });
+
+                        if (!Array.isArray(responsibilitiesByPosition[selectedPositionId])) {
+                            responsibilitiesByPosition[selectedPositionId] = [];
+                        }
+
+                        if (isEditing) {
+                            updateResponsibilityById(selectedPositionId, savedItem);
+                        } else {
+                            responsibilitiesByPosition[selectedPositionId].push(savedItem);
+                        }
+                        setResponsibilitiesForPosition(selectedPositionId);
                         checkedMap.set(responsibilities.length - 1, true);
+                        if (responsibilitySearchInput) {
+                            responsibilitySearchInput.value = '';
+                        }
+                        responsibilitySearchTerm = '';
                         renderList();
                         markDraftDirty();
                         closeModal();
@@ -759,6 +1037,58 @@
                         saveModalBtn.classList.remove('opacity-70', 'cursor-not-allowed');
                     });
             });
+
+            if (canEditResponsibilities && bulkDeleteBtn) {
+                bulkDeleteBtn.addEventListener('click', () => {
+                    const selectedPositionId = String(positionSelect?.value || responsibilityRoleSelect?.value || '');
+                    const selectedIds = responsibilities
+                        .filter((item, index) => checkedMap.get(index) && item.id)
+                        .map((item) => Number(item.id));
+
+                    if (selectedIds.length === 0) {
+                        alert('Select at least one responsibility to delete.');
+                        return;
+                    }
+
+                    const confirmed = window.confirm(`Delete ${selectedIds.length} checked responsibilities? This action cannot be undone.`);
+                    if (!confirmed) {
+                        return;
+                    }
+
+                    bulkDeleteBtn.disabled = true;
+                    bulkDeleteBtn.classList.add('opacity-70', 'cursor-not-allowed');
+
+                    fetch(responsibilityBulkDestroyUrl, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken,
+                            'Accept': 'application/json',
+                        },
+                        body: JSON.stringify({ ids: selectedIds }),
+                    })
+                        .then((response) => {
+                            if (!response.ok) {
+                                throw new Error('Unable to bulk delete responsibilities.');
+                            }
+
+                            return response.json();
+                        })
+                        .then(() => {
+                            selectedIds.forEach((id) => removeResponsibilityById(selectedPositionId, id));
+                            setResponsibilitiesForPosition(selectedPositionId);
+                            renderList();
+                            markDraftDirty();
+                        })
+                        .catch(() => {
+                            alert('Failed to delete checked responsibilities. Please try again.');
+                        })
+                        .finally(() => {
+                            bulkDeleteBtn.disabled = false;
+                            bulkDeleteBtn.classList.remove('opacity-70', 'cursor-not-allowed');
+                        });
+                });
+            }
 
             const setEditorFromHidden = () => {
                 if (!quill) {
@@ -852,6 +1182,10 @@
                             restoredDraftPositionId = String(value ?? '');
                         }
 
+                        if (name === 'sub_division_id') {
+                            restoredDraftSubDivisionId = String(value ?? '');
+                        }
+
                         if (field instanceof RadioNodeList) {
                             return;
                         }
@@ -882,17 +1216,17 @@
                 quill.on('text-change', markDraftDirty);
             }
 
+            if (responsibilitySearchInput) {
+                responsibilitySearchInput.addEventListener('input', () => {
+                    responsibilitySearchTerm = normalizeResponsibilitySearch(responsibilitySearchInput.value);
+                    renderList();
+                });
+            }
+
             restoreDraft();
 
             setEditorFromHidden();
             syncRoleBriefInput();
-
-            parseOldResponsibilities();
-            if (hiddenInput.value && hiddenInput.value !== oldRaw) {
-                applyResponsibilitiesFromRaw(hiddenInput.value);
-            }
-            if (!oldRaw && !hiddenInput.value) defaultAllChecked();
-            renderList();
 
             const renderPositionsForDivision = () => {
                 if (!positionSelect || !divisionSelect) {
@@ -919,12 +1253,84 @@
                 }
             };
 
+            const renderSubDivisionsForDivision = () => {
+                if (!subDivisionSelect || !divisionSelect) {
+                    return;
+                }
+
+                const selectedDivision = String(divisionSelect.value || '');
+                const subDivisions = subDivisionsByDivision[selectedDivision] || [];
+                const previousValue = String(subDivisionSelect.value || restoredDraftSubDivisionId || oldSubDivisionId || '');
+
+                subDivisionSelect.innerHTML = '<option value="">Select sub-division</option>';
+                subDivisions.forEach((subDivision) => {
+                    const option = document.createElement('option');
+                    option.value = String(subDivision.id);
+                    option.textContent = subDivision.name;
+                    if (String(subDivision.id) === previousValue) {
+                        option.selected = true;
+                    }
+                    subDivisionSelect.appendChild(option);
+                });
+
+                if (subDivisions.length === 0) {
+                    subDivisionSelect.value = '';
+                }
+            };
+
+            const syncResponsibilityRoleSelect = () => {
+                if (!responsibilityRoleSelect || !positionSelect) {
+                    return;
+                }
+
+                responsibilityRoleSelect.value = String(positionSelect.value || '');
+                responsibilityRoleSelect.disabled = true;
+            };
+
+            const initializeResponsibilitiesForCurrentPosition = () => {
+                const selectedRoleId = String(positionSelect?.value || responsibilityRoleSelect?.value || '');
+                setResponsibilitiesForPosition(selectedRoleId);
+
+                if (!oldResponsibilitiesApplied) {
+                    parseOldResponsibilities();
+                    if (hiddenInput.value && hiddenInput.value !== oldRaw) {
+                        applyResponsibilitiesFromRaw(hiddenInput.value);
+                    }
+                    if (!oldRaw && !hiddenInput.value) {
+                        defaultAllChecked();
+                    }
+                    oldResponsibilitiesApplied = true;
+                }
+
+                renderList();
+            };
+
             if (divisionSelect) {
                 divisionSelect.addEventListener('change', () => {
+                    if (subDivisionSelect) {
+                        subDivisionSelect.value = '';
+                    }
                     positionSelect.value = '';
+                    renderSubDivisionsForDivision();
                     renderPositionsForDivision();
+                    syncResponsibilityRoleSelect();
+                    initializeResponsibilitiesForCurrentPosition();
                 });
+                renderSubDivisionsForDivision();
                 renderPositionsForDivision();
+                syncResponsibilityRoleSelect();
+                initializeResponsibilitiesForCurrentPosition();
+            }
+
+            if (positionSelect) {
+                positionSelect.addEventListener('change', () => {
+                    syncResponsibilityRoleSelect();
+                    initializeResponsibilitiesForCurrentPosition();
+                });
+            }
+
+            if (subDivisionSelect) {
+                subDivisionSelect.addEventListener('change', markDraftDirty);
             }
 
             const syncLanguageLawTranslation = () => {
